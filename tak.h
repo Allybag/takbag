@@ -1,47 +1,12 @@
+#pragma once
 #include <cstddef>
 
 #include <vector>
 #include <string>
 #include <unordered_map>
 
-enum class Player
-{
-    White,
-    Black
-};
-
-enum class Stone : uint8_t
-{
-    Blank = 0,
-    WhiteFlat = 1,
-    WhiteWall = 2,
-    WhiteCap  = 3,
-    BlackFlat = 5,
-    BlackWall = 6,
-    BlackCap  = 7,
-};
-
-template <typename Value>
-struct PlayerPair
-{
-    Value White;
-    Value Black;
-
-    explicit PlayerPair(Value value) : PlayerPair(value, value) { }
-    PlayerPair(Value white, Value black) : White(white), Black(black) { }
-
-    PlayerPair() = delete;
-    PlayerPair(const PlayerPair&) = default;
-    PlayerPair(PlayerPair&&) = default;
-    PlayerPair& operator=(const PlayerPair&) = default;
-    PlayerPair& operator=(PlayerPair&&) = default;
-    ~PlayerPair() = default;
-
-
-    Value& operator[](Player player) { return player == Player::White ? White : Black; }
-    const Value& operator[](Player player) const { return player == Player::White ? White : Black; }
-
-};
+#include "Stone.h"
+#include "Player.h"
 
 struct Square
 {
@@ -55,7 +20,20 @@ struct Square
     }
 
     Square() : topStone(Stone::Blank), reserveCount(0), stack(0) { }
+    Square(const Square&) noexcept = default;
+    Square(Square&&) noexcept = default;
+    Square& operator=(const Square&) noexcept = default;
+    Square& operator=(Square&&) noexcept = default;
+    ~Square() = default;
+};
 
+static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> pieceCounts = {
+        std::make_pair(3, std::make_pair(10, 0)),
+        std::make_pair(4, std::make_pair(15, 0)),
+        std::make_pair(5, std::make_pair(21, 1)),
+        std::make_pair(6, std::make_pair(30, 1)),
+        std::make_pair(7, std::make_pair(40, 2)), // Sometimes played with just one capStone
+        std::make_pair(8, std::make_pair(50, 2)),
 };
 
 class Position
@@ -64,10 +42,9 @@ class Position
     std::vector<Square> mBoard;
     Player mToPlay;
 
-    // On playtak.com these are now customisable, but the rules say:
-    // 4x4 -> 15 flats and no caps, 5x5 -> 21 flats and 1 cap, 6x6 -> 30 flats and 1 cap, 8x8 -> 50 flats and 2 caps
-    PlayerPair<std::size_t> mFlatReserves {21, 21};
-    PlayerPair<std::size_t> mCapReserves {1, 1};
+    PlayerPair<std::size_t> mFlatReserves;
+    PlayerPair<std::size_t> mCapReserves;
 
-    explicit Position(std::size_t size) : mSize(size), mToPlay(Player::White) { }
+    explicit Position(std::size_t size) : mSize(size), mToPlay(Player::White),
+        mFlatReserves(PlayerPair{pieceCounts[size].first}), mCapReserves(PlayerPair{pieceCounts[size].second}) { }
 };
