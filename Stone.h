@@ -5,17 +5,19 @@
 #include <type_traits>
 
 // Let us use bitwise operations on our scoped enums
-template <typename Enum>
-inline constexpr auto operator|(Enum lhs, Enum rhs) -> typename std::underlying_type<Enum>::type
+template <typename LeftEnum, typename RightEnum>
+inline constexpr auto operator|(LeftEnum lhs, RightEnum rhs) -> typename std::underlying_type<LeftEnum>::type
 {
-    using underType = typename std::underlying_type<Enum>::type;
+    using underType = typename std::underlying_type<LeftEnum>::type;
+    static_assert(std::is_same<underType, typename std::underlying_type<RightEnum>::type>::value);
     return static_cast<underType>(lhs) | static_cast<underType>(rhs);
 }
 
-template <typename Enum>
-inline constexpr auto operator&(Enum lhs, Enum rhs) -> typename std::underlying_type<Enum>::type
+template <typename LeftEnum, typename RightEnum>
+inline constexpr auto operator&(LeftEnum lhs, RightEnum rhs) -> typename std::underlying_type<LeftEnum>::type
 {
-    using underType = typename std::underlying_type<Enum>::type;
+    using underType = typename std::underlying_type<LeftEnum>::type;
+    static_assert(std::is_same<underType, typename std::underlying_type<RightEnum>::type>::value);
     return static_cast<underType>(lhs) & static_cast<underType>(rhs);
 }
 
