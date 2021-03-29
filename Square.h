@@ -3,6 +3,7 @@
 #include "Stone.h"
 
 #include <string>
+#include <sstream>
 
 struct Square
 {
@@ -28,33 +29,33 @@ std::size_t Square::count() const
 
 std::string Square::print()
 {
-    std::string output;
+    std::stringstream output;
     switch (topStone)
     {
         case Stone::Blank:
-            return "";
+            return " ";
         case Stone::WhiteFlat:
-            output.append("F");
+            output << "F";
             break;
         case Stone::BlackFlat:
-            output.append("f");
+            output << "f";
             break;
         case Stone::WhiteWall:
-            output.append("S");
+            output << "S";
             break;
         case Stone::BlackWall:
-            output.append("s");
+            output << "s";
             break;
         case Stone::WhiteCap:
-            output.append("C");
+            output << "C";
             break;
         case Stone::BlackCap:
-            output.append("c");
+            output << "c";
             break;
     }
 
     for (std::size_t i = 0; i < reserveCount; ++i)
-        output.append(stack & (1 >> i) ? "f" : "F");
+        output << (stack & (1 >> i) ? "f" : "F");
 
-    return output;
+    return output.str();
 }

@@ -1,10 +1,27 @@
 #pragma once
 
+#include <iostream>
+
 enum class Player
 {
     White,
     Black
 };
+
+std::ostream& operator<<(std::ostream& stream, Player player)
+{
+    switch (player)
+    {
+        case Player::White:
+            stream << "White";
+            break;
+        case Player::Black:
+            stream << "Black";
+            break;
+    }
+
+    return stream;
+}
 
 template <typename Value>
 struct PlayerPair

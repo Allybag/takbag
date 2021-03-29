@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <cstdint>
 #include <type_traits>
 
@@ -52,3 +53,31 @@ enum class Stone : uint8_t
     BlackCap  = StoneBits::Stone | StoneBits::Road | StoneBits::Standing | StoneBits::Black,
 };
 
+std::ostream& operator<<(std::ostream& stream, Stone stone)
+{
+    switch (stone)
+    {
+        case Stone::Blank:
+            stream << "Empty";
+            break;
+        case Stone::WhiteFlat:
+            stream << "White Flat";
+            break;
+        case Stone::BlackFlat:
+            stream << "Black Flat";
+            break;
+        case Stone::WhiteWall:
+            stream << "White Wall";
+            break;
+        case Stone::BlackWall:
+            stream << "Black Wall";
+            break;
+        case Stone::WhiteCap:
+            stream << "White Cap";
+            break;
+        case Stone::BlackCap:
+            stream << "Black Cap";
+            break;
+    }
+    return stream;
+}
