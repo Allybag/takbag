@@ -1,6 +1,9 @@
 #pragma once
 
+#include "Player.h"
 #include "Square.h"
+#include "Move.h"
+
 #include <vector>
 #include <unordered_map>
 #include <sstream>
@@ -26,7 +29,13 @@ class Position
 public:
     explicit Position(std::size_t size);
 
-    std::string print();
+    std::string print() const;
+
+    void place(const Place& place);
+
+private:
+    void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
+
 };
 
 Position::Position(std::size_t size) :  mSize(size), mToPlay(Player::White), mFlatReserves(PlayerPair{pieceCounts[size].first}), mCapReserves(PlayerPair{pieceCounts[size].second})
@@ -34,7 +43,7 @@ Position::Position(std::size_t size) :  mSize(size), mToPlay(Player::White), mFl
     mBoard.resize(mSize * mSize); // Our board is a 1d array
 }
 
-std::string Position::print()
+std::string Position::print() const
 {
     std::stringstream output;
     for (std::size_t row = 0; row < mSize; ++row)
@@ -58,4 +67,21 @@ std::string Position::print()
     }
 
     return output.str();
+}
+
+void Position::place(const Place& place)
+{
+    assert(place.index < mBoard.size());
+    assert(mBoard[place.index].topStone == Stone::Blank);
+
+    // TODO: Deal with the annoying first turn swap rule
+    assert((place.stone & StoneBits::Black) == (mToPlay == Player::Black));
+    mBoard[place.index].topStone = place.stone;
+
+    if (place.stone & StoneBits::Standing & StoneBits::Road) // Capstone
+        mCapReserves[mToPlay] -= 1;
+    else
+        mFlatReserves[mToPlay] -= 1;
+
+    togglePlayer();
 }

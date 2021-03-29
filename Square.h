@@ -19,7 +19,7 @@ struct Square
     ~Square() = default;
 
     std::size_t count() const;
-    std::string print();
+    std::string print() const;
 };
 
 std::size_t Square::count() const
@@ -27,7 +27,7 @@ std::size_t Square::count() const
     return topStone == Stone::Blank ? 0 : reserveCount + 1;
 }
 
-std::string Square::print()
+std::string Square::print() const
 {
     std::stringstream output;
     switch (topStone)
