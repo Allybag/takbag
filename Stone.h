@@ -35,10 +35,10 @@ inline constexpr auto operator&(typename std::underlying_type<Enum>::type lhs, E
 
 enum class StoneBits : uint8_t
 {
-    Stone = 1 >> 0,
-    Black = 1 >> 1,
-    Road  = 1 >> 2, // Road eligible pieces, flats or caps
-    Standing = 1 >> 3, // Top only pieces, walls or caps
+    Stone = 1 << 0,
+    Black = 1 << 1,
+    Road  = 1 << 2, // Road eligible pieces, flats or caps
+    Standing = 1 << 3, // Top only pieces, walls or caps
 };
 
 enum class Stone : uint8_t
