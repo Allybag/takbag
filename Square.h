@@ -4,6 +4,7 @@
 
 #include <string>
 #include <sstream>
+#include <cmath>
 
 // Representation:
 // mTopStone describes the surface stone and mStack[0]
@@ -25,7 +26,7 @@ struct Square
     std::size_t count() const;
     std::string print() const;
 
-    void give(Stone stone, uint8_t count, uint8_t allStones);
+    void give(uint32_t allStones, uint8_t count, Stone topStone);
     void take(std::size_t count);
 };
 
@@ -68,22 +69,18 @@ std::string Square::print() const
     return output.str();
 }
 
-void Square::give(Stone topStone, uint8_t count, uint8_t allStones)
+void Square::give(uint32_t allStones, uint8_t count, Stone topStone)
 {
     assert(!(mTopStone & StoneBits::Standing));
     assert(count);
     assert(mCount + count < 32); // Could have more than 32 stones in a stack
 
+    // TODO: Test this!
     mTopStone = topStone;
-    for (std::size_t i = 0; i < count; ++i)
-    {
-        int currentStone = allStones & (1 << i);
-        // Apparently works for 2's complement representation, now guaranteed in c++
-        // Sets the mCount bit of mStack to currentStone
-        // TODO: Test this bit twiddling
-        mStack ^= (-currentStone ^ mStack) & (1 << mCount);
-        mCount++;
-    }
+    allStones << mCount;
+
+    mStack += allStones;
+    mCount += count;
 }
 
 void Square::take(std::size_t count)
@@ -91,7 +88,11 @@ void Square::take(std::size_t count)
     assert(mTopStone != Stone::Blank);
     assert(mCount >= count);
 
-    // We let mStack contain old garbage beyone mCount as we shouldn't use it
     mCount -= count;
+
+    // TODO: Test this
+    uint32_t mask = std::pow(2, mCount + 1) - 1; // Should have all bits set to 1
+    mStack &= mask;
+
     mTopStone = (mCount == 0 ? Stone::Blank : (mStack & 1 << mCount) ? Stone::BlackFlat : Stone::WhiteFlat);
 }
