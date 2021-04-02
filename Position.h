@@ -32,6 +32,7 @@ public:
     std::string print() const;
 
     void place(const Place& place);
+    void move(const Move& move);
 
 private:
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
@@ -71,17 +72,75 @@ std::string Position::print() const
 
 void Position::place(const Place& place)
 {
-    assert(place.index < mBoard.size());
-    assert(mBoard[place.index].topStone == Stone::Blank);
+    assert(place.mIndex < mBoard.size());
+    assert(mBoard[place.mIndex].mTopStone == Stone::Blank);
 
     // TODO: Deal with the annoying first turn swap rule
-    assert((place.stone & StoneBits::Black) == (mToPlay == Player::Black));
-    mBoard[place.index].topStone = place.stone;
+    bool stoneIsBlack = place.mStone & StoneBits::Black;
+    bool playerIsBlack = (mToPlay == Player::Black);
+    assert(stoneIsBlack == playerIsBlack);
+    Square singleStone = Square(place.mStone, 1, stoneIsBlack ? 1 : 0);
+    mBoard[place.mIndex].add(singleStone, 1);
 
-    if (place.stone & StoneBits::Standing & StoneBits::Road) // Capstone
+    if (place.mStone & StoneBits::Standing && (place.mStone & StoneBits::Road)) // Capstone
+    {
+        assert(mCapReserves[mToPlay]);
         mCapReserves[mToPlay] -= 1;
+    }
     else
+    {
+        assert(mFlatReserves[mToPlay]);
         mFlatReserves[mToPlay] -= 1;
+    }
+
+    togglePlayer();
+}
+
+void Position::move(const Move &move)
+{
+    assert(move.mIndex < mBoard.size());
+
+    Square& source = mBoard[move.mIndex];
+
+    assert(source.mTopStone != Stone::Blank);
+
+    bool stoneIsBlack = source.mTopStone & StoneBits::Black;
+    bool playerIsBlack = (mToPlay == Player::Black);
+    assert(stoneIsBlack == playerIsBlack);
+    assert(source.mCount + 1 >= move.mCount);
+
+
+    const int offset = [ &move, this ]() -> int {
+                switch (move.mDirection) {
+                    case Direction::Up:
+                        return -1 * mSize;
+                    case Direction::Down:
+                        return mSize;
+                    case Direction::Left:
+                        return -1;
+                    case Direction::Right:
+                        return 1;
+                } }();
+
+    Square hand = Square(source, move.mCount); // Removes mCount flats from source
+
+    uint32_t dropCountMask = 0xf; // Last four bits set
+    uint8_t stonesLeftToDrop = move.mCount;
+    for (int i = 0; stonesLeftToDrop != 0; ++i)
+    {
+        std::size_t nextIndex = move.mIndex + ((i + 1) * offset);
+        assert(nextIndex < mBoard.size()); // As size_t is unsigned this also checks for negative index
+
+        Square& nextSquare = mBoard[nextIndex];
+
+        uint8_t dropCount = (move.mDropCounts & (dropCountMask << i * 4)) >> (i * 4);
+        assert(dropCount > 0);
+        assert(dropCount <= 0x8);
+
+        nextSquare.add(hand, dropCount);
+
+        stonesLeftToDrop -= dropCount;
+    }
 
     togglePlayer();
 }
