@@ -4,7 +4,6 @@
 
 #include <string>
 #include <sstream>
-#include <cmath>
 
 // Representation:
 // mTopStone describes the surface stone and mStack[0]
@@ -17,17 +16,26 @@ struct Square
     uint32_t mStack; // A mCount long bitSet, 0 is white and 1 is black
 
     Square() : mTopStone(Stone::Blank), mCount(0), mStack(0) { }
+    Square(Stone topStone, uint8_t count, uint32_t stack) : mTopStone(topStone), mCount(count), mStack(stack) { }
     Square(const Square&) noexcept = default;
     Square(Square&&) noexcept = default;
     Square& operator=(const Square&) noexcept = default;
     Square& operator=(Square&&) noexcept = default;
     ~Square() = default;
 
+    // Take count pieces from this square to make another
+    // This constructor is basically a "take stones" function
+    Square(Square& source, uint8_t count); // Note, mutates source
+    void add(Square& source, uint8_t count);
+
     std::size_t count() const;
     std::string print() const;
 
-    void give(uint32_t allStones, uint8_t count, Stone topStone);
-    void take(std::size_t count);
+    // Utility functions
+    void clearBeyondStack();
+    void setTopFromStack();
+    void checkValid();
+
 };
 
 std::size_t Square::count() const
@@ -63,36 +71,88 @@ std::string Square::print() const
     }
 
     // TODO: Test this bit twiddling
-    for (std::size_t i = 1; i < mCount; ++i) // Start at 1 as we've already done mTopStone
-        output << (mStack & (1 << i) ? "f" : "F");
+    for (std::size_t i = mCount - 1; i != 0; --i) // We start at mCount - 1 as we have already printed the top stone
+        output << (mStack & (1 << (i - 1)) ? "f" : "F");
 
+    if (mCount > 1)
+        std::cerr << "Top: " << this->mTopStone << " count: " << static_cast<int>(this->mCount) << " stack: " << this->mStack << std::endl;
     return output.str();
 }
 
-void Square::give(uint32_t allStones, uint8_t count, Stone topStone)
+void Square::add(Square& source, uint8_t count)
 {
     assert(!(mTopStone & StoneBits::Standing));
     assert(count);
+    assert(source.mCount >= count);
     assert(mCount + count < 32); // Could have more than 32 stones in a stack
 
     // TODO: Test this!
-    mTopStone = topStone;
-    allStones << mCount;
+    int stonesLeftInSource = source.mCount - count;
+    uint32_t movingStones = (source.mStack & ((1 << stonesLeftInSource + 1) - 1)); // Just the stones we need to move
+    std::cout << "Source .mStack: " << source.mStack << " movingStones: " << movingStones << std::endl;
+    movingStones = movingStones << mCount;
+    std::cout << "Source .mStack: " << source.mStack << " shiftedStones: " << movingStones << " mCount: " << static_cast<int>(mCount) << std::endl;
 
-    mStack += allStones;
+    // Deal with this square
     mCount += count;
+    mStack += movingStones;
+
+    // Deal with the old square
+    // We drop from the bottom
+    source.mCount -= count;
+    source.mStack >>= stonesLeftInSource;
+    // source.clearBeyondStack(); // Should be unnecessary?
+
+    // Deal with the topStones
+    if (source.mCount)
+    {
+        setTopFromStack();
+    }
+    else
+    {
+        mTopStone = source.mTopStone;
+        source.setTopFromStack(); // Or just source.mTopStone = Stone::Blank
+        assert(source.mTopStone == Stone::Blank);
+    }
+
+    checkValid();
+    source.checkValid();
 }
 
-void Square::take(std::size_t count)
+Square::Square(Square& source, uint8_t count)
 {
-    assert(mTopStone != Stone::Blank);
-    assert(mCount >= count);
+    assert(source.mTopStone != Stone::Blank);
+    assert(source.mCount >= count);
 
-    mCount -= count;
+    // Initialise our members
+    mTopStone = source.mTopStone;
+    mCount = count;
+    mStack = (source.mStack >> (source.mCount - count)); // TODO: Test this!
 
+    // Remove pieces from the old stone
+    source.mCount -= count;
+    source.clearBeyondStack();
+    source.setTopFromStack();
+
+    checkValid();
+    source.checkValid();
+}
+
+void Square::clearBeyondStack()
+{
     // TODO: Test this
-    uint32_t mask = std::pow(2, mCount + 1) - 1; // Should have all bits set to 1
+    uint32_t mask = (1 << mCount) - 1;
     mStack &= mask;
+}
 
-    mTopStone = (mCount == 0 ? Stone::Blank : (mStack & 1 << mCount) ? Stone::BlackFlat : Stone::WhiteFlat);
+void Square::setTopFromStack()
+{
+    mTopStone = (mCount == 0 ? Stone::Blank : (mStack & 1 << (mCount - 1)) ? Stone::BlackFlat : Stone::WhiteFlat);
+}
+
+void Square::checkValid()
+{
+    bool topStoneIsBlack = mTopStone & StoneBits::Black;
+    bool topOfStackIsBlack = (mStack & 1 << (mCount - 1));
+    assert(topStoneIsBlack == topOfStackIsBlack);
 }
