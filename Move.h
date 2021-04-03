@@ -7,7 +7,9 @@ enum class Direction : uint8_t
     Up = '+',
     Down = '-',
     Left = '<',
-    Right = '>'
+    Right = '>',
+    None = 0
+
 };
 
 struct Place

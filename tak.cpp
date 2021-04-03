@@ -4,11 +4,14 @@
 
 int main()
 {
+    std::size_t ply = 0;
     Position position(6);
-    position.place(Place(0, Stone::WhiteFlat));
-    position.place(Place(5, Stone::BlackFlat));
-    position.place(Place(14, Stone::WhiteFlat));
-    position.place(Place(15, Stone::BlackFlat));
+    position.play(PtnTurn("a1", ++ply));
+    position.play(PtnTurn("a6", ++ply));
+    position.play(PtnTurn("c3", ++ply));
+    position.play(PtnTurn("c4", ++ply));
+    std::cout << position.print();
+    return 0;
 
     std::cout << position.print();
     position.move(Move(14, 1, 1, Direction::Right));

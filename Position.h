@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Square.h"
 #include "Move.h"
+#include "ptn.h"
 
 #include <vector>
 #include <unordered_map>
@@ -33,6 +34,7 @@ public:
 
     void place(const Place& place);
     void move(const Move& move);
+    void play(const PtnTurn& ptn);
 
 private:
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
@@ -143,4 +145,17 @@ void Position::move(const Move &move)
     }
 
     togglePlayer();
+}
+
+void Position::play(const PtnTurn &ptn)
+{
+    if (ptn.mType == MoveType::Place)
+    {
+        std::size_t index = ptn.mRank * mSize + ptn.mCol;
+        place(Place(index, ptn.mTopStone));
+    }
+    else
+    {
+        assert(false);
+    }
 }

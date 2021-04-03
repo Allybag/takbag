@@ -5,3 +5,4 @@
 #include "Player.h"
 #include "Square.h"
 #include "Position.h"
+#include "ptn.h"
