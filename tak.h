@@ -5,4 +5,5 @@
 #include "Player.h"
 #include "Square.h"
 #include "Position.h"
+#include "Game.h"
 #include "ptn.h"

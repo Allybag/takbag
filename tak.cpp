@@ -4,23 +4,21 @@
 
 int main()
 {
-    std::size_t ply = 0;
-    Position position(6);
-    position.play(PtnTurn("Fa1", ++ply));
-    position.play(PtnTurn("a6", ++ply));
-    position.play(PtnTurn("c3", ++ply));
-    position.play(PtnTurn("fc4", ++ply));
+    Game game(6);
+    game.play("a1");
+    game.play("a6");
+    game.play("c3");
+    game.play("c4");
 
-    position.play(PtnTurn("1c3>1", ++ply));
-    position.play(PtnTurn("1a6-f", ++ply));
+    game.play("c3>");
+    game.play("a6-");
 
-    position.play(PtnTurn("Cc3", ++ply));
-    position.play(PtnTurn("Cc6", ++ply));
-    position.play(PtnTurn("c3>1", ++ply));
-    position.play(PtnTurn("Sa6", ++ply));
-    position.play(PtnTurn("3c4<111C", ++ply));
+    game.play("Cc3");
+    game.play("cc6");
+    game.play("c3>");
+    game.play("Sa6");
+    game.play("3c4<111C");
 
-
-    std::cout << position.print();
+    std::cout << game.print();
     return 0;
 }

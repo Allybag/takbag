@@ -18,32 +18,30 @@ struct PtnTurn
     uint8_t mRank;
     uint8_t mCol;
 
-    // Only used for placing
-    Stone mTopStone{Stone::Blank};
 
     // Only used for moves
     Direction mDirection{Direction::None};
     uint8_t mCount{0};
+    uint8_t mDistance{0};
     uint32_t mDropCounts{0};
-    bool mIsWallSmash{false};
 
-    std::size_t mPly;
+    // Set by Game
+    Stone mTopStone{Stone::Blank};
+    bool mIsWallSmash{false};
 
     std::string mSourceString; // Can be handy to read a file in and write the same file out
 
-    PtnTurn(const std::string& sourceString, std::size_t ply);
+    PtnTurn(const std::string& sourceString);
     std::string canonicalString() const;
 };
 
 
-PtnTurn::PtnTurn(const std::string &sourceString, std::size_t ply) : mPly(ply), mSourceString(sourceString)
+PtnTurn::PtnTurn(const std::string &sourceString) : mSourceString(sourceString)
 {
     // Spec is here: https://ustak.org/portable-tak-notation/
 
     // Simplest rule to check if place: ends in a number, and is 3 or fewer chars
     mType = (std::isdigit(sourceString[sourceString.size() - 1]) && sourceString.size() <= 3) ? MoveType::Place : MoveType::Move;
-
-    Player player = (mPly % 2 == 0) ? Player::Black : Player::White;
 
     if (mType == MoveType::Place)
     {
@@ -54,7 +52,7 @@ PtnTurn::PtnTurn(const std::string &sourceString, std::size_t ply) : mPly(ply), 
         mDropCounts = 0;
         mIsWallSmash = false;
 
-        uint8_t stoneBits = (player == Player::Black ? StoneBits::Black : StoneBits::Stone) | StoneBits::Stone;
+        auto stoneBits = static_cast<uint8_t>(StoneBits::Stone);
         if (sourceString.size() == 3)
         {
             switch (std::tolower(sourceString[0]))
@@ -102,6 +100,7 @@ PtnTurn::PtnTurn(const std::string &sourceString, std::size_t ply) : mPly(ply), 
         if (currentIndex == sourceString.size() || !(std::isdigit(sourceString[currentIndex])))
         {
             mDropCounts = mCount;
+            mDistance = 1;
             return;
         }
 
@@ -114,6 +113,7 @@ PtnTurn::PtnTurn(const std::string &sourceString, std::size_t ply) : mPly(ply), 
             int dropCount = (sourceString[currentIndex + i] - '0');
             assert(dropCount != 0);
             totalCount += dropCount;
+            ++mDistance;
             mDropCounts += (dropCount << (i * 4));
         }
         assert(totalCount == mCount);

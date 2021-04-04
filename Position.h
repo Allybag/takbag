@@ -30,9 +30,13 @@ class Position
 public:
     explicit Position(std::size_t size);
 
-    std::string print() const;
+    std::size_t size() const { return mSize; }
+    const Square& operator[](std::size_t index) const { return mBoard[index]; }
+    int getOffset(Direction direction) const;
 
     void play(const PtnTurn& ptn);
+
+    std::string print() const;
 
 private:
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
@@ -111,21 +115,7 @@ void Position::move(const Move &move)
     assert(stoneIsBlack == playerIsBlack);
     assert(source.mCount + 1 >= move.mCount);
 
-
-    const int offset = [ &move, this ]() -> int {
-                switch (move.mDirection) {
-                    case Direction::Up:
-                        return -1 * mSize;
-                    case Direction::Down:
-                        return mSize;
-                    case Direction::Left:
-                        return -1;
-                    case Direction::Right:
-                        return 1;
-                    case Direction::None:
-                        assert(false);
-                } }();
-
+    const int offset = getOffset(move.mDirection);
     Square hand = Square(source, move.mCount); // Removes mCount flats from source
 
     uint32_t dropCountMask = 0xf; // Last four bits set
@@ -159,5 +149,22 @@ void Position::play(const PtnTurn &ptn)
     else
     {
         move(Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection));
+    }
+}
+
+int Position::getOffset(Direction direction) const
+{
+    switch (direction) {
+        case Direction::Up:
+            return -1 * mSize;
+        case Direction::Down:
+            return mSize;
+        case Direction::Left:
+            return -1;
+        case Direction::Right:
+            return 1;
+        case Direction::None:
+            assert(false);
+            return 0;
     }
 }
