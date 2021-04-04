@@ -44,11 +44,9 @@ void Game::fillPtn(PtnTurn &ptn)
         std::size_t finalIndex = index + mPosition.getOffset(ptn.mDirection) * ptn.mDistance;
         Stone finalStone = mPosition[finalIndex].mTopStone;
 
-        bool landsOnWall = (finalStone & StoneBits::Standing) && !(finalStone & StoneBits::Road);
-        if (landsOnWall)
+        if (isWall(finalStone))
         {
-            bool topStoneIsCap = (ptn.mTopStone & StoneBits::Standing) && (ptn.mTopStone & StoneBits::Road);
-            assert(topStoneIsCap);
+            assert(isCap(ptn.mTopStone));
             ptn.mIsWallSmash = true;
         }
     }

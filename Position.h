@@ -88,7 +88,7 @@ void Position::place(const Place& place)
     Square singleStone = Square(place.mStone, 1, stoneIsBlack ? 1 : 0);
     mBoard[place.mIndex].add(singleStone, 1);
 
-    if (place.mStone & StoneBits::Standing && (place.mStone & StoneBits::Road)) // Capstone
+    if (isCap(place.mStone))
     {
         assert(mCapReserves[mToPlay]);
         mCapReserves[mToPlay] -= 1;

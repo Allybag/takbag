@@ -83,3 +83,18 @@ std::ostream& operator<<(std::ostream& stream, Stone stone)
     }
     return stream;
 }
+
+inline bool isFlat(Stone stone)
+{
+    return (stone & StoneBits::Road) && !(stone & StoneBits::Standing);
+}
+
+inline bool isWall(Stone stone)
+{
+    return (stone & StoneBits::Standing) && !(stone & StoneBits::Road);
+}
+
+inline bool isCap(Stone stone)
+{
+    return (stone & StoneBits::Standing) && (stone & StoneBits::Road);
+}

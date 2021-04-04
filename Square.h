@@ -76,22 +76,29 @@ std::string Square::print() const
 
     if (mCount > 1)
         std::cerr << "Top: " << this->mTopStone << " count: " << static_cast<int>(this->mCount) << " stack: " << this->mStack << std::endl;
+
     return output.str();
 }
 
 void Square::add(Square& source, uint8_t count)
 {
-    assert(!(mTopStone & StoneBits::Standing));
+    assert(!isCap(mTopStone));
     assert(count);
     assert(source.mCount >= count);
     assert(mCount + count < 32); // Could have more than 32 stones in a stack
 
+    // Wall smashes
+    if (isWall(mTopStone))
+    {
+        assert(source.mCount == 1 && isCap(source.mTopStone));
+        std::cerr << "Wall smash!" << std::endl;
+        // We don't actually use mTopStone again, so we don't need to flatten it
+    }
+
     // TODO: Test this!
     int stonesLeftInSource = source.mCount - count;
     uint32_t movingStones = (source.mStack & ((1 << (stonesLeftInSource + 1)) - 1)); // Just the stones we need to move
-    std::cout << "Source .mStack: " << source.mStack << " movingStones: " << movingStones << std::endl;
     movingStones = movingStones << mCount;
-    std::cout << "Source .mStack: " << source.mStack << " shiftedStones: " << movingStones << " mCount: " << static_cast<int>(mCount) << std::endl;
 
     // Deal with this square
     mCount += count;
