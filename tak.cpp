@@ -6,23 +6,20 @@ int main()
 {
     std::size_t ply = 0;
     Position position(6);
-    position.play(PtnTurn("a1", ++ply));
+    position.play(PtnTurn("Fa1", ++ply));
     position.play(PtnTurn("a6", ++ply));
     position.play(PtnTurn("c3", ++ply));
-    position.play(PtnTurn("c4", ++ply));
-    std::cout << position.print();
-    return 0;
+    position.play(PtnTurn("fc4", ++ply));
 
-    std::cout << position.print();
-    position.move(Move(14, 1, 1, Direction::Right));
-    position.move(Move(5, 1, 1, Direction::Down));
+    position.play(PtnTurn("1c3>1", ++ply));
+    position.play(PtnTurn("1a6-f", ++ply));
 
-    position.place(Place(14, Stone::WhiteCap));
-    position.place(Place(17, Stone::BlackCap));
-    position.move(Move(14, 1, 1, Direction::Right));
-    position.place(Place(5, Stone::BlackWall));
-    std::cout << position.print();
-    position.move(Move(15, 3, 0x111, Direction::Left));
+    position.play(PtnTurn("Cc3", ++ply));
+    position.play(PtnTurn("Cc6", ++ply));
+    position.play(PtnTurn("c3>1", ++ply));
+    position.play(PtnTurn("Sa6", ++ply));
+    position.play(PtnTurn("3c4<111C", ++ply));
+
 
     std::cout << position.print();
     return 0;

@@ -88,7 +88,7 @@ void Square::add(Square& source, uint8_t count)
 
     // TODO: Test this!
     int stonesLeftInSource = source.mCount - count;
-    uint32_t movingStones = (source.mStack & ((1 << stonesLeftInSource + 1) - 1)); // Just the stones we need to move
+    uint32_t movingStones = (source.mStack & ((1 << (stonesLeftInSource + 1)) - 1)); // Just the stones we need to move
     std::cout << "Source .mStack: " << source.mStack << " movingStones: " << movingStones << std::endl;
     movingStones = movingStones << mCount;
     std::cout << "Source .mStack: " << source.mStack << " shiftedStones: " << movingStones << " mCount: " << static_cast<int>(mCount) << std::endl;

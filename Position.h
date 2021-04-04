@@ -32,12 +32,12 @@ public:
 
     std::string print() const;
 
-    void place(const Place& place);
-    void move(const Move& move);
     void play(const PtnTurn& ptn);
 
 private:
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
+    void place(const Place& place);
+    void move(const Move& move);
 
 };
 
@@ -122,6 +122,8 @@ void Position::move(const Move &move)
                         return -1;
                     case Direction::Right:
                         return 1;
+                    case Direction::None:
+                        assert(false);
                 } }();
 
     Square hand = Square(source, move.mCount); // Removes mCount flats from source
@@ -149,13 +151,13 @@ void Position::move(const Move &move)
 
 void Position::play(const PtnTurn &ptn)
 {
+    std::size_t index = ptn.mRank * mSize + ptn.mCol;
     if (ptn.mType == MoveType::Place)
     {
-        std::size_t index = ptn.mRank * mSize + ptn.mCol;
         place(Place(index, ptn.mTopStone));
     }
     else
     {
-        assert(false);
+        move(Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection));
     }
 }
