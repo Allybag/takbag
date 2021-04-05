@@ -100,15 +100,12 @@ void Square::add(Square& source, uint8_t count)
     Square oldThis(*this);
 
     int stonesLeftInSource = source.mCount - count;
-    // We want just the bits in source.mStack from source.mCount to source.mCount - count
-    // We want a mask which has all bits set to 1, except for the stonesLeftInSource bits on the left
-    // And then we shift that to the beginning
-    uint32_t allStonesMask = static_cast<uint32_t>(-1);
-    uint32_t hideLowStonesMask = (1 << stonesLeftInSource) - 1;
-    uint32_t mask = allStonesMask - hideLowStonesMask;
+    // We want just the bits in source.mStack from 0 to count
+    // uint32_t allStonesMask = static_cast<uint32_t>(-1);
+    // uint32_t hideLowStonesMask = (1 << stonesLeftInSource) - 1;
+    uint32_t movingMask = (1 << count ) - 1;
 
-    uint32_t movingStones = (source.mStack & mask); // Just the stones we need to move
-    movingStones = movingStones >> stonesLeftInSource;
+    uint32_t movingStones = (source.mStack & movingMask); // Just the stones we need to move
     movingStones = movingStones << mCount;
 
     // Deal with this square
