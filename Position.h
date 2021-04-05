@@ -23,6 +23,7 @@ class Position
     const std::size_t mSize;
     std::vector<Square> mBoard;
     Player mToPlay;
+    int mOpeningSwapMoves;
 
     PlayerPair<std::size_t> mFlatReserves;
     PlayerPair<std::size_t> mCapReserves;
@@ -46,7 +47,9 @@ private:
 
 };
 
-Position::Position(std::size_t size) :  mSize(size), mToPlay(Player::White), mFlatReserves(PlayerPair{pieceCounts[size].first}), mCapReserves(PlayerPair{pieceCounts[size].second})
+Position::Position(std::size_t size) :  mSize(size), mToPlay(Player::White), mOpeningSwapMoves(2),
+                                        mFlatReserves(PlayerPair{pieceCounts[size].first}),
+                                        mCapReserves(PlayerPair{pieceCounts[size].second})
 {
     mBoard.resize(mSize * mSize); // Our board is a 1d array
 }
@@ -84,10 +87,17 @@ void Position::place(const Move& place)
     assert(place.mIndex < mBoard.size());
     assert(mBoard[place.mIndex].mTopStone == Stone::Blank);
 
-    // TODO: Deal with the annoying first turn swap rule
     bool stoneIsBlack = place.mStone & StoneBits::Black;
     bool playerIsBlack = (mToPlay == Player::Black);
-    // assert(stoneIsBlack == playerIsBlack);
+    if (mOpeningSwapMoves)
+    {
+        assert(stoneIsBlack != playerIsBlack);
+        assert(!(place.mStone & StoneBits::Standing)); // Only allowed to play flats for the first two ply
+        mOpeningSwapMoves--;
+    }
+    else
+        assert(stoneIsBlack == playerIsBlack);
+
     Square singleStone = Square(place.mStone, 1, stoneIsBlack ? 1 : 0);
     mBoard[place.mIndex].add(singleStone, 1);
 
@@ -108,6 +118,7 @@ void Position::place(const Move& place)
 void Position::move(const Move &move)
 {
     assert(move.mIndex < mBoard.size());
+    assert(mOpeningSwapMoves == 0);
 
     Square& source = mBoard[move.mIndex];
 
