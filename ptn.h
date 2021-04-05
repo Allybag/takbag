@@ -4,12 +4,6 @@
 #include "Move.h"
 #include <string>
 
-enum class MoveType
-{
-    Place, // (stone)(square)
-    Move // (count)(square)(direction)(drop counts)(stone)
-};
-
 struct PtnTurn
 {
     MoveType mType;

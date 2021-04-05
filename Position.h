@@ -41,7 +41,7 @@ public:
 
 private:
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
-    void place(const Place& place);
+    void place(const Move& place);
     void move(const Move& move);
 
 };
@@ -79,7 +79,7 @@ std::string Position::print() const
     return output.str();
 }
 
-void Position::place(const Place& place)
+void Position::place(const Move& place)
 {
     assert(place.mIndex < mBoard.size());
     assert(mBoard[place.mIndex].mTopStone == Stone::Blank);
@@ -147,7 +147,7 @@ void Position::play(const PtnTurn &ptn)
     std::size_t index = getPtnIndex(ptn);
     if (ptn.mType == MoveType::Place)
     {
-        place(Place(index, ptn.mTopStone));
+        place(Move(index, ptn.mTopStone));
     }
     else
     {
