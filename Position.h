@@ -33,6 +33,7 @@ public:
     std::size_t size() const { return mSize; }
     const Square& operator[](std::size_t index) const { return mBoard[index]; }
     int getOffset(Direction direction) const;
+    std::size_t getPtnIndex(const PtnTurn& ptn) const;
 
     void play(const PtnTurn& ptn);
 
@@ -52,6 +53,8 @@ Position::Position(std::size_t size) :  mSize(size), mToPlay(Player::White), mFl
 
 std::string Position::print() const
 {
+    // We want the a file on the left and the 1 rank along the bottom
+    // for consistency with playtak.com and ptn.ninja
     std::stringstream output;
     for (std::size_t row = 0; row < mSize; ++row)
     {
@@ -84,7 +87,7 @@ void Position::place(const Place& place)
     // TODO: Deal with the annoying first turn swap rule
     bool stoneIsBlack = place.mStone & StoneBits::Black;
     bool playerIsBlack = (mToPlay == Player::Black);
-    assert(stoneIsBlack == playerIsBlack);
+    // assert(stoneIsBlack == playerIsBlack);
     Square singleStone = Square(place.mStone, 1, stoneIsBlack ? 1 : 0);
     mBoard[place.mIndex].add(singleStone, 1);
 
@@ -141,7 +144,7 @@ void Position::move(const Move &move)
 
 void Position::play(const PtnTurn &ptn)
 {
-    std::size_t index = ptn.mRank * mSize + ptn.mCol;
+    std::size_t index = getPtnIndex(ptn);
     if (ptn.mType == MoveType::Place)
     {
         place(Place(index, ptn.mTopStone));
@@ -150,6 +153,11 @@ void Position::play(const PtnTurn &ptn)
     {
         move(Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection));
     }
+}
+
+std::size_t Position::getPtnIndex(const PtnTurn& ptn) const
+{
+    return (mSize - 1 - ptn.mCol) * mSize + ptn.mRank;
 }
 
 int Position::getOffset(Direction direction) const

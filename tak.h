@@ -7,3 +7,4 @@
 #include "Position.h"
 #include "Game.h"
 #include "ptn.h"
+#include "PtnFile.h"
