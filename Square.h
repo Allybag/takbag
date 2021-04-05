@@ -95,9 +95,20 @@ void Square::add(Square& source, uint8_t count)
         // We don't actually use mTopStone again, so we don't need to flatten it
     }
 
-    // TODO: Test this!
+    // TODO: Test all this!
+    Square oldSource(source);
+    Square oldThis(*this);
+
     int stonesLeftInSource = source.mCount - count;
-    uint32_t movingStones = (source.mStack & ((1 << (stonesLeftInSource + 1)) - 1)); // Just the stones we need to move
+    // We want just the bits in source.mStack from source.mCount to source.mCount - count
+    // We want a mask which has all bits set to 1, except for the stonesLeftInSource bits on the left
+    // And then we shift that to the beginning
+    uint32_t allStonesMask = static_cast<uint32_t>(-1);
+    uint32_t hideLowStonesMask = (1 << stonesLeftInSource) - 1;
+    uint32_t mask = allStonesMask - hideLowStonesMask;
+
+    uint32_t movingStones = (source.mStack & mask); // Just the stones we need to move
+    movingStones = movingStones >> stonesLeftInSource;
     movingStones = movingStones << mCount;
 
     // Deal with this square
@@ -107,7 +118,7 @@ void Square::add(Square& source, uint8_t count)
     // Deal with the old square
     // We drop from the bottom
     source.mCount -= count;
-    source.mStack >>= stonesLeftInSource;
+    source.mStack >>= count;
     // source.clearBeyondStack(); // Should be unnecessary?
 
     // Deal with the topStones
