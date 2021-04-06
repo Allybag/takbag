@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <fstream>
 
-#include "ptn.h"
+#include "Ptn.h"
 
 enum class PtnTag
 {
@@ -69,13 +69,13 @@ PtnFile::PtnFile(const std::string& ptnFilePath)
     mSize = maxIndex; // Could feasibly be wrong, but super unlikely.
 }
 
-void PtnFile::parsePtnTag(const std::string &ptnLine)
+void PtnFile::parsePtnTag(const std::string& ptnLine)
 {
     // [Size "6"]
     std::string tagPair = ptnLine.substr(1, ptnLine.size() - 2);
 }
 
-void PtnFile::parsePtnTurn(const std::string &ptnLine)
+void PtnFile::parsePtnTurn(const std::string& ptnLine)
 {
     // 1. a6 f6
 
@@ -103,60 +103,8 @@ void PtnFile::parsePtnTurn(const std::string &ptnLine)
 
 }
 
-void PtnFile::parsePtnResult(const std::string &ptnLine)
+void PtnFile::parsePtnResult(const std::string& ptnLine)
 {
     // R-0
+    std::string unused(ptnLine);
 }
-
-#if 0
-[Site "PlayTak.com"]
-[Event "Online Play"]
-[Date "2021.04.03"]
-[Time "18:37:17"]
-[Player1 "Simmon"]
-[Player2 "Ally"]
-[Clock "15:0 +20"]
-[Result "0-R"]
-[Size "6"]
-[Komi "3"]
-[Flats "30"]
-[Caps "1"]
-
-1. a6 f6
-2. d4 c4
-3. d3 c3
-4. d5 c5
-5. d2 Ce3
-6. c2 1e3<1
-7. e2 b2
-8. Cb3 b4
-9. f2 d1
-10. a2 1d1+1
-11. d1 Sc1
-12. f3 f4
-13. e3 e4
-14. e5 b5
-15. 1d4>1 d4
-16. f1 2d3>2
-17. 1d1+1 1c1+1
-18. 2e4>2 Sf5
-19. 3d2+12 1f5-1
-20. 1b3+1 3e3<3
-21. 2b4>11 3f4-3
-22. 4d4>13 Sf5
-23. e3 1e4-1
-24. e4 a5
-25. 1f4-1 1f5-1
-26. 4f3<4 3f4<3
-27. f5 b3
-28. Sb1 a1
-29. 2e3>2 1f4+1
-30. 2f3+11 4d3>13
-31. 5e3<131 2c2+2
-32. d2 d4
-33. 1d5-1 1c4>1
-34. 1d3+1 2e4<2
-35. 3f5-3 4f3<121
-36. 2f4<2 6c3>114
-0-R
-#endif

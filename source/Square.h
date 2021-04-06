@@ -93,13 +93,6 @@ void Square::add(Square& source, uint8_t count)
     }
 
     // TODO: Test all this!
-    Square oldSource(source);
-    Square oldThis(*this);
-
-    int stonesLeftInSource = source.mCount - count;
-    // We want just the bits in source.mStack from 0 to count
-    // uint32_t allStonesMask = static_cast<uint32_t>(-1);
-    // uint32_t hideLowStonesMask = (1 << stonesLeftInSource) - 1;
     uint32_t movingMask = (1 << count ) - 1;
 
     uint32_t movingStones = (source.mStack & movingMask); // Just the stones we need to move

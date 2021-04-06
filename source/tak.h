@@ -6,5 +6,5 @@
 #include "Square.h"
 #include "Position.h"
 #include "Game.h"
-#include "ptn.h"
+#include "Ptn.h"
 #include "PtnFile.h"

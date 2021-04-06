@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Position.h"
-#include "ptn.h"
+#include "Ptn.h"
 #include "PtnFile.h"
 
 #include <string>

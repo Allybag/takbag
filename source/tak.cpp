@@ -42,9 +42,7 @@ int main()
     std::cout << game.moveCount() << std::endl;
 
 #else
-    // PtnFile ptnFile("/Users/ally/clones/takbag/SimmonAllyRyderCupMatch.ptn");
-    PtnFile ptnFile("/Users/ally/clones/takbag/LongStackyGame.ptn");
-    // PtnFile ptnFile("/Users/ally/clones/takbag/RoadWin.ptn");
+    PtnFile ptnFile("/Users/ally/clones/takbag/games/LongStackyGame.ptn");
     Game ptnGame(ptnFile);
     std::cout << ptnGame.print() << std::endl;
 #endif

@@ -3,7 +3,7 @@
 #include "Player.h"
 #include "Square.h"
 #include "Move.h"
-#include "ptn.h"
+#include "Ptn.h"
 
 #include <vector>
 #include <unordered_map>
