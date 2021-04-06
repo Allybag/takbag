@@ -79,7 +79,7 @@ Game::Game(const PtnFile& ptnFile) : Game(ptnFile.mSize)
         std::cout << "Ply: " << mPly << " Move: " << ptnTurn.mSourceString << std::endl;
         fillPtn(ptnTurn);
         play(ptnTurn.mSourceString);
-        std::cerr << print() << std::endl;
+        std::cout << print() << std::endl;
     }
 
     std::cout << "Game of size " << mPosition.size() << " with " << mMoveList.size() << " moves" << std::endl;

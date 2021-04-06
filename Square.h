@@ -74,9 +74,6 @@ std::string Square::print() const
     for (std::size_t i = mCount - 1; i != 0; --i) // We start at mCount - 1 as we have already printed the top stone
         output << (mStack & (1 << (i - 1)) ? "f" : "F");
 
-    if (mCount > 1)
-        std::cerr << "Top: " << this->mTopStone << " count: " << static_cast<int>(this->mCount) << " stack: " << this->mStack << std::endl;
-
     return output.str();
 }
 
@@ -91,7 +88,7 @@ void Square::add(Square& source, uint8_t count)
     if (isWall(mTopStone))
     {
         assert(source.mCount == 1 && isCap(source.mTopStone));
-        std::cerr << "Wall smash!" << std::endl;
+        std::cout << "Wall smash!" << std::endl;
         // We don't actually use mTopStone again, so we don't need to flatten it
     }
 

@@ -84,7 +84,7 @@ std::string Position::print() const
     {
         std::size_t remainingFlats = mFlatReserves[side];
         std::size_t remainingCaps = mCapReserves[side];
-        output << side << " has " << remainingFlats << " flat" <<  (remainingFlats == 1 ? "" : "s") << " remaining";
+        output << side << " has " << remainingFlats << " flat" <<  (remainingFlats == 1 ? "" : "s");
         output << " and " << remainingCaps << " cap" << (remainingCaps == 1 ? "" : "s") << " remaining\n";
     }
 
@@ -167,7 +167,6 @@ void Position::play(const PtnTurn &ptn)
 {
     std::size_t index = getPtnIndex(ptn);
     auto moves = generateMoves();
-    std::cerr << "There are " << moves.size() << " legal moves" << std::endl;
     if (ptn.mType == MoveType::Place)
     {
         auto placeMove = Move(index, ptn.mTopStone);
@@ -256,7 +255,7 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
 {
     const Square& square = mBoard[index];
 
-    std::size_t maxHandSize = std::max(static_cast<std::size_t>(square.mCount), mSize);
+    std::size_t maxHandSize = std::min(static_cast<std::size_t>(square.mCount), mSize);
     bool isCapStack = isCap(square.mTopStone);
 
     for (const auto direction : Directions)
@@ -339,14 +338,11 @@ void DropCountGenerator::generateDropCounts(uint8_t sum, uint8_t distance, uint3
     if (distance == mMaxDistance)
         return;
 
-    if (mEndsInSmash && distance == (mMaxDistance - 1) && sum != (mTarget - 1))
+    if (mEndsInSmash && distance == (mMaxDistance) && sum != (mTarget - 1))
         return;
 
     for (uint8_t i = 1; i <= (mTarget - sum); ++i)
-    {
-        dropCounts += (i << ((distance - 1) * 4));
-        generateDropCounts(sum + i, ++distance, dropCounts, dropCountVec);
-    }
+        generateDropCounts(sum + i, distance + 1, dropCounts + (i << distance * 4), dropCountVec);
 }
 
 // TODO: Might be able to make this constexpr with C++20 constexpr vectors
@@ -356,14 +352,8 @@ std::vector<uint32_t> Position::generateDropCounts(std::size_t handSize, std::si
     std::vector<uint32_t> dropCountVec;
 
     DropCountGenerator generator(handSize, maxDistance, endsInSmash);
-    generator.generateDropCounts(0, 1, 0, dropCountVec);
+    generator.generateDropCounts(0, 0, 0, dropCountVec);
     return dropCountVec;
-    // 1, 1, false -> 1
-    // 2, 2, false -> 11 ,2
-    // 3, 3, false -> 111, 12, 21, 3
-    // 4, 4, false -> 1111, 112, 121, 13, 211, 22, 31, 4
-    // 6, 3, false -> 114, 123, 132, 141, 15, 213, 222, 231, 24, 312, 321, 33, 411, 42, 51, 6
-    // 6, 3, false -> 6, 15, 24, 33, 42, 51, 114, 123, 132, 141, 213, 222, 231, 312, 321, 411
 
 }
 

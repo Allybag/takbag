@@ -31,8 +31,8 @@ int main()
     std::cout << game.print();
 #else
 
-    PtnFile ptnFile("/Users/ally/clones/takbag/SimmonAllyRyderCupMatch.ptn");
-    // PtnFile ptnFile("/Users/ally/clones/takbag/LongStackyGame.ptn");
+    // PtnFile ptnFile("/Users/ally/clones/takbag/SimmonAllyRyderCupMatch.ptn");
+    PtnFile ptnFile("/Users/ally/clones/takbag/LongStackyGame.ptn");
     Game ptnGame(ptnFile);
 #endif
     return 0;
