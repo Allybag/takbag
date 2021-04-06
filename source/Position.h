@@ -183,6 +183,7 @@ void Position::move(const Move &move)
 
 void Position::play(const PtnTurn &ptn)
 {
+    assert(checkResult() == Result::None);
     std::size_t index = getPtnIndex(ptn);
     auto moves = generateMoves();
     if (ptn.mType == MoveType::Place)
@@ -227,17 +228,13 @@ std::vector<Move> Position::generateMoves() const
         return generateOpeningMoves();
 
     std::vector<Move> moves;
-    std::size_t placeMoves = 0;
-    std::size_t moveMoves = 0;
     for (int index = 0; index < mBoard.size(); ++index)
     {
         const Square& square = mBoard[index];
         if (square.mTopStone == Stone::Blank)
         {
             assert(square.mCount == 0 && square.mStack == 0);
-            std::size_t moveCount = moves.size();
             addPlaceMoves(index, moves);
-            placeMoves += moves.size() - moveCount;
         }
         else
         {
@@ -245,14 +242,11 @@ std::vector<Move> Position::generateMoves() const
             bool stoneIsBlack = square.mTopStone & StoneBits::Black;
             bool playerIsBlack = (mToPlay == Player::Black);
 
-            std::size_t moveCount = moves.size();
             if (playerIsBlack == stoneIsBlack)
                 addMoveMoves(index, moves);
-            moveMoves += moves.size() - moveCount;
         }
     }
 
-    std::cout << "Generated " << placeMoves << " places and " << moveMoves << " moves" << std::endl;
     return moves;
 }
 
@@ -329,8 +323,7 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
             for (const auto dropCount : dropCounts)
             {
                 moves.emplace_back(index, handSize, dropCount, direction);
-
-#if 1
+#if 0
                 Move moveMove(index, handSize, dropCount, direction);
                 std::cout << moveMove << std::endl;
 #endif
@@ -379,14 +372,14 @@ Result Position::checkRoadWin() const {
     for (std::size_t index = 0; index < mBoard.size(); ++index)
     {
         Stone topStone = mBoard[index].mTopStone;
-        if (topStone == Stone::Blank)
+        if (topStone == Stone::Blank || isWall(topStone))
             continue;
 
         uint8_t colour = topStone & StoneBits::Black;
         if (squareInIsland[index])
             continue;
 
-        // We do a bfs
+        // We do a breadth first search
         std::vector<std::size_t> parents;
         parents.push_back(index);
         std::vector<std::size_t> island;
@@ -408,7 +401,7 @@ Result Position::checkRoadWin() const {
                         continue; // Empty
                     if ((neighbourStone & StoneBits::Black) != colour)
                         continue; // Wrong colour
-                    if (!(neighbourStone & StoneBits::Road))
+                    if (isWall(neighbourStone))
                         continue; // Wall
 
                     children.push_back(neighbour);
@@ -419,7 +412,18 @@ Result Position::checkRoadWin() const {
 
         // TODO: Dragon clause
         if (checkConnectsOppositeEdges(island))
+        {
+#if 0
+            std::cout << "Island contains ";
+            for (const auto islandIndex : island)
+            {
+                std::cout << islandIndex << ",";
+            }
+            std::cout << std::endl;
+#endif
+
             return static_cast<Result>((topStone & StoneBits::Black) | Result::WhiteRoad);
+        }
 
     }
     return Result::None;

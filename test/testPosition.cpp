@@ -31,3 +31,41 @@ TEST_CASE("Test Basic Move Generation", "[moveGen]")
     game.play("Sc4");
     REQUIRE(game.moveCount() == 87);
 }
+
+TEST_CASE("Test Basic Flat Win", "[gameResult]")
+{
+    PtnFile ptnFile("games/FlatLoss.ptn"); // My first game which went to flats, loss against TakticianBot
+    Game game(ptnFile);
+    REQUIRE(game.checkResult() == Result::BlackFlat);
+}
+
+TEST_CASE("Test Board Fill Flat Result", "[gameResult]")
+{
+    PtnFile ptnFile("games/BoardFillDraw.ptn");
+    Game game(ptnFile);
+    REQUIRE(game.checkResult() == Result::Draw);
+}
+
+TEST_CASE("Test Basic Road Win", "[gameResult]")
+{
+    PtnFile ptnFile("games/RoadWin.ptn"); // My first game against a human on playtak
+    Game game(ptnFile);
+    REQUIRE(game.checkResult() == Result::BlackRoad);
+}
+
+// TODO: Find the games to test this
+#if 0
+TEST_CASE("Test Road Supercedes Flat Win", "[gameResult]")
+{
+    PtnFile ptnFile("games/RoadWinLastFlat.ptn");
+    Game game(ptnFile);
+    REQUIRE(game.checkResult() == Result::BlackRoad);
+}
+
+TEST_CASE("Test Dragon Clause", "[gameResult]")
+{
+    PtnFile ptnFile("games/DragonClause.ptn");
+    Game game(ptnFile);
+    REQUIRE(game.checkResult() == Result::BlackRoad);
+}
+#endif
