@@ -8,6 +8,7 @@
 #include <vector>
 #include <unordered_map>
 #include <sstream>
+#include <algorithm>
 
 static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> pieceCounts = {
         std::make_pair(3, std::make_pair(10, 0)),
@@ -37,6 +38,7 @@ public:
     std::size_t getPtnIndex(const PtnTurn& ptn) const;
 
     void play(const PtnTurn& ptn);
+    std::vector<Move> generateMoves() const;
 
     std::string print() const;
 
@@ -44,6 +46,12 @@ private:
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
     void place(const Move& place);
     void move(const Move& move);
+
+    std::vector<Move> generateOpeningMoves() const;
+    void addPlaceMoves(std::size_t index, std::vector<Move>& moves) const;
+    void addMoveMoves(std::size_t index, std::vector<Move>& moves) const;
+
+    static std::vector<uint32_t> generateDropCounts(std::size_t handSize, std::size_t maxDistance, bool endsInSmash);
 
 };
 
@@ -74,8 +82,9 @@ std::string Position::print() const
 
     for (const auto side : {Player::White, Player::Black})
     {
+        std::size_t remainingFlats = mFlatReserves[side];
         std::size_t remainingCaps = mCapReserves[side];
-        output << side << " has " << mFlatReserves[side] << " stones remaining";
+        output << side << " has " << remainingFlats << " flat" <<  (remainingFlats == 1 ? "" : "s") << " remaining";
         output << " and " << remainingCaps << " cap" << (remainingCaps == 1 ? "" : "s") << " remaining\n";
     }
 
@@ -118,6 +127,7 @@ void Position::place(const Move& place)
 void Position::move(const Move &move)
 {
     assert(move.mIndex < mBoard.size());
+    assert(move.mCount <= mSize);
     assert(mOpeningSwapMoves == 0);
 
     Square& source = mBoard[move.mIndex];
@@ -156,13 +166,19 @@ void Position::move(const Move &move)
 void Position::play(const PtnTurn &ptn)
 {
     std::size_t index = getPtnIndex(ptn);
+    auto moves = generateMoves();
+    std::cerr << "There are " << moves.size() << " legal moves" << std::endl;
     if (ptn.mType == MoveType::Place)
     {
-        place(Move(index, ptn.mTopStone));
+        auto placeMove = Move(index, ptn.mTopStone);
+        assert(std::find(moves.begin(), moves.end(), placeMove) != moves.cend());
+        place(placeMove);
     }
     else
     {
-        move(Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection));
+        auto moveMove = Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection);
+        assert(std::find(moves.begin(), moves.end(), moveMove) != moves.cend());
+        move(moveMove);
     }
 }
 
@@ -187,3 +203,167 @@ int Position::getOffset(Direction direction) const
             return 0;
     }
 }
+
+std::vector<Move> Position::generateMoves() const
+{
+    if (mOpeningSwapMoves)
+        return generateOpeningMoves();
+
+    std::vector<Move> moves;
+    for (int index = 0; index < mBoard.size(); ++index)
+    {
+        const Square& square = mBoard[index];
+        if (square.mTopStone == Stone::Blank)
+        {
+            assert(square.mCount == 0 && square.mStack == 0);
+            addPlaceMoves(index, moves);
+        }
+        else
+        {
+            assert(square.mCount > 0);
+            bool stoneIsBlack = square.mTopStone & StoneBits::Black;
+            bool playerIsBlack = (mToPlay == Player::Black);
+
+            if (playerIsBlack == stoneIsBlack)
+                addMoveMoves(index, moves);
+        }
+    }
+
+    return moves;
+}
+
+
+void Position::addPlaceMoves(std::size_t index, std::vector<Move> &moves) const
+{
+    StoneBits colour = (mToPlay == Player::Black) ? StoneBits::Black : StoneBits::Stone;
+    std::vector<Stone> potentialStones;
+    if (mFlatReserves[mToPlay])
+    {
+        potentialStones.push_back(static_cast<Stone>(Stone::WhiteFlat | colour));
+        potentialStones.push_back(static_cast<Stone>(Stone::WhiteWall | colour));
+    }
+    if (mCapReserves[mToPlay])
+    {
+        potentialStones.push_back(static_cast<Stone>(Stone::WhiteCap | colour));
+    }
+
+    for (const auto& stone : potentialStones)
+        moves.emplace_back(index, stone);
+
+}
+
+void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
+{
+    const Square& square = mBoard[index];
+
+    std::size_t maxHandSize = std::max(static_cast<std::size_t>(square.mCount), mSize);
+    bool isCapStack = isCap(square.mTopStone);
+
+    for (const auto direction : Directions)
+    {
+        const int offset = getOffset(direction);
+
+        std::size_t maxDistance = mSize;
+        bool endsInSmash = false;
+        for (std::size_t j = 1; j <= maxHandSize; ++j)
+        {
+            int nextIndex = index + j * offset;
+            if (nextIndex > mBoard.size())
+            {
+                maxDistance = j - 1;
+                break;
+            }
+
+            const Square nextSquare = mBoard[nextIndex];
+            if (isWall(nextSquare.mTopStone) && isCapStack)
+            {
+                maxDistance = j;
+                endsInSmash = true;
+                break;
+            }
+
+            if (nextSquare.mTopStone & StoneBits::Standing) // Either a cap stack, or a wall and we aren't a cap stack
+            {
+                maxDistance = j - 1;
+                break;
+            }
+        }
+
+        if (maxDistance == 0)
+            continue;
+
+        for (std::size_t handSize = 1; handSize <= maxHandSize; ++handSize)
+        {
+            auto dropCounts = generateDropCounts(handSize, maxDistance, endsInSmash);
+            for (const auto dropCount : dropCounts)
+                moves.emplace_back(index, handSize, dropCount, direction);
+        }
+    }
+}
+
+std::vector<Move> Position::generateOpeningMoves() const
+{
+    std::vector<Move> moves;
+
+    // Super simple, we can play a flat of the opposite colour in any empty square
+    for (std::size_t index = 0; index < mBoard.size(); ++index)
+    {
+        const Square& square = mBoard[index];
+        if (square.mTopStone == Stone::Blank)
+        {
+            Stone stone = (mToPlay == Player::White) ? Stone::BlackFlat : Stone::WhiteFlat;
+            assert(square.mCount == 0 && square.mStack == 0);
+            moves.emplace_back(index, stone);
+        }
+    }
+
+    return moves;
+}
+
+struct DropCountGenerator
+{
+    uint8_t mTarget;
+    uint8_t mMaxDistance;
+    bool mEndsInSmash;
+    DropCountGenerator(uint8_t target, uint8_t maxDistance, bool endsInSmash) : mTarget(target), mMaxDistance(maxDistance), mEndsInSmash(endsInSmash) { }
+
+    void generateDropCounts(uint8_t sum, uint8_t distance, uint32_t dropCounts, std::vector<uint32_t>& dropCountVec) const;
+
+};
+
+void DropCountGenerator::generateDropCounts(uint8_t sum, uint8_t distance, uint32_t dropCounts, std::vector<uint32_t> &dropCountVec) const
+{
+    if (sum == mTarget)
+        dropCountVec.push_back(dropCounts);
+
+    if (distance == mMaxDistance)
+        return;
+
+    if (mEndsInSmash && distance == (mMaxDistance - 1) && sum != (mTarget - 1))
+        return;
+
+    for (uint8_t i = 1; i <= (mTarget - sum); ++i)
+    {
+        dropCounts += (i << ((distance - 1) * 4));
+        generateDropCounts(sum + i, ++distance, dropCounts, dropCountVec);
+    }
+}
+
+// TODO: Might be able to make this constexpr with C++20 constexpr vectors
+// Can only be called in (8 * 8 * 2 = 128) possible configurations
+std::vector<uint32_t> Position::generateDropCounts(std::size_t handSize, std::size_t maxDistance, bool endsInSmash)
+{
+    std::vector<uint32_t> dropCountVec;
+
+    DropCountGenerator generator(handSize, maxDistance, endsInSmash);
+    generator.generateDropCounts(0, 1, 0, dropCountVec);
+    return dropCountVec;
+    // 1, 1, false -> 1
+    // 2, 2, false -> 11 ,2
+    // 3, 3, false -> 111, 12, 21, 3
+    // 4, 4, false -> 1111, 112, 121, 13, 211, 22, 31, 4
+    // 6, 3, false -> 114, 123, 132, 141, 15, 213, 222, 231, 24, 312, 321, 33, 411, 42, 51, 6
+    // 6, 3, false -> 6, 15, 24, 33, 42, 51, 114, 123, 132, 141, 213, 222, 231, 312, 321, 411
+
+}
+
