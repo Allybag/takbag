@@ -31,13 +31,6 @@ int main()
     std::cout << game.print();
 #elif 0
     // ["d3", "c3", "c4", "1d3<", "1c4-", "Sc4"]
-    Game game(5);
-    game.play("d3");
-    game.play("c3");
-    game.play("c4");
-    game.play("d3<");
-    game.play("c4-");
-    game.play("Sc4");
     std::cout << game.print() << std::endl;
     std::cout << game.moveCount() << std::endl;
 
