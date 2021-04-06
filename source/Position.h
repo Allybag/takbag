@@ -292,7 +292,7 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
         for (std::size_t j = 1; j <= maxHandSize; ++j)
         {
             int nextIndex = index + j * offset;
-            if (nextIndex > mBoard.size()) // Stops us going off the top or bottom of the board
+            if (nextIndex >= mBoard.size()) // Stops us going off the top or bottom of the board
             {
                 maxDistance = j - 1;
                 break;
@@ -330,7 +330,7 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
             {
                 moves.emplace_back(index, handSize, dropCount, direction);
 
-#if 0
+#if 1
                 Move moveMove(index, handSize, dropCount, direction);
                 std::cout << moveMove << std::endl;
 #endif
@@ -483,7 +483,7 @@ std::vector<std::size_t> Position::getNeighbours(std::size_t index) const
     {
         const int offset = getOffset(direction);
         const std::size_t neighbour = index + offset;
-        if (neighbour > mBoard.size())
+        if (neighbour >= mBoard.size())
             continue;
         if ((direction == Direction::Right || direction == Direction::Left))
             if ((neighbour / mSize) != (index / mSize)) // Stops us going off right or legt
