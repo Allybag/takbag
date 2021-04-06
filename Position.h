@@ -134,11 +134,12 @@ void Position::move(const Move &move)
 
     assert(source.mTopStone != Stone::Blank);
 
-    bool stoneIsBlack = source.mTopStone & StoneBits::Black;
-    bool playerIsBlack = (mToPlay == Player::Black);
+    const bool stoneIsBlack = source.mTopStone & StoneBits::Black;
+    const bool playerIsBlack = (mToPlay == Player::Black);
     assert(stoneIsBlack == playerIsBlack);
     assert(source.mCount + 1 >= move.mCount);
 
+    const bool movingLaterally = (move.mDirection == Direction::Left || move.mDirection == Direction::Right);
     const int offset = getOffset(move.mDirection);
     Square hand = Square(source, move.mCount); // Removes mCount flats from source
 
@@ -148,6 +149,9 @@ void Position::move(const Move &move)
     {
         std::size_t nextIndex = move.mIndex + ((i + 1) * offset);
         assert(nextIndex < mBoard.size()); // As size_t is unsigned this also checks for negative index
+
+        if (movingLaterally)
+            assert((nextIndex / mSize) == (move.mIndex / mSize)); // Stops us going off the right or left of the board
 
         Square& nextSquare = mBoard[nextIndex];
 

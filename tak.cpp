@@ -29,7 +29,7 @@ int main()
     game.play("3c4>21C");
 
     std::cout << game.print();
-#elif 1
+#elif 0
     // ["d3", "c3", "c4", "1d3<", "1c4-", "Sc4"]
     Game game(5);
     game.play("d3");
