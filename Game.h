@@ -25,6 +25,7 @@ public:
     void play(const std::string& ptnString);
     std::string print() const;
     std::size_t moveCount() const;
+    Result checkResult() const;
 };
 
 void Game::play(const std::string& ptnString)
@@ -89,4 +90,9 @@ Game::Game(const PtnFile& ptnFile) : Game(ptnFile.mSize)
 std::size_t Game::moveCount() const
 {
     return mPosition.generateMoves().size();
+}
+
+Result Game::checkResult() const
+{
+    return mPosition.checkResult();
 }

@@ -19,6 +19,51 @@ static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> piec
         std::make_pair(8, std::make_pair(50, 2)),
 };
 
+enum class Result : uint8_t
+{
+    None,
+    WhiteRoad,
+    WhiteFlat,
+    WhiteOther,
+    BlackRoad,
+    BlackFlat,
+    BlackOther,
+    Draw
+};
+
+std::ostream& operator<<(std::ostream& stream, Result result)
+{
+    switch (result)
+    {
+        case Result::WhiteRoad:
+            stream << "R-O";
+            break;
+        case Result::WhiteFlat:
+            stream << "F-O";
+            break;
+        case Result::WhiteOther:
+            stream << "1-O";
+            break;
+        case Result::BlackRoad:
+            stream << "0-R";
+            break;
+        case Result::BlackFlat:
+            stream << "0-F";
+            break;
+        case Result::BlackOther:
+            stream << "0-1";
+            break;
+        case Result::Draw:
+            stream << "1/2-1/2";
+            break;
+        case Result::None:
+            stream << "0-0";
+            break;
+    }
+
+    return stream;
+}
+
 class Position
 {
     const std::size_t mSize;
@@ -42,6 +87,8 @@ public:
 
     std::string print() const;
 
+    Result checkResult() const;
+
 private:
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
     void place(const Move& place);
@@ -52,6 +99,10 @@ private:
     void addMoveMoves(std::size_t index, std::vector<Move>& moves) const;
 
     static std::vector<uint32_t> generateDropCounts(std::size_t handSize, std::size_t maxDistance, bool endsInSmash);
+
+    Result checkRoadWin() const;
+    Result checkFlatWin() const;
+    PlayerPair<std::size_t> checkFlatCount() const;
 
 };
 
@@ -87,6 +138,10 @@ std::string Position::print() const
         output << side << " has " << remainingFlats << " flat" <<  (remainingFlats == 1 ? "" : "s");
         output << " and " << remainingCaps << " cap" << (remainingCaps == 1 ? "" : "s") << " remaining\n";
     }
+
+    Result result = checkResult();
+    if (result != Result::None)
+        output << "Result: " << result << "\n";
 
     return output.str();
 }
@@ -383,3 +438,57 @@ std::vector<uint32_t> Position::generateDropCounts(std::size_t handSize, std::si
 
 }
 
+Result Position::checkRoadWin() const {
+    return Result::None;
+}
+
+Result Position::checkFlatWin() const
+{
+    bool whiteStonesGone = (mFlatReserves.White == 0 && mCapReserves.White == 0);
+    bool blackStonesGone = (mFlatReserves.Black == 0 && mCapReserves.Black == 0);
+
+    bool boardFilled = true;
+    for (const auto& square : mBoard)
+    {
+        if (square.mTopStone == Stone::Blank)
+        {
+            boardFilled = false;
+            break;
+        }
+    }
+
+    if (whiteStonesGone || blackStonesGone || boardFilled)
+    {
+        auto flatCounts = checkFlatCount();
+        if (flatCounts.White > flatCounts.Black)
+            return Result::WhiteFlat;
+        else if (flatCounts.Black > flatCounts.White)
+            return Result::BlackFlat;
+        else
+            return Result::Draw;
+    }
+
+    return Result::None;
+}
+
+
+Result Position::checkResult() const
+{
+    Result roadResult = checkRoadWin();
+    return (roadResult != Result::None ? roadResult : checkFlatWin());
+}
+
+PlayerPair<std::size_t> Position::checkFlatCount() const
+{
+    PlayerPair<std::size_t> flatCounts{0};
+    for (const auto& square : mBoard)
+    {
+        if (square.mTopStone != Stone::Blank)
+        {
+        Player colour = (square.mTopStone & StoneBits::Black) ? Player::Black : Player::White;
+        flatCounts[colour] += 1;
+        }
+    }
+
+    return flatCounts;
+}
