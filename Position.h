@@ -19,51 +19,6 @@ static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> piec
         std::make_pair(8, std::make_pair(50, 2)),
 };
 
-enum class Result : uint8_t
-{
-    None,
-    WhiteRoad,
-    WhiteFlat,
-    WhiteOther,
-    BlackRoad,
-    BlackFlat,
-    BlackOther,
-    Draw
-};
-
-std::ostream& operator<<(std::ostream& stream, Result result)
-{
-    switch (result)
-    {
-        case Result::WhiteRoad:
-            stream << "R-O";
-            break;
-        case Result::WhiteFlat:
-            stream << "F-O";
-            break;
-        case Result::WhiteOther:
-            stream << "1-O";
-            break;
-        case Result::BlackRoad:
-            stream << "0-R";
-            break;
-        case Result::BlackFlat:
-            stream << "0-F";
-            break;
-        case Result::BlackOther:
-            stream << "0-1";
-            break;
-        case Result::Draw:
-            stream << "1/2-1/2";
-            break;
-        case Result::None:
-            stream << "0-0";
-            break;
-    }
-
-    return stream;
-}
-
 class Position
 {
     const std::size_t mSize;
@@ -99,6 +54,8 @@ private:
     void addMoveMoves(std::size_t index, std::vector<Move>& moves) const;
 
     static std::vector<uint32_t> generateDropCounts(std::size_t handSize, std::size_t maxDistance, bool endsInSmash);
+    std::vector<std::size_t> getNeighbours(std::size_t index) const;
+    bool checkConnectsOppositeEdges(const std::vector<std::size_t>& island) const;
 
     Result checkRoadWin() const;
     Result checkFlatWin() const;
@@ -439,6 +396,56 @@ std::vector<uint32_t> Position::generateDropCounts(std::size_t handSize, std::si
 }
 
 Result Position::checkRoadWin() const {
+    // Plan: We iterate through the board, creating "islands"
+    // We then look at each island, and check if it connects two sides
+    // TODO: Think about and optimise this
+    std::unordered_map<std::size_t, bool> squareInIsland;
+    for (std::size_t index = 0; index < mBoard.size(); ++index)
+    {
+        Stone topStone = mBoard[index].mTopStone;
+        if (topStone == Stone::Blank)
+            continue;
+
+        uint8_t colour = topStone & StoneBits::Black;
+        if (squareInIsland[index])
+            continue;
+
+        // We do a bfs
+        std::vector<std::size_t> parents;
+        parents.push_back(index);
+        std::vector<std::size_t> island;
+        while (!parents.empty())
+        {
+            std::vector<std::size_t> children;
+            for (const auto parent : parents)
+            {
+                island.push_back(parent);
+                squareInIsland[parent] = true;
+                for (const auto neighbour : getNeighbours(parent))
+                {
+                    if (squareInIsland[neighbour])
+                        continue; // Already assigned to an island
+
+                    Stone neighbourStone = mBoard[neighbour].mTopStone;
+
+                    if (neighbourStone == Stone::Blank)
+                        continue; // Empty
+                    if ((neighbourStone & StoneBits::Black) != colour)
+                        continue; // Wrong colour
+                    if (!(neighbourStone & StoneBits::Road))
+                        continue; // Wall
+
+                    children.push_back(neighbour);
+                }
+            }
+            std::swap(parents, children);
+        }
+
+        // TODO: Dragon clause
+        if (checkConnectsOppositeEdges(island))
+            return static_cast<Result>((topStone & StoneBits::Black) | Result::WhiteRoad);
+
+    }
     return Result::None;
 }
 
@@ -491,4 +498,45 @@ PlayerPair<std::size_t> Position::checkFlatCount() const
     }
 
     return flatCounts;
+}
+
+std::vector<std::size_t> Position::getNeighbours(std::size_t index) const
+{
+    std::vector<std::size_t> neighbours;
+    for (const auto direction : Directions)
+    {
+        const int offset = getOffset(direction);
+        const std::size_t neighbour = index + offset;
+        if (neighbour > mBoard.size())
+            continue;
+        if ((direction == Direction::Right || direction == Direction::Left))
+            if ((neighbour / mSize) != (index / mSize)) // Stops us going off right or legt
+                continue;
+
+        neighbours.push_back(neighbour);
+    }
+
+    return neighbours;
+}
+
+bool Position::checkConnectsOppositeEdges(const std::vector<std::size_t>& island) const
+{
+    bool connectsTop = false;
+    bool connectsBottom = false;
+    bool connectsLeft = false;
+    bool connectsRight = false;
+
+    for (const auto index : island)
+    {
+        if (index < mSize)
+            connectsBottom = true;
+        if (index > mBoard.size() - mSize)
+            connectsTop = true;
+        if (index % mSize == 0)
+            connectsLeft = true;
+        if (index % mSize == mSize - 1)
+            connectsRight = true;
+    }
+
+    return ((connectsLeft && connectsRight) || (connectsTop && connectsBottom));
 }

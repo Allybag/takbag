@@ -43,8 +43,8 @@ int main()
 
 #else
     // PtnFile ptnFile("/Users/ally/clones/takbag/SimmonAllyRyderCupMatch.ptn");
-    // PtnFile ptnFile("/Users/ally/clones/takbag/LongStackyGame.ptn");
-    PtnFile ptnFile("/Users/ally/clones/takbag/Draw.ptn");
+    PtnFile ptnFile("/Users/ally/clones/takbag/LongStackyGame.ptn");
+    // PtnFile ptnFile("/Users/ally/clones/takbag/RoadWin.ptn");
     Game ptnGame(ptnFile);
     std::cout << ptnGame.print() << std::endl;
 #endif
