@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Stone.h"
+#include <iostream>
 
 enum class Direction : uint8_t
 {
@@ -51,4 +52,53 @@ inline bool operator==(const Move& lhs, const Move& rhs)
 inline bool operator!=(const Move& lhs, const Move& rhs)
 {
     return !(lhs == rhs);
+}
+
+std::ostream& operator<<(std::ostream& stream, const Direction& dir)
+{
+    switch (dir)
+    {
+        case Direction::Up:
+            stream << "Up";
+            break;
+        case Direction::Down:
+            stream << "Down";
+            break;
+        case Direction::Left:
+            stream << "Left";
+            break;
+        case Direction::Right:
+            stream << "Right";
+            break;
+        case Direction::None:
+            assert(false);
+            break;
+    }
+    return stream;
+}
+
+std::ostream& operator<<(std::ostream& stream, const Move& move)
+{
+    if (move.mType == MoveType::Place)
+    {
+        stream << "Place a " << move.mStone << " at index " << move.mIndex;
+    }
+    else
+    {
+        stream << "Move " << move.mCount << " stones from index " << move.mIndex << " " << move.mDirection;
+        stream << " dropping ";
+
+        uint32_t dropCountMask = 0xf; // Last four bits set
+        uint8_t stonesLeftToDrop = move.mCount;
+        for (int i = 0; stonesLeftToDrop != 0; ++i)
+        {
+            uint8_t dropCount = (move.mDropCounts & (dropCountMask << i * 4)) >> (i * 4);
+            stonesLeftToDrop -= dropCount;
+            assert(dropCount > 0);
+            assert(dropCount <= 0x8);
+            stream << static_cast<int>(dropCount) << " ";
+        }
+        stream << "stones";
+    }
+    return stream;
 }
