@@ -24,6 +24,7 @@ public:
     explicit Game(const PtnFile& ptnFile);
     void play(const std::string& ptnString);
     std::string print() const;
+    std::size_t moveCount() const;
 };
 
 void Game::play(const std::string& ptnString)
@@ -83,4 +84,9 @@ Game::Game(const PtnFile& ptnFile) : Game(ptnFile.mSize)
     }
 
     std::cout << "Game of size " << mPosition.size() << " with " << mMoveList.size() << " moves" << std::endl;
+}
+
+std::size_t Game::moveCount() const
+{
+    return mPosition.generateMoves().size();
 }

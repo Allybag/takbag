@@ -209,13 +209,17 @@ std::vector<Move> Position::generateMoves() const
         return generateOpeningMoves();
 
     std::vector<Move> moves;
+    std::size_t placeMoves = 0;
+    std::size_t moveMoves = 0;
     for (int index = 0; index < mBoard.size(); ++index)
     {
         const Square& square = mBoard[index];
         if (square.mTopStone == Stone::Blank)
         {
             assert(square.mCount == 0 && square.mStack == 0);
+            std::size_t moveCount = moves.size();
             addPlaceMoves(index, moves);
+            placeMoves += moves.size() - moveCount;
         }
         else
         {
@@ -223,11 +227,14 @@ std::vector<Move> Position::generateMoves() const
             bool stoneIsBlack = square.mTopStone & StoneBits::Black;
             bool playerIsBlack = (mToPlay == Player::Black);
 
+            std::size_t moveCount = moves.size();
             if (playerIsBlack == stoneIsBlack)
                 addMoveMoves(index, moves);
+            moveMoves += moves.size() - moveCount;
         }
     }
 
+    std::cout << "Generated " << placeMoves << " places and " << moveMoves << " moves" << std::endl;
     return moves;
 }
 
@@ -267,11 +274,18 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
         for (std::size_t j = 1; j <= maxHandSize; ++j)
         {
             int nextIndex = index + j * offset;
-            if (nextIndex > mBoard.size())
+            if (nextIndex > mBoard.size()) // Stops us going off the top or bottom of the board
             {
                 maxDistance = j - 1;
                 break;
             }
+
+            if ((direction == Direction::Right || direction == Direction::Left))
+                if ((nextIndex / mSize) != (index / mSize)) // Stops us going off the right or left of the board
+                {
+                    maxDistance = j - 1;
+                    break;
+                }
 
             const Square nextSquare = mBoard[nextIndex];
             if (isWall(nextSquare.mTopStone) && isCapStack)
@@ -295,7 +309,15 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
         {
             auto dropCounts = generateDropCounts(handSize, maxDistance, endsInSmash);
             for (const auto dropCount : dropCounts)
+            {
                 moves.emplace_back(index, handSize, dropCount, direction);
+
+#if 0
+                Move moveMove(index, handSize, dropCount, direction);
+                std::cout << moveMove << std::endl;
+#endif
+
+            }
         }
     }
 }

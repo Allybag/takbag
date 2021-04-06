@@ -29,8 +29,19 @@ int main()
     game.play("3c4>21C");
 
     std::cout << game.print();
-#else
+#elif 1
+    // ["d3", "c3", "c4", "1d3<", "1c4-", "Sc4"]
+    Game game(5);
+    game.play("d3");
+    game.play("c3");
+    game.play("c4");
+    game.play("d3<");
+    game.play("c4-");
+    game.play("Sc4");
+    std::cout << game.print() << std::endl;
+    std::cout << game.moveCount() << std::endl;
 
+#else
     // PtnFile ptnFile("/Users/ally/clones/takbag/SimmonAllyRyderCupMatch.ptn");
     PtnFile ptnFile("/Users/ally/clones/takbag/LongStackyGame.ptn");
     Game ptnGame(ptnFile);
