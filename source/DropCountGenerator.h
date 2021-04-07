@@ -22,7 +22,7 @@ void DropCountGenerator::generateDropCounts(uint8_t sum, uint8_t distance, uint3
     if (distance == mMaxDistance)
         return;
 
-    if (mEndsInSmash && distance == (mMaxDistance) && sum != (mTarget - 1))
+    if (mEndsInSmash && distance == (mMaxDistance - 1) && sum != (mTarget - 1))
         return;
 
     for (uint8_t i = 1; i <= (mTarget - sum); ++i)

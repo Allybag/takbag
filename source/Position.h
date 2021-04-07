@@ -247,6 +247,16 @@ std::vector<Move> Position::generateMoves() const
         }
     }
 
+    // Check that at least we think all moves are legal
+    for (const auto& move : moves)
+    {
+        Position scratchPosition(*this);
+        if (move.mType == MoveType::Place)
+            scratchPosition.place(move);
+        else
+            scratchPosition.move(move);
+    }
+
     return moves;
 }
 
