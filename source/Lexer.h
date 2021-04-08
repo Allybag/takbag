@@ -60,7 +60,7 @@ std::ostream& operator<<(std::ostream& stream, TokenType tokenType)
 
 struct Token {
     TokenType mType;
-    std::string_view mValue;
+    std::string mValue;
 };
 
 std::ostream& operator<<(std::ostream& stream, const Token& token)
@@ -93,29 +93,36 @@ std::optional<Token> Lexer::match(std::string_view v) noexcept
 {
     if (auto [match, tagOpen, tagClose, tagKey, tagData, plyNum, placeMove, moveMove, gameResult, comment] = ctre::match<mPattern>(v); match) {
         if (tagOpen)
-            return Token{TokenType::TagOpen, tagOpen};
+            return Token{TokenType::TagOpen, std::string(tagOpen)};
         else if (tagClose)
-            return Token{TokenType::TagClose, tagClose};
+            return Token{TokenType::TagClose, std::string(tagClose)};
         else if (tagKey)
-            return Token{TokenType::TagKey, tagKey};
+            return Token{TokenType::TagKey, std::string(tagKey)};
         else if (tagData)
-            return Token{TokenType::TagData, tagData};
+            return Token{TokenType::TagData, std::string(tagData)};
         else if (plyNum)
-            return Token{TokenType::PlyNum, plyNum};
+            return Token{TokenType::PlyNum, std::string(plyNum)};
         else if (placeMove)
-            return Token{TokenType::PlaceMove, placeMove};
+            return Token{TokenType::PlaceMove, std::string(placeMove)};
         else if (moveMove)
-            return Token{TokenType::MoveMove, moveMove};
+            return Token{TokenType::MoveMove, std::string(moveMove)};
         else if (gameResult)
-            return Token{TokenType::GameResult, gameResult};
+            return Token{TokenType::GameResult, std::string(gameResult)};
         else if (comment)
-            return Token{TokenType::Comment, comment};
+            return Token{TokenType::Comment, std::string(comment)};
     }
     return std::nullopt;
 }
 
 std::vector<Token> Lexer::tokenise(const std::string& stringBuffer)
 {
+    if (!mBuffer.empty())
+    {
+        // Assuming we go line by line, should only ever come in here because of a multi line Comment or TagData
+        std::cout << "Left over: " << mBuffer << std::endl;
+        assert(false);
+    }
+
     mBuffer.append(stringBuffer);
 
     std::size_t startIndex = 0;
@@ -124,7 +131,6 @@ std::vector<Token> Lexer::tokenise(const std::string& stringBuffer)
     while (startIndex != std::string::npos)
     {
         const auto s = std::string_view(mBuffer.c_str() + startIndex, len);
-        std::cout << "Testing substring " << s << std::endl;
         auto item = match(s);
         if (item)
         {
