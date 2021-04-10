@@ -378,6 +378,7 @@ Result Position::checkRoadWin() const {
     // Plan: We iterate through the board, creating "islands"
     // We then look at each island, and check if it connects two sides
     // TODO: Think about and optimise this
+    Result result = Result::None;
     std::unordered_map<std::size_t, bool> squareInIsland;
     for (std::size_t index = 0; index < mBoard.size(); ++index)
     {
@@ -420,9 +421,10 @@ Result Position::checkRoadWin() const {
             std::swap(parents, children);
         }
 
-        // TODO: Dragon clause
+
         if (checkConnectsOppositeEdges(island))
         {
+
 #if 0
             std::cout << "Island contains ";
             for (const auto islandIndex : island)
@@ -431,12 +433,16 @@ Result Position::checkRoadWin() const {
             }
             std::cout << std::endl;
 #endif
+            bool roadIsBlack = topStone & StoneBits::Black;
+            bool playerIsBlack = (mToPlay == Player::Black);
+            result = static_cast<Result>((topStone & StoneBits::Black) | Result::WhiteRoad);
 
-            return static_cast<Result>((topStone & StoneBits::Black) | Result::WhiteRoad);
+            if (roadIsBlack != playerIsBlack)
+                return result; // Dragon clause, player should have already been toggled when he completed the road
         }
-
     }
-    return Result::None;
+
+    return result;
 }
 
 Result Position::checkFlatWin() const
@@ -480,7 +486,7 @@ PlayerPair<std::size_t> Position::checkFlatCount() const
     PlayerPair<std::size_t> flatCounts{0};
     for (const auto& square : mBoard)
     {
-        if (square.mTopStone != Stone::Blank)
+        if (square.mTopStone != Stone::Blank && isFlat(square.mTopStone))
         {
         Player colour = (square.mTopStone & StoneBits::Black) ? Player::Black : Player::White;
         flatCounts[colour] += 1;
@@ -520,7 +526,7 @@ bool Position::checkConnectsOppositeEdges(const std::vector<std::size_t>& island
     {
         if (index < mSize)
             connectsBottom = true;
-        if (index > mBoard.size() - mSize)
+        if (index >= mBoard.size() - mSize)
             connectsTop = true;
         if (index % mSize == 0)
             connectsLeft = true;
