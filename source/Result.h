@@ -51,3 +51,39 @@ std::ostream& operator<<(std::ostream& stream, Result result)
     return stream;
 }
 
+Result resultFromString(const std::string& resultString)
+{
+    if (resultString.size() == 3)
+    {
+        assert(resultString[1] == '-');
+        switch (resultString[0])
+        {
+            case 'R':
+                assert(resultString[2] == '0');
+                return Result::WhiteRoad;
+            case 'F':
+                assert(resultString[2] == '0');
+                return Result::WhiteFlat;
+            case '1':
+                assert(resultString[2] == '0');
+                return Result::WhiteOther;
+            case '0':
+                switch (resultString[2])
+                {
+                    case 'R':
+                        return Result::BlackRoad;
+                    case 'F':
+                        return Result::BlackFlat;
+                    case '1':
+                        return Result::BlackOther;
+                    default:
+                        assert(false);
+                }
+            default:
+                assert(false);
+        }
+    }
+
+    assert(resultString == "1/2-1/2");
+    return Result::Draw;
+}
