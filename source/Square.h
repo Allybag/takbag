@@ -82,13 +82,18 @@ void Square::add(Square& source, uint8_t count)
     assert(!isCap(mTopStone));
     assert(count);
     assert(source.mCount >= count);
-    assert(mCount + count < 32); // Could have more than 32 stones in a stack
+
+    if (mCount + count >= 32)
+    {
+        std::cout << "Dropping bottom 6 stones from stack of " << mCount + count << " stones" << std::endl;
+        mCount -= 6;
+        mStack >>= 6;
+    }
 
     // Wall smashes
     if (isWall(mTopStone))
     {
         assert(source.mCount == 1 && isCap(source.mTopStone));
-        std::cout << "Wall smash!" << std::endl;
         // We don't actually use mTopStone again, so we don't need to flatten it
     }
 
