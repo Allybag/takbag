@@ -57,7 +57,7 @@ public:
 void Parser::parseTag(const std::vector<Token>& tokens)
 {
     if (!mRemainingTokens.empty())
-        flush();
+        mParsedNodes = flush();
 
     assert(tokens[mIndex].mType == TokenType::TagOpen);
     assert(tokens[mIndex + 1].mType == TokenType::TagKey);
@@ -69,6 +69,9 @@ void Parser::parseTag(const std::vector<Token>& tokens)
 
 void Parser::parseResult(const std::vector<Token>& tokens)
 {
+    if (!mRemainingTokens.empty())
+        mParsedNodes = flush();
+
     assert(tokens[mIndex].mType == TokenType::GameResult);
     Result result = resultFromString(tokens[mIndex].mValue);
     mParsedNodes.emplace_back(result);
@@ -105,11 +108,12 @@ void Parser::parsePly(const std::vector<Token>& tokens)
                 movesRemaining = 0;
                 break;
             }
-            case TokenType::TagOpen:
             case TokenType::GameResult:
+            case TokenType::TagOpen:
             case TokenType::End:
                 assert(movesRemaining == 1);
                 movesRemaining = 0;
+                --mIndex;
                 break;
             case TokenType::PlaceMove:
                 moveTokens.push_back(tokens[mIndex]);

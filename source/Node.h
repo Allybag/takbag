@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iostream>
 
+#include "Token.h"
 #include "Result.h"
 
 enum class NodeType : uint8_t

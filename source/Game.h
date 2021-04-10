@@ -2,26 +2,34 @@
 
 #include "Position.h"
 #include "Ptn.h"
-#include "PtnFile.h"
+#include "PtnGame.h"
+#include "Token.h"
+#include "Node.h"
+#include "Generator.h"
 
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <fstream>
 
 class Game
 {
+    const std::string mFirstPlayer{"Unknown"};
+    const std::string mSecondPlayer{"Unknown"};
+    const std::string mDate{"?"};
+    const Result mPtnResult{Result::None};
+
     Position mPosition;
     std::vector<PtnTurn> mMoveList;
     std::size_t mPly;
 
-    std::unordered_map<PtnTag, std::string> mTags;
     std::unordered_map<std::string, std::string> mUnknownTags;
 
     void fillPtn(PtnTurn& ptn);
 
 public:
     explicit Game(std::size_t size) : mPosition(size), mMoveList{}, mPly(1) { }
-    explicit Game(const PtnFile& ptnFile);
+    explicit Game(const PtnGame& ptnGame);
     void play(const std::string& ptnString);
     std::string print() const;
     std::size_t moveCount() const;
@@ -74,17 +82,17 @@ std::string Game::print() const
     return mPosition.print();
 }
 
-Game::Game(const PtnFile& ptnFile) : Game(ptnFile.mSize)
+Game::Game(const PtnGame& ptnGame) : Game(ptnGame.mSize)
 {
-    for (auto ptnTurn : ptnFile.mMoves)
+    for (const auto& ptnTurn : ptnGame.mTurnNodes)
     {
-        std::cout << "Ply: " << mPly << " Move: " << ptnTurn.mSourceString << std::endl;
-        fillPtn(ptnTurn);
-        play(ptnTurn.mSourceString);
-        std::cout << print() << std::endl;
+        play(ptnTurn.mFirstToken.mValue);
+        if (ptnTurn.mSecondToken.mType != TokenType::End)
+            play(ptnTurn.mSecondToken.mValue);
     }
 
     std::cout << "Game of size " << mPosition.size() << " with " << mMoveList.size() << " moves" << std::endl;
+    std::cout << print() << std::endl;
 }
 
 std::size_t Game::moveCount() const
@@ -95,4 +103,38 @@ std::size_t Game::moveCount() const
 Result Game::checkResult() const
 {
     return mPosition.checkResult();
+}
+
+// Utility function to extract all games from a PTN file containing one or more games
+std::vector<Game> readGames(const std::string& ptnFilePath)
+{
+    std::vector<Game> games;
+    Lexer lexer;
+    Parser parser;
+    Generator generator;
+    std::ifstream fileStream(ptnFilePath);
+
+    std::string line;
+    while (getline(fileStream, line))
+    {
+        auto tokens = lexer.tokenise(line);
+        auto nodes = parser.parse(tokens);
+        auto ptnGames = generator.generate(nodes);
+        for (const auto& ptnGame : ptnGames)
+            games.emplace_back(ptnGame);
+    }
+    auto nodes = parser.flush();
+    auto ptnGames = generator.generate(nodes, true);
+    for (const auto& ptnGame : ptnGames)
+        games.emplace_back(ptnGame);
+
+    return games;
+}
+
+// Utility function to extract a game from a PTN file containing a single game
+Game readGame(const std::string& ptnFilePath)
+{
+    auto games = readGames(ptnFilePath);
+    assert(games.size() == 1);
+    return games.front();
 }

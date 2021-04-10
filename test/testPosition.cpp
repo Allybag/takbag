@@ -41,22 +41,22 @@ int main()
 
     "Basic Flat Win"_test = []
     {
-        PtnFile ptnFile("games/FlatLoss.ptn"); // My first game which went to flats, loss against TakticianBot
-        Game game(ptnFile);
+        std::string ptnFile("games/FlatLoss.ptn"); // My first game which went to flats, loss against TakticianBot
+        Game game = readGame(ptnFile);
         expect(game.checkResult() == Result::BlackFlat);
     };
 
     "Basic Board Fill"_test = []
     {
-        PtnFile ptnFile("games/BoardFillDraw.ptn"); // My first game which went to flats, loss against TakticianBot
-        Game game(ptnFile);
+        std::string ptnFile("games/BoardFillDraw.ptn"); // My first game which went to flats, loss against TakticianBot
+        Game game = readGame(ptnFile);
         expect(game.checkResult() == Result::Draw);
     };
 
     "Basic Road Win"_test = []
     {
-        PtnFile ptnFile("games/RoadWin.ptn"); // My first game against a human on playtak
-        Game game(ptnFile);
+        std::string ptnFile("games/RoadWin.ptn"); // My first game against a human on playtak
+        Game game = readGame(ptnFile);
         expect(game.checkResult() == Result::BlackRoad);
     };
 }
