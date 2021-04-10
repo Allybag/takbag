@@ -32,6 +32,14 @@ void PtnGame::addNode(const Node& node)
         case NodeType::TagNode:
             if (node.mFirstToken.mValue == "Size") // Ignoring all other tags atm
                 mSize = std::stoi(node.mSecondToken.mValue);
+            else if (node.mFirstToken.mValue == "Player1")
+                mFirstPlayer = node.mSecondToken.mValue;
+            else if (node.mFirstToken.mValue == "Player2")
+                mSecondPlayer = node.mSecondToken.mValue;
+            else if (node.mFirstToken.mValue == "Date")
+                mDate = node.mSecondToken.mValue;
+            else if (node.mFirstToken.mValue == "Result")
+                mPtnResult = node.mResult;
             break;
         case NodeType::TurnNode:
             assert(node.mTurnNum == mTurnNum + 1);
@@ -39,6 +47,7 @@ void PtnGame::addNode(const Node& node)
             mTurnNodes.push_back(node);
             break;
         case NodeType::ResultNode:
+            assert(mPtnResult == Result::None || mPtnResult == node.mResult);
             mPtnResult = node.mResult;
             break;
         case NodeType::CommentNode:

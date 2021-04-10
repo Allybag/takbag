@@ -76,6 +76,8 @@ Result resultFromString(const std::string& resultString)
                         return Result::BlackFlat;
                     case '1':
                         return Result::BlackOther;
+                    case 0:
+                        return Result::None; // Not a real result
                     default:
                         assert(false);
                 }
