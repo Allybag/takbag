@@ -21,6 +21,7 @@ enum class TokenType : uint8_t
     MoveMove, // 5a2>1121*''!! (<num>?<alpha><num><dir><num>*<*>[?!'])
     GameResult, // R-O (R-0F1) in various orders
     Comment, // { Player1 had to abandon the game } // ({.+})
+    End, // Cannot appear in PTN file, used to tell Parser that the previous turn is over
 };
 
 std::ostream& operator<<(std::ostream& stream, TokenType tokenType)
@@ -54,6 +55,8 @@ std::ostream& operator<<(std::ostream& stream, TokenType tokenType)
         case TokenType::Comment:
             stream << "Comment";
             break;
+        case TokenType::End:
+            break;
     }
     return stream;
 }
@@ -73,12 +76,13 @@ struct Lexer
 {
     static constexpr auto mPattern = ctll::fixed_string{"\\s*(\\[)" // TagOpen
                                                         "|(\\])" // TagClose
-                                                        "|([A-Za-z0-9_]+\\s)" // TagKey
-                                                        "|\"(.*)\"" //TagData
-                                                        "|\\s*([1-9][0-9]*)\\.\\s" // PlyNum
+                                                        "|\\s*([1-9]\\d*)\\.\\s" // PlyNum
                                                         "|\\s*([CSF]?[a-h][1-8]['!?]*)[\\s\x00]" // PlaceMove
                                                         "|\\s*([1-8]?[a-h][1-8][+-<>][1-8]*[CSF]?\\*?['!?]*)[\\s\x00]" // MoveMove
-                                                        "|\\s*([RF10](?:/2-1/2)|(?:-[RF10]))" // Result
+                                                        // "|\\s*([RF10](?:/2-1/2)|(?:-[RF10]))" // Result
+                                                        "|\\s*((?:(?:1/2-1/2)|(?:[RF10]-[RF10])))" // Result
+                                                        "|\"(.*)\"" //TagData
+                                                        "|(\\w+)\\s" // TagKey
                                                         "|\\s*\\{(.*?)\\}"}; // Comment
 
     std::string mBuffer;
@@ -91,7 +95,7 @@ struct Lexer
 
 std::optional<Token> Lexer::match(std::string_view v) noexcept
 {
-    if (auto [match, tagOpen, tagClose, tagKey, tagData, plyNum, placeMove, moveMove, gameResult, comment] = ctre::match<mPattern>(v); match) {
+    if (auto [match, tagOpen, tagClose, plyNum, placeMove, moveMove, gameResult, tagData, tagKey, comment] = ctre::match<mPattern>(v); match) {
         if (tagOpen)
             return Token{TokenType::TagOpen, std::string(tagOpen)};
         else if (tagClose)
@@ -130,6 +134,7 @@ std::vector<Token> Lexer::tokenise(const std::string& stringBuffer)
     std::vector<Token> items;
     while (startIndex != std::string::npos)
     {
+        // TODO: We're literally going character by character, must be a better way
         const auto s = std::string_view(mBuffer.c_str() + startIndex, len);
         auto item = match(s);
         if (item)
@@ -141,7 +146,7 @@ std::vector<Token> Lexer::tokenise(const std::string& stringBuffer)
         else
             ++len;
 
-        if (len + startIndex > mBuffer.size() + 1)
+        if (startIndex + len > mBuffer.size() + 1)
             break; // If we end abruptly with a move like "a1" need to read the null char on the end
     }
 
