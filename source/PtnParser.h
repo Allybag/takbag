@@ -6,6 +6,7 @@
 
 #include "Ptn.h"
 #include "Lexer.h"
+#include "Result.h"
 
 // The structure and design of this Parser is taken from the great free tutorial at
 // https://www.destroyallsoftware.com/screencasts/catalog/a-compiler-from-scratch
@@ -40,15 +41,12 @@ struct PtnGame
     std::unordered_map<std::string, std::string> mUnknownTags;
 
     std::size_t mSize;
-
-    PtnGame(std::stringstream& ptnStream); // A stream of lines from a PTN File
 };
 
 enum class NodeType : uint8_t
 {
     TagNode,
-    PlaceNode,
-    MoveNode,
+    TurnNode,
     ResultNode,
     CommentNode,
 };
@@ -60,11 +58,8 @@ std::ostream& operator<<(std::ostream& stream, NodeType nodeType)
         case NodeType::TagNode:
             stream << "Tag";
             break;
-        case NodeType::PlaceNode:
-            stream << "Place";
-            break;
-        case NodeType::MoveNode:
-            stream << "Move";
+        case NodeType::TurnNode:
+            stream << "Turn";
             break;
         case NodeType::ResultNode:
             stream << "Result";
@@ -78,15 +73,42 @@ std::ostream& operator<<(std::ostream& stream, NodeType nodeType)
 
 struct Node
 {
-    Node(NodeType type, std::string string) : mType(type), mString(std::move(string)) { }
-
     NodeType mType;
-    std::string mString;
+
+    // Only for Results
+    Result mResult{Result::None};
+
+    // Only for Turns
+    std::size_t mTurnNum{0};
+
+    // Used for Tags, Moves and Comments
+    Token mFirstToken; // TagKey, FirstMove or comment depending on mType
+    Token mSecondToken; // TagData or SecondMove depending on myType
+
+    Node(Token tagKey, Token tagData) : mType(NodeType::TagNode), mFirstToken(std::move(tagKey)), mSecondToken(std::move(tagData)) { }
+    Node(std::size_t turnNum, Token firstMove) : mType(NodeType::TurnNode), mTurnNum(turnNum), mFirstToken(std::move(firstMove)) { }
+    Node(std::size_t turnNum, Token firstMove, Token secondMove) : mType(NodeType::TurnNode), mTurnNum(turnNum), mFirstToken(std::move(firstMove)), mSecondToken(std::move(secondMove)) { }
+    Node(Result result) : mType(NodeType::ResultNode), mResult(result) { }
+    Node(Token comment) : mType(NodeType::CommentNode), mFirstToken(std::move(comment)) { }
 };
 
 std::ostream& operator<<(std::ostream& stream, const Node& node)
 {
-    stream << "Node of type " << node.mType << " with string " << node.mString;
+    stream << node.mType << " Node:";
+    if (node.mResult != Result::None)
+        stream << " Result: " << node.mResult;
+    if (node.mTurnNum != 0)
+        stream << " TurnNum: " << node.mTurnNum;
+    if (node.mFirstToken.mType != TokenType::End)
+    {
+        assert(node.mType != NodeType::ResultNode);
+        stream << " " << node.mFirstToken;
+    }
+    if (node.mSecondToken.mType != TokenType::End)
+    {
+        assert(node.mType == NodeType::TagNode || node.mType == NodeType::TurnNode);
+        stream << " and " << node.mSecondToken;
+    }
     return stream;
 }
 
@@ -118,23 +140,22 @@ void Parser::parseTag(const std::vector<Token>& tokens)
     assert(tokens[mIndex + 1].mType == TokenType::TagKey);
     assert(tokens[mIndex + 2].mType == TokenType::TagData);
     assert(tokens[mIndex + 3].mType == TokenType::TagClose);
-    std::string tagKey = tokens[mIndex + 1].mValue;
-    tagKey.append(":").append(tokens[mIndex + 2].mValue);
-    mParsedNodes.emplace_back(NodeType::TagNode, tagKey);
+    mParsedNodes.emplace_back(tokens[mIndex + 1], tokens[mIndex + 2]);
     mIndex += 4;
 }
 
 void Parser::parseResult(const std::vector<Token>& tokens)
 {
     assert(tokens[mIndex].mType == TokenType::GameResult);
-    mParsedNodes.emplace_back(NodeType::ResultNode, tokens[mIndex].mValue);
+    Result result = resultFromString(tokens[mIndex].mValue);
+    mParsedNodes.emplace_back(result);
     ++mIndex;
 }
 
 void Parser::parseComment(const std::vector<Token> &tokens)
 {
     assert(tokens[mIndex].mType == TokenType::Comment);
-    mParsedNodes.emplace_back(NodeType::ResultNode, tokens[mIndex].mValue);
+    mParsedNodes.emplace_back(tokens[mIndex]);
     ++mIndex;
 }
 
@@ -143,8 +164,10 @@ void Parser::parsePly(const std::vector<Token>& tokens)
     // PlyNum, 0 or more comments, PlaceMove or MoveMove, 0 or more comments, PlaceMove or MoveMove or GameResult (or nothing)
     std::size_t originalIndex = mIndex;
     assert(tokens[mIndex].mType == TokenType::PlyNum);
-    int moveNum = std::stoi(tokens[mIndex].mValue);
+    std::size_t moveNum = std::stoi(tokens[mIndex].mValue);
     ++mIndex;
+
+    std::vector<Token> moveTokens;
     int movesRemaining = 2;
     std::vector<Node> nodes;
     while (mIndex != tokens.size() && movesRemaining)
@@ -166,12 +189,12 @@ void Parser::parsePly(const std::vector<Token>& tokens)
                 movesRemaining = 0;
                 break;
             case TokenType::PlaceMove:
-                nodes.emplace_back(NodeType::PlaceNode, tokens[mIndex].mValue);
+                moveTokens.push_back(tokens[mIndex]);
                 movesRemaining -= 1;
                 mIndex++;
                 break;
             case TokenType::MoveMove:
-                nodes.emplace_back(NodeType::MoveNode, tokens[mIndex].mValue);
+                moveTokens.push_back(tokens[mIndex]);
                 movesRemaining -= 1;
                 mIndex++;
                 break;
@@ -193,7 +216,10 @@ void Parser::parsePly(const std::vector<Token>& tokens)
     }
     else
     {
-        mParsedNodes.insert(mParsedNodes.end(), nodes.begin(), nodes.end());
+        if (moveTokens.size() == 1)
+            mParsedNodes.emplace_back(moveNum, moveTokens[0]);
+        else if (moveTokens.size() == 2)
+            mParsedNodes.emplace_back(moveNum, moveTokens[0], moveTokens[1]);
     }
 }
 

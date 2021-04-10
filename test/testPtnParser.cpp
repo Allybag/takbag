@@ -12,7 +12,8 @@ int main()
 {
     Lexer lexer;
     Parser parser;
-    std::ifstream fileStream("/Users/ally/clones/takbag/games/ShortDump.ptn");
+    std::ifstream fileStream("games/ShortDump.ptn");
+    // std::ifstream fileStream("games/TiltakVsTakoSize6.ptn");
 
     std::string line;
     while (getline(fileStream, line))
@@ -21,7 +22,6 @@ int main()
         parser.accept(items);
     }
     parser.flush();
-    std::cout << "Tokens: \n";
     for (const auto& node : parser.getNodes())
         std::cout << node << std::endl;
 

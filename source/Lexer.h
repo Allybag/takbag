@@ -62,7 +62,7 @@ std::ostream& operator<<(std::ostream& stream, TokenType tokenType)
 }
 
 struct Token {
-    TokenType mType;
+    TokenType mType{TokenType::End};
     std::string mValue;
 };
 
@@ -120,13 +120,6 @@ std::optional<Token> Lexer::match(std::string_view v) noexcept
 
 std::vector<Token> Lexer::tokenise(const std::string& stringBuffer)
 {
-    if (!mBuffer.empty())
-    {
-        // Assuming we go line by line, should only ever come in here because of a multi line Comment or TagData
-        std::cout << "Left over: " << mBuffer << std::endl;
-        assert(false);
-    }
-
     mBuffer.append(stringBuffer);
 
     std::size_t startIndex = 0;
