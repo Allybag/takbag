@@ -14,12 +14,13 @@
 
 class Game
 {
+    Position mPosition;
+
     const std::string mFirstPlayer{"Unknown"};
     const std::string mSecondPlayer{"Unknown"};
     const std::string mDate{"?"};
     const Result mPtnResult{Result::None};
 
-    Position mPosition;
     std::vector<PtnTurn> mMoveList;
     std::size_t mPly;
 
@@ -27,6 +28,7 @@ class Game
 
     void fillPtn(PtnTurn& ptn);
 
+    void checkPtnResult() const;
 public:
     explicit Game(std::size_t size) : mPosition(size), mMoveList{}, mPly(1) { }
     explicit Game(const PtnGame& ptnGame);
@@ -82,7 +84,7 @@ std::string Game::print() const
     return mPosition.print();
 }
 
-Game::Game(const PtnGame& ptnGame) : Game(ptnGame.mSize)
+Game::Game(const PtnGame& ptnGame) : mPosition(ptnGame.mSize), mFirstPlayer(ptnGame.mFirstPlayer), mSecondPlayer(ptnGame.mSecondPlayer), mDate(ptnGame.mDate), mPtnResult(ptnGame.mPtnResult), mPly(1)
 {
     for (const auto& ptnTurn : ptnGame.mTurnNodes)
     {

@@ -10,5 +10,5 @@
 
 int main()
 {
-    auto games = readGames("games/BoardFillDraw.ptn");
+    auto games = readGames("games/TiltakVsTakoSize6.ptn");
 }
