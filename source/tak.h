@@ -7,4 +7,4 @@
 #include "Position.h"
 #include "Game.h"
 #include "Ptn.h"
-#include "PtnParser.h"
+#include "ptn/PtnParser.h"

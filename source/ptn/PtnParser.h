@@ -113,7 +113,6 @@ void Parser::parsePly(const std::vector<Token>& tokens)
             case TokenType::End:
                 assert(movesRemaining == 1);
                 movesRemaining = 0;
-                --mIndex;
                 break;
             case TokenType::PlaceMove:
                 moveTokens.push_back(tokens[mIndex]);
@@ -176,6 +175,7 @@ std::vector<Node> Parser::parse(const std::vector<Token>& tokens)
             case TokenType::MoveMove:
             case TokenType::End:
                 assert(false); // None of these tokens are valid to begin a Node
+                // TODO: We actually can start with a move after a long (or multi line) comment
                 break;
         }
     }

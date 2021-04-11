@@ -2,10 +2,10 @@
 
 #include "Position.h"
 #include "Ptn.h"
-#include "PtnGame.h"
-#include "Token.h"
-#include "Node.h"
-#include "Generator.h"
+#include "ptn/PtnGame.h"
+#include "ptn/Token.h"
+#include "ptn/Node.h"
+#include "ptn/Generator.h"
 
 #include <string>
 #include <vector>

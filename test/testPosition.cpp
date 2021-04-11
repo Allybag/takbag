@@ -59,4 +59,11 @@ int main()
         Game game = readGame(ptnFile);
         expect(game.checkResult() == Result::BlackRoad);
     };
+
+    "Dragon Road Win"_test = []
+    {
+        std::string ptnFile("games/DragonClause.ptn"); // A recent game with a dragon clause
+        Game game = readGame(ptnFile);
+        expect(game.checkResult() == Result::WhiteRoad);
+    };
 }

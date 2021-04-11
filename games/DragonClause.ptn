@@ -1,0 +1,43 @@
+[Site "PlayTak.com"]
+[Event "Online Play"]
+[Date "2021.03.15"]
+[Time "16:03:54"]
+[Player1 "Reid"]
+[Player2 "Ineria"]
+[Clock "15:0 +10"]
+[Result "R-0"]
+[Size "6"]
+[Komi "0"]
+[Flats "30"]
+[Caps "1"]
+[Opening "swap"]
+
+1. a6 f1
+2. d3 c3
+3. d4 c4
+4. d2 e4
+5. d5 Ce3
+6. d1 e3<
+7. e3 f4
+8. e5 b4
+9. Cb3 b5
+10. c5 b6
+11. b3+ b5>
+12. 2b4> d6
+13. e6 e2
+14. f6 c6
+15. b4 2d3+
+16. 3c4+ 3d4+
+17. d4 e4+
+18. e6- 4d5>
+19. d5 5e5<
+20. 4c5+ c4
+21. b4> c3+
+22. d4< Sd4
+23. 4c4-22 Sc4
+24. Sf5 e4
+25. b2 c4-
+26. a2 3c3-
+27. c4 d3
+28. e1 c1
+29. 4c6-1111* R-0
