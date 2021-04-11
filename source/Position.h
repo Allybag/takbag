@@ -8,7 +8,7 @@
 #include "Player.h"
 #include "Square.h"
 #include "Move.h"
-#include "Ptn.h"
+#include "ptn/Ptn.h"
 #include "Result.h"
 #include "DropCountGenerator.h"
 

@@ -6,7 +6,7 @@
 
 #include "Ptn.h"
 #include "Lexer.h"
-#include "Result.h"
+#include "../Result.h"
 #include "Node.h"
 
 // The structure and design of this Parser is taken from the great free tutorial at

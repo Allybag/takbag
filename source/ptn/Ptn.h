@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Stone.h"
-#include "Move.h"
+#include "../Stone.h"
+#include "../Move.h"
 #include <string>
 
 struct PtnTurn

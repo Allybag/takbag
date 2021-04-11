@@ -1,8 +1,15 @@
-#include "tak.h"
-
+#include "Game.h"
 #include <iostream>
 
-int main()
+int main(int argc, char** argv)
 {
-    return 0;
+    Game game = Game(6);
+    std::cout << game.print() << std::endl;
+
+    std::string ptn;
+    while (std::cin >> ptn)
+    {
+        game.play(ptn);
+        std::cout << game.print() << std::endl;
+    }
 }

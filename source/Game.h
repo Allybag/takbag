@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Position.h"
-#include "Ptn.h"
+#include "ptn/Ptn.h"
 #include "ptn/PtnGame.h"
 #include "ptn/Token.h"
 #include "ptn/Node.h"

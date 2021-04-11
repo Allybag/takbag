@@ -6,7 +6,7 @@
 #include <sstream>
 
 #include "Ptn.h"
-#include "Result.h"
+#include "../Result.h"
 #include "Node.h"
 
 struct PtnGame
