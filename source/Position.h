@@ -34,6 +34,12 @@ class Position
 public:
     explicit Position(std::size_t size);
 
+    Position(const Position&) noexcept = default;
+    Position(Position&&) noexcept = default;
+    Position& operator=(const Position& other) noexcept;
+    Position& operator=(Position&& other) noexcept;
+    ~Position() = default;
+
     std::size_t size() const { return mSize; }
     const Square& operator[](std::size_t index) const { return mBoard[index]; }
     int getOffset(Direction direction) const;
@@ -45,11 +51,11 @@ public:
     std::string print() const;
 
     Result checkResult() const;
+    void place(const Move& place);
+    void move(const Move& move);
 
 private:
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
-    void place(const Move& place);
-    void move(const Move& move);
 
     std::vector<Move> generateOpeningMoves() const;
     void addPlaceMoves(std::size_t index, std::vector<Move>& moves) const;
@@ -535,4 +541,23 @@ bool Position::checkConnectsOppositeEdges(const std::vector<std::size_t>& island
     }
 
     return ((connectsLeft && connectsRight) || (connectsTop && connectsBottom));
+}
+
+Position& Position::operator=(const Position& other) noexcept
+{
+    assert(mSize == other.mSize);
+    mBoard = other.mBoard;
+    mToPlay = other.mToPlay;
+    mOpeningSwapMoves = other.mOpeningSwapMoves;
+    mFlatReserves = other.mFlatReserves;
+    mCapReserves = other.mCapReserves;
+}
+Position& Position::operator=(Position&& other) noexcept
+{
+    assert(mSize == other.mSize);
+    mBoard = other.mBoard;
+    mToPlay = other.mToPlay;
+    mOpeningSwapMoves = other.mOpeningSwapMoves;
+    mFlatReserves = other.mFlatReserves;
+    mCapReserves = other.mCapReserves;
 }

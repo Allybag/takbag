@@ -36,6 +36,11 @@ public:
     std::string print() const;
     std::size_t moveCount() const;
     Result checkResult() const;
+
+    // TODO: This isn't the API we want
+    // void acceptPosition(Position& position) { mPosition = move(position); }
+    Position& getPosition() { return mPosition; }
+    void incrementPly() { ++mPly; }
 };
 
 void Game::play(const std::string& ptnString)
