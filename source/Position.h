@@ -551,6 +551,7 @@ Position& Position::operator=(const Position& other) noexcept
     mOpeningSwapMoves = other.mOpeningSwapMoves;
     mFlatReserves = other.mFlatReserves;
     mCapReserves = other.mCapReserves;
+    return *this;
 }
 Position& Position::operator=(Position&& other) noexcept
 {
@@ -560,4 +561,5 @@ Position& Position::operator=(Position&& other) noexcept
     mOpeningSwapMoves = other.mOpeningSwapMoves;
     mFlatReserves = other.mFlatReserves;
     mCapReserves = other.mCapReserves;
+    return *this;
 }
