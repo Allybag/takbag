@@ -2,6 +2,7 @@
 
 #include "Stone.h"
 
+#include <iostream>
 #include <string>
 #include <sstream>
 

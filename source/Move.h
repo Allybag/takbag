@@ -2,6 +2,9 @@
 
 #include "Stone.h"
 #include <iostream>
+#include <string>
+#include <utility>
+#include <cstdint>
 
 enum class Direction : uint8_t
 {
