@@ -1,2 +1,3 @@
-include_directories(../external)
-add_executable(tak tak.cpp)
+add_subdirectory(tak)
+add_subdirectory(ptn)
+add_subdirectory(engine)

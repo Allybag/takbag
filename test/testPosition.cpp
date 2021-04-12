@@ -3,8 +3,8 @@
 #include "boost/ut.hpp"
 #pragma clang diagnostic pop
 
-#include "Position.h"
-#include "Game.h" // Game is basically the interface to Position
+#include "tak/Position.h"
+#include "tak/Game.h" // Game is basically the interface to Position
 
 int main()
 {

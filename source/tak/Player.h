@@ -8,7 +8,7 @@ enum class Player
     Black
 };
 
-std::ostream& operator<<(std::ostream& stream, Player player)
+inline std::ostream& operator<<(std::ostream& stream, Player player)
 {
     switch (player)
     {

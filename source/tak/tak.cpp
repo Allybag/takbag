@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Game.h"
-#include "engine/Engine.h"
+#include "../engine/Engine.h"
 
 int main()
 {

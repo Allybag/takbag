@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Stone.h"
-#include "../Move.h"
+#include "tak/Stone.h"
+#include "tak/Move.h"
 #include <string>
 
 struct PtnTurn
@@ -28,8 +28,7 @@ struct PtnTurn
     std::string canonicalString() const;
 };
 
-
-PtnTurn::PtnTurn(const std::string &sourceString) : mSourceString(sourceString)
+inline PtnTurn::PtnTurn(const std::string &sourceString) : mSourceString(sourceString)
 {
     // Spec is here: https://ustak.org/portable-tak-notation/
 

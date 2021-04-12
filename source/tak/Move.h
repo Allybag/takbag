@@ -60,7 +60,7 @@ inline bool operator!=(const Move& lhs, const Move& rhs)
     return !(lhs == rhs);
 }
 
-std::ostream& operator<<(std::ostream& stream, const Direction& dir)
+inline std::ostream& operator<<(std::ostream& stream, const Direction& dir)
 {
     switch (dir)
     {
@@ -83,7 +83,7 @@ std::ostream& operator<<(std::ostream& stream, const Direction& dir)
     return stream;
 }
 
-std::ostream& operator<<(std::ostream& stream, const Move& move)
+inline std::ostream& operator<<(std::ostream& stream, const Move& move)
 {
     if (move.mType == MoveType::Place)
     {
@@ -106,7 +106,7 @@ std::ostream& operator<<(std::ostream& stream, const Move& move)
 }
 
 template <typename LambdaT>
-void Move::forEachStone(LambdaT lambda) const
+inline void Move::forEachStone(LambdaT lambda) const
 {
     uint32_t dropCountMask = 0xf; // Last four bits set
     uint8_t stonesLeftToDrop = mCount;
@@ -120,19 +120,19 @@ void Move::forEachStone(LambdaT lambda) const
     }
 }
 
-std::size_t axisToIndex(uint8_t col, uint8_t rank, std::size_t size)
+inline std::size_t axisToIndex(uint8_t col, uint8_t rank, std::size_t size)
 {
     return col + (rank * size);
 }
 
-std::pair<uint8_t, uint8_t> indexToAxis(uint8_t index, std::size_t size)
+inline std::pair<uint8_t, uint8_t> indexToAxis(uint8_t index, std::size_t size)
 {
     uint8_t col = index % size;
     uint8_t rank = index / size;
     return std::make_pair(col, rank);
 }
 
-std::string moveToPtn(const Move& move, std::size_t size)
+inline std::string moveToPtn(const Move& move, std::size_t size)
 {
     std::string ptn;
     auto [col, rank] = indexToAxis(move.mIndex, size);

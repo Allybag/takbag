@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "Token.h"
-#include "../Result.h"
+#include "tak/Result.h"
 
 enum class NodeType : uint8_t
 {
@@ -14,7 +14,7 @@ enum class NodeType : uint8_t
     CommentNode,
 };
 
-std::ostream& operator<<(std::ostream& stream, NodeType nodeType)
+inline std::ostream& operator<<(std::ostream& stream, NodeType nodeType)
 {
     switch (nodeType)
     {
@@ -55,7 +55,7 @@ struct Node
     Node(Token comment) : mType(NodeType::CommentNode), mFirstToken(std::move(comment)) { }
 };
 
-std::ostream& operator<<(std::ostream& stream, const Node& node)
+inline std::ostream& operator<<(std::ostream& stream, const Node& node)
 {
     stream << node.mType << " Node:";
     if (node.mResult != Result::None)

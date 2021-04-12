@@ -18,7 +18,7 @@ enum class Result : uint8_t
     Draw
 };
 
-std::ostream& operator<<(std::ostream& stream, Result result)
+inline std::ostream& operator<<(std::ostream& stream, Result result)
 {
     switch (result)
     {
@@ -51,7 +51,7 @@ std::ostream& operator<<(std::ostream& stream, Result result)
     return stream;
 }
 
-Result resultFromString(const std::string& resultString)
+inline Result resultFromString(const std::string& resultString)
 {
     if (resultString.size() == 3)
     {

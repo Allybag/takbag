@@ -6,7 +6,7 @@
 #include <sstream>
 
 #include "Ptn.h"
-#include "../Result.h"
+#include "tak/Result.h"
 #include "Node.h"
 
 struct PtnGame
@@ -25,7 +25,7 @@ struct PtnGame
     std::vector<Node> mTurnNodes;
 };
 
-void PtnGame::addNode(const Node& node)
+inline void PtnGame::addNode(const Node& node)
 {
     switch (node.mType)
     {

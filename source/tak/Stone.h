@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstdint>
 
-#include "EnumBitOps.h"
+#include "../other/EnumBitOps.h"
 
 enum class StoneBits : uint8_t
 {
@@ -24,7 +24,7 @@ enum class Stone : uint8_t
     BlackCap  = StoneBits::Stone | StoneBits::Road | StoneBits::Standing | StoneBits::Black,
 };
 
-std::ostream& operator<<(std::ostream& stream, Stone stone)
+inline std::ostream& operator<<(std::ostream& stream, Stone stone)
 {
     switch (stone)
     {

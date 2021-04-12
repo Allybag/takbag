@@ -17,7 +17,7 @@ enum class TokenType : uint8_t
     End, // Cannot appear in PTN file, used to tell Parser that the previous turn is over
 };
 
-std::ostream& operator<<(std::ostream& stream, TokenType tokenType)
+inline std::ostream& operator<<(std::ostream& stream, TokenType tokenType)
 {
     switch (tokenType)
     {
@@ -59,7 +59,7 @@ struct Token {
     std::string mValue;
 };
 
-std::ostream& operator<<(std::ostream& stream, const Token& token)
+inline std::ostream& operator<<(std::ostream& stream, const Token& token)
 {
     stream << "Token of type " << token.mType << " containing " << token.mValue;
     return stream;
