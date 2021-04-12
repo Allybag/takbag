@@ -9,9 +9,8 @@ struct PtnTurn
     MoveType mType;
 
     // Either square to place in, or square to pick pieces from
-    uint8_t mRank;
     uint8_t mCol;
-
+    uint8_t mRank;
 
     // Only used for moves
     Direction mDirection{Direction::None};
@@ -68,9 +67,9 @@ PtnTurn::PtnTurn(const std::string &sourceString) : mSourceString(sourceString)
             stoneBits = stoneBits | StoneBits::Road; // If not specified the stone is just a flat
 
         mTopStone = static_cast<Stone>(stoneBits);
-        mRank = std::tolower(sourceString[sourceString.size() - 2]) - 'a';
-        mCol = sourceString[sourceString.size() - 1] - '1'; // The 1 rank is the first
-        assert(mRank < 8 && mCol < 8);
+        mCol = std::tolower(sourceString[sourceString.size() - 2]) - 'a';
+        mRank = sourceString[sourceString.size() - 1] - '1'; // The 1 rank is the first
+        assert(mCol < 8 && mRank < 8);
     }
     else // mType == MoveType::Move
     {
@@ -85,8 +84,8 @@ PtnTurn::PtnTurn(const std::string &sourceString) : mSourceString(sourceString)
         {
             mCount = 1;
         }
-        mRank = std::tolower(sourceString[currentIndex++]) - 'a';
-        mCol = sourceString[currentIndex++] - '1'; // The 1 rank is the first
+        mCol = std::tolower(sourceString[currentIndex++]) - 'a';
+        mRank = sourceString[currentIndex++] - '1'; // The 1 rank is the first
         assert(mRank < 8 && mCol < 8);
 
         mDirection = static_cast<Direction>(sourceString[currentIndex++]);

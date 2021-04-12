@@ -43,7 +43,6 @@ public:
     std::size_t size() const { return mSize; }
     const Square& operator[](std::size_t index) const { return mBoard[index]; }
     int getOffset(Direction direction) const;
-    std::size_t getPtnIndex(const PtnTurn& ptn) const;
 
     void play(const PtnTurn& ptn);
     std::vector<Move> generateMoves() const;
@@ -83,12 +82,12 @@ std::string Position::print() const
     // We want the a file on the left and the 1 rank along the bottom
     // for consistency with playtak.com and ptn.ninja
     std::stringstream output;
-    for (std::size_t row = 0; row < mSize; ++row)
+    for (std::size_t row = mSize; row != 0; --row)
     {
         output << "|";
         for (std::size_t col = 0; col < mSize; ++col)
         {
-            output << mBoard[row * mSize + col].print();
+            output << mBoard[(row - 1) * mSize + col].print();
             output << "|";
         }
         output << "\n";
@@ -163,26 +162,19 @@ void Position::move(const Move &move)
     const int offset = getOffset(move.mDirection);
     Square hand = Square(source, move.mCount); // Removes mCount flats from source
 
-    uint32_t dropCountMask = 0xf; // Last four bits set
-    uint8_t stonesLeftToDrop = move.mCount;
-    for (int i = 0; stonesLeftToDrop != 0; ++i)
+    uint8_t nextIndex = move.mIndex;
+    auto dropStone = [&](uint8_t dropCount)
     {
-        std::size_t nextIndex = move.mIndex + ((i + 1) * offset);
-        assert(nextIndex < mBoard.size()); // As size_t is unsigned this also checks for negative index
+        nextIndex += offset;
 
+        assert(nextIndex < mBoard.size());
         if (movingLaterally)
             assert((nextIndex / mSize) == (move.mIndex / mSize)); // Stops us going off the right or left of the board
 
         Square& nextSquare = mBoard[nextIndex];
-
-        uint8_t dropCount = (move.mDropCounts & (dropCountMask << i * 4)) >> (i * 4);
-        assert(dropCount > 0);
-        assert(dropCount <= 0x8);
-
         nextSquare.add(hand, dropCount);
-
-        stonesLeftToDrop -= dropCount;
-    }
+    };
+    move.forEachStone(dropStone);
 
     togglePlayer();
 }
@@ -190,7 +182,7 @@ void Position::move(const Move &move)
 void Position::play(const PtnTurn &ptn)
 {
     assert(checkResult() == Result::None);
-    std::size_t index = getPtnIndex(ptn);
+    std::size_t index = axisToIndex(ptn.mCol, ptn.mRank, mSize);
     auto moves = generateMoves();
     if (ptn.mType == MoveType::Place)
     {
@@ -206,18 +198,13 @@ void Position::play(const PtnTurn &ptn)
     }
 }
 
-std::size_t Position::getPtnIndex(const PtnTurn& ptn) const
-{
-    return (mSize - 1 - ptn.mCol) * mSize + ptn.mRank;
-}
-
 int Position::getOffset(Direction direction) const
 {
     switch (direction) {
         case Direction::Up:
-            return -1 * mSize;
-        case Direction::Down:
             return mSize;
+        case Direction::Down:
+            return -1 * mSize;
         case Direction::Left:
             return -1;
         case Direction::Right:

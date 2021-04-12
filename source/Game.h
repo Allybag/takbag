@@ -70,7 +70,7 @@ void Game::fillPtn(PtnTurn &ptn)
     }
     else // ptn.mType == MoveType::Move
     {
-        std::size_t index = mPosition.getPtnIndex(ptn);
+        std::size_t index = axisToIndex(ptn.mCol, ptn.mRank, mPosition.size());
         ptn.mTopStone = mPosition[index].mTopStone;
 
         std::size_t finalIndex = index + mPosition.getOffset(ptn.mDirection) * ptn.mDistance;

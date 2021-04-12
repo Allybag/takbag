@@ -41,6 +41,9 @@ struct Move
     Move(std::size_t index, Stone stone) : mType(MoveType::Place), mIndex(index), mStone(stone) { }
     Move(std::size_t index, std::size_t count, uint32_t dropCounts, Direction direction) :
         mType(MoveType::Move), mIndex(index), mCount(count), mDropCounts(dropCounts), mDirection(direction) { }
+
+    template <typename LambdaT> // Lambda should take a single uint8_t
+    void forEachStone(LambdaT lambda) const;
 };
 
 inline bool operator==(const Move& lhs, const Move& rhs)
@@ -88,17 +91,58 @@ std::ostream& operator<<(std::ostream& stream, const Move& move)
         stream << "Move " << move.mCount << " stones from index " << move.mIndex << " " << move.mDirection;
         stream << " dropping ";
 
-        uint32_t dropCountMask = 0xf; // Last four bits set
-        uint8_t stonesLeftToDrop = move.mCount;
-        for (int i = 0; stonesLeftToDrop != 0; ++i)
+        auto printStone = [&stream](uint8_t dropCount)
         {
-            uint8_t dropCount = (move.mDropCounts & (dropCountMask << i * 4)) >> (i * 4);
-            stonesLeftToDrop -= dropCount;
-            assert(dropCount > 0);
-            assert(dropCount <= 0x8);
             stream << static_cast<int>(dropCount) << " ";
-        }
+        };
+
+        move.forEachStone(printStone);
         stream << "stones";
     }
     return stream;
+}
+
+template <typename LambdaT>
+void Move::forEachStone(LambdaT lambda) const
+{
+    uint32_t dropCountMask = 0xf; // Last four bits set
+    uint8_t stonesLeftToDrop = mCount;
+    for (uint8_t i = 0; stonesLeftToDrop != 0; ++i)
+    {
+        uint8_t dropCount = (mDropCounts & (dropCountMask << i * 4)) >> (i * 4);
+        stonesLeftToDrop -= dropCount;
+        assert(dropCount > 0);
+        assert(dropCount <= 0x8);
+        lambda(dropCount);
+    }
+}
+
+std::size_t axisToIndex(uint8_t col, uint8_t rank, std::size_t size)
+{
+    return col + (rank * size);
+}
+
+std::pair<uint8_t, uint8_t> indexToAxis(uint8_t index, std::size_t size)
+{
+    uint8_t col = index % size;
+    uint8_t rank = index / size;
+    return std::make_pair(col, rank);
+}
+
+std::string moveToPtn(const Move& move, std::size_t size)
+{
+    std::string ptn;
+    if (move.mType == MoveType::Place)
+    {
+        if (isCap(move.mStone))
+            ptn.push_back('C');
+        else if (isWall(move.mStone))
+            ptn.push_back('S');
+
+        auto [col, rank] = indexToAxis(move.mIndex, size);
+        ptn.push_back('a' + col);
+        ptn.push_back('1' + rank);
+    }
+
+    return ptn;
 }
