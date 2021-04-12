@@ -132,6 +132,8 @@ std::pair<uint8_t, uint8_t> indexToAxis(uint8_t index, std::size_t size)
 std::string moveToPtn(const Move& move, std::size_t size)
 {
     std::string ptn;
+    auto [col, rank] = indexToAxis(move.mIndex, size);
+
     if (move.mType == MoveType::Place)
     {
         if (isCap(move.mStone))
@@ -139,9 +141,21 @@ std::string moveToPtn(const Move& move, std::size_t size)
         else if (isWall(move.mStone))
             ptn.push_back('S');
 
-        auto [col, rank] = indexToAxis(move.mIndex, size);
         ptn.push_back('a' + col);
         ptn.push_back('1' + rank);
+    }
+    else
+    {
+        ptn.push_back('0' + move.mCount);
+        ptn.push_back('a' + col);
+        ptn.push_back('1' + rank);
+        ptn.push_back(static_cast<char>(move.mDirection));
+
+        auto addCountToPtn = [&ptn](uint8_t count)
+        {
+            ptn.push_back('0' + count);
+        };
+        move.forEachStone(addCountToPtn);
     }
 
     return ptn;

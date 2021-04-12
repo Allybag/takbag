@@ -27,8 +27,6 @@ class Game
     std::unordered_map<std::string, std::string> mUnknownTags;
 
     void fillPtn(PtnTurn& ptn);
-
-    void checkPtnResult() const;
 public:
     explicit Game(std::size_t size) : mPosition(size), mMoveList{}, mPly(1) { }
     explicit Game(const PtnGame& ptnGame);
@@ -38,9 +36,7 @@ public:
     Result checkResult() const;
 
     // TODO: This isn't the API we want
-    // void acceptPosition(Position& position) { mPosition = move(position); }
-    Position& getPosition() { return mPosition; }
-    void incrementPly() { ++mPly; }
+    const Position& getPosition() { return mPosition; }
 };
 
 void Game::play(const std::string& ptnString)

@@ -5,17 +5,13 @@
 class Engine
 {
 public:
-    Position play(Position& position);
+    std::string chooseMove(const Position& position);
 };
 
-Position Engine::play(Position& position)
+std::string Engine::chooseMove(const Position& position)
 {
     assert(position.checkResult() == Result::None);
     auto moves = position.generateMoves();
     auto move = moves.front();
-    if (move.mType == MoveType::Place)
-        position.place(move);
-    else
-        position.move(move);
-    return position;
+    return moveToPtn(move, position.size());
 }
