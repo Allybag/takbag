@@ -116,21 +116,17 @@ void Position::move(const Move &move)
 
 void Position::play(const PtnTurn &ptn)
 {
-    assert(checkResult() == Result::None);
     std::size_t index = axisToIndex(ptn.mCol, ptn.mRank, mSize);
-    auto moves = generateMoves();
-    if (ptn.mType == MoveType::Place)
-    {
-        auto placeMove = Move(index, ptn.mTopStone);
-        assert(std::find(moves.begin(), moves.end(), placeMove) != moves.cend());
-        place(placeMove);
-    }
+    auto chosenMove = (ptn.mType == MoveType::Place) ? Move(index, ptn.mTopStone) : Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection);
+    play(chosenMove);
+}
+
+void Position::play(const Move& chosenMove)
+{
+    if (chosenMove.mType == MoveType::Place)
+        place(chosenMove);
     else
-    {
-        auto moveMove = Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection);
-        assert(std::find(moves.begin(), moves.end(), moveMove) != moves.cend());
-        move(moveMove);
-    }
+        move(chosenMove);
 }
 
 int Position::getOffset(Direction direction) const
@@ -173,16 +169,6 @@ std::vector<Move> Position::generateMoves() const
             if (playerIsBlack == stoneIsBlack)
                 addMoveMoves(index, moves);
         }
-    }
-
-    // Check that at least we think all moves are legal
-    for (const auto& move : moves)
-    {
-        Position scratchPosition(*this);
-        if (move.mType == MoveType::Place)
-            scratchPosition.place(move);
-        else
-            scratchPosition.move(move);
     }
 
     return moves;

@@ -28,7 +28,6 @@ int main()
     "Basic Move Generation"_test = []
     {
         // This position and move count are taken from github.com/MortenLohne/tiltak
-        // This is the only externally verified position and move count I've come across so far
         Game game(5);
         game.play("d3");
         game.play("c3");

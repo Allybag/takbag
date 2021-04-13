@@ -28,6 +28,8 @@ class Position
     PlayerPair<std::size_t> mFlatReserves;
     PlayerPair<std::size_t> mCapReserves;
 
+    void place(const Move& place);
+    void move(const Move& move);
 public:
     explicit Position(std::size_t size);
 
@@ -42,13 +44,12 @@ public:
     int getOffset(Direction direction) const;
 
     void play(const PtnTurn& ptn);
+    void play(const Move& move);
     std::vector<Move> generateMoves() const;
 
     std::string print() const;
 
     Result checkResult() const;
-    void place(const Move& place);
-    void move(const Move& move);
 
 private:
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
