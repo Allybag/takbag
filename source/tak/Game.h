@@ -3,14 +3,9 @@
 #include "Position.h"
 #include "ptn/Ptn.h"
 #include "ptn/PtnGame.h"
-#include "ptn/Token.h"
-#include "ptn/Node.h"
-#include "ptn/Generator.h"
 
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <fstream>
 
 class Game
 {
@@ -23,8 +18,6 @@ class Game
 
     std::vector<PtnTurn> mMoveList;
     std::size_t mPly;
-
-    std::unordered_map<std::string, std::string> mUnknownTags;
 
     void fillPtn(PtnTurn& ptn);
 public:

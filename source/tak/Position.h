@@ -1,16 +1,13 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <sstream>
-#include <algorithm>
-
 #include "Player.h"
 #include "Square.h"
 #include "Move.h"
-#include "ptn/Ptn.h"
 #include "Result.h"
+#include "ptn/Ptn.h"
+
+#include <vector>
+#include <unordered_map>
 
 static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> pieceCounts = {
         std::make_pair(3, std::make_pair(10, 0)),

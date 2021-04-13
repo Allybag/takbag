@@ -61,10 +61,6 @@ void Parser::parsePly(const std::vector<Token>& tokens)
                 movesRemaining = 0;
                 break;
             case TokenType::PlaceMove:
-                moveTokens.push_back(tokens[mIndex]);
-                movesRemaining -= 1;
-                mIndex++;
-                break;
             case TokenType::MoveMove:
                 moveTokens.push_back(tokens[mIndex]);
                 movesRemaining -= 1;

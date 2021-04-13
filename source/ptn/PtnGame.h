@@ -1,13 +1,12 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <unordered_map>
-#include <sstream>
-
-#include "Ptn.h"
 #include "tak/Result.h"
 #include "Node.h"
+
+#include <vector>
+#include <string>
+#include <cstddef>
+
 
 struct PtnGame
 {

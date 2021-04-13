@@ -1,5 +1,9 @@
 #include "Position.h"
+
 #include "DropCountGenerator.h"
+
+#include <sstream>
+#include <cassert>
 
 Position::Position(std::size_t size) :  mSize(size), mToPlay(Player::White), mOpeningSwapMoves(2),
                                         mFlatReserves(PlayerPair{pieceCounts[size].first}),

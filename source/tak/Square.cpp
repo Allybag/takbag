@@ -1,6 +1,6 @@
 #include "Square.h"
 
-#include <iostream>
+#include <cassert>
 #include <sstream>
 
 std::size_t Square::count() const
@@ -125,7 +125,7 @@ void Square::setTopFromStack()
     mTopStone = (mCount == 0 ? Stone::Blank : (mStack & 1 << (mCount - 1)) ? Stone::BlackFlat : Stone::WhiteFlat);
 }
 
-void Square::checkValid()
+void Square::checkValid() const
 {
     bool topStoneIsBlack = mTopStone & StoneBits::Black;
     bool topOfStackIsBlack = (mStack & 1 << (mCount - 1));

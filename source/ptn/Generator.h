@@ -1,8 +1,9 @@
 #pragma once
 
-#include <optional>
-#include "Parser.h"
+#include "Node.h"
 #include "PtnGame.h"
+
+#include <vector>
 
 class Generator
 {

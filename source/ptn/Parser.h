@@ -1,13 +1,10 @@
 #pragma once
 
-#include <cstddef>
-#include <utility>
-#include <unordered_map>
-
-#include "Ptn.h"
-#include "Lexer.h"
-#include "tak/Result.h"
 #include "Node.h"
+#include "Token.h"
+
+#include <cstddef>
+#include <vector>
 
 // The structure and design of this Parser is taken from the great free tutorial at
 // https://www.destroyallsoftware.com/screencasts/catalog/a-compiler-from-scratch
@@ -15,7 +12,7 @@
 // The PTN Spec followed is here: https://ustak.org/portable-tak-notation/
 // With additional notes on tags taken from here: https://www.reddit.com/r/Tak/wiki/ptn_file_format
 
-enum class PtnTag
+enum class PtnTag : uint8_t
 {
     // Required Tags
     Player1,

@@ -3,6 +3,8 @@
 #include "Stone.h"
 
 #include <string>
+#include <cstddef>
+#include <iostream>
 
 // Representation:
 // mTopStone describes the surface stone and mStack[0]
@@ -33,6 +35,6 @@ struct Square
     // Utility functions
     void clearBeyondStack();
     void setTopFromStack();
-    void checkValid();
+    void checkValid() const;
 
 };

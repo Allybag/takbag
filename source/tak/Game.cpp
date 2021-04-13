@@ -1,5 +1,11 @@
 #include "Game.h"
 
+#include "ptn/Generator.h"
+#include "ptn/Parser.h"
+#include "ptn/Lexer.h"
+
+#include <fstream>
+
 void Game::play(const std::string& ptnString)
 {
     PtnTurn ptnTurn(ptnString);
