@@ -17,7 +17,6 @@ external/ctre.hpp (https://github.com/hanickadot/compile-time-regular-expression
 # Goals
 Support TEI protocol (github.com/MortenLohne/racetrack/) to play against other bots  
 Support Playtak protocol (playtak.com) which is sadly not PTN, and needs some web socket work  
-Support TPS protocol to easily give customised positions to the engine (might be required for TEI)  
 A simple search function using negamax (which would work as a nice Tinue solver)  
 A simple search function using MonteCarlo  
 A simple evaluation based on flat count  

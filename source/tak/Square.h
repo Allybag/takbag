@@ -17,6 +17,7 @@ struct Square
     uint32_t mStack; // A mCount long bitSet, 0 is white and 1 is black
 
     Square() : mTopStone(Stone::Blank), mCount(0), mStack(0) { }
+    explicit Square(Stone stone) : mTopStone(stone), mCount(1), mStack((stone & StoneBits::Black ? 1 : 0)) { }
     Square(Stone topStone, uint8_t count, uint32_t stack) : mTopStone(topStone), mCount(count), mStack(stack) { }
     Square(const Square&) noexcept = default;
     Square(Square&&) noexcept = default;

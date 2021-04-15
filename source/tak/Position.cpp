@@ -461,6 +461,7 @@ Position& Position::operator=(const Position& other) noexcept
     mCapReserves = other.mCapReserves;
     return *this;
 }
+
 Position& Position::operator=(Position&& other) noexcept
 {
     assert(mSize == other.mSize);
@@ -471,3 +472,54 @@ Position& Position::operator=(Position&& other) noexcept
     mCapReserves = other.mCapReserves;
     return *this;
 }
+
+void Position::setSquare(std::size_t col, std::size_t rank, const std::string& tpsSquare)
+{
+    assert(tpsSquare.starts_with('2') || tpsSquare.starts_with('1'));
+
+    std::size_t index = axisToIndex(col, rank, mSize);
+    Square& square = mBoard[index];
+
+    PlayerPair<std::size_t> flats{0};
+    for (const char c : tpsSquare)
+    {
+        if (c == '1')
+        {
+            auto singleStone = Square(Stone::WhiteFlat);
+            square.add(singleStone, 1);
+            flats.White += 1;
+        }
+        else if (c == '2')
+        {
+            auto singleStone = Square(Stone::BlackFlat);
+            square.add(singleStone, 1);
+            flats.Black += 1;
+        }
+        else
+        {
+            assert(c == 'S' || c == 'C');
+            assert(square.mTopStone != Stone::Blank);
+
+            // We set the Standing Bit of the top stone
+            auto topStone = static_cast<uint8_t>(square.mTopStone);
+            topStone = topStone | StoneBits::Standing;
+            if (c == 'S') // We clear the Road Bit if the top stone is a Wall
+                topStone = topStone - static_cast<uint8_t>(StoneBits::Road);
+            else if (c == 'C') // We add the flat back and subtract a cap if the top stone is a cap
+            {
+                Player colour = (square.mTopStone & StoneBits::Black) ? Player::Black : Player::White;
+                flats[colour] -= 1;
+                assert(mCapReserves[colour]);
+                mCapReserves[colour] -= 1;
+            }
+
+            square.mTopStone = static_cast<Stone>(topStone);
+        }
+    }
+
+    assert(mFlatReserves.White >= flats.White);
+    assert(mFlatReserves.Black >= flats.Black);
+    mFlatReserves.White -= flats.White;
+    mFlatReserves.Black -= flats.Black;
+}
+

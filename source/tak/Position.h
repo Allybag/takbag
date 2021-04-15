@@ -51,8 +51,10 @@ public:
 
     Result checkResult() const;
 
-private:
+    void setSquare(std::size_t col, std::size_t rank, const std::string& tpsSquare);
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
+
+private:
 
     std::vector<Move> generateOpeningMoves() const;
     void addPlaceMoves(std::size_t index, std::vector<Move>& moves) const;
