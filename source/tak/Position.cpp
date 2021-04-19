@@ -523,3 +523,12 @@ void Position::setSquare(std::size_t col, std::size_t rank, const std::string& t
     mFlatReserves.Black -= flats.Black;
 }
 
+bool Position::operator==(const Position& other) const
+{
+    return mSize == other.mSize && mToPlay == other.mToPlay && mBoard == other.mBoard;
+}
+
+bool Position::operator!=(const Position& other) const
+{
+    return !(*this == other);
+}

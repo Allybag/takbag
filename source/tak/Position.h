@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <functional>
 
 static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> pieceCounts = {
         std::make_pair(3, std::make_pair(10, 0)),
@@ -53,6 +54,10 @@ public:
 
     void setSquare(std::size_t col, std::size_t rank, const std::string& tpsSquare);
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
+    Player getPlayer() const { return mToPlay; }
+
+    bool operator==(const Position& other) const;
+    bool operator!=(const Position& other) const;
 
 private:
 
@@ -69,3 +74,27 @@ private:
     PlayerPair<std::size_t> checkFlatCount() const;
 
 };
+
+namespace std
+{
+    template <>
+    struct hash<Position>
+    {
+        std::size_t operator()(const Position& pos) const
+        {
+            std::size_t sizeHash = std::hash<std::size_t>{}(pos.size());
+            std::size_t playerHash = std::hash<Player>{}(pos.getPlayer());
+
+            // We won't hash flatReserves or capReservers, as for a given mBoard they should never differ
+
+            std::size_t squareCount = pos.size() * pos.size();
+            std::size_t boardHash = squareCount;
+            for (std::size_t index = 0; index < squareCount; ++index)
+            {
+                auto square = pos[index];
+                boardHash ^= std::hash<Square>()(square);
+            }
+            return boardHash ^ (playerHash << 1) ^ (sizeHash << 2);
+        }
+    };
+}
