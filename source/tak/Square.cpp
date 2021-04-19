@@ -131,3 +131,13 @@ void Square::checkValid() const
     bool topOfStackIsBlack = (mStack & 1 << (mCount - 1));
     assert(topStoneIsBlack == topOfStackIsBlack);
 }
+
+bool Square::operator==(const Square &other) const
+{
+    return mTopStone == other.mTopStone && mCount == other.mCount && mStack == other.mStack;
+}
+
+bool Square::operator!=(const Square &other) const
+{
+    return !(*this == other);
+}

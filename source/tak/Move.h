@@ -49,6 +49,8 @@ struct Move
     void forEachStone(LambdaT lambda) const;
 };
 
+static_assert(std::is_trivially_copyable_v<Move>);
+
 inline bool operator==(const Move& lhs, const Move& rhs)
 {
     return std::tie(lhs.mType, lhs.mIndex, lhs.mStone, lhs.mCount, lhs.mDropCounts, lhs.mDirection) ==

@@ -42,3 +42,19 @@ struct PlayerPair
     Value& operator[](Player player) { return player == Player::White ? White : Black; }
     const Value& operator[](Player player) const { return player == Player::White ? White : Black; }
 };
+
+namespace std
+{
+    template<typename ValueType>
+    struct hash<PlayerPair<ValueType>>
+    {
+        std::size_t operator()(const PlayerPair<ValueType>& pair) const noexcept
+        {
+            std::size_t whiteHash = std::hash<ValueType>{}(pair.White);
+            std::size_t blackHash = std::hash<ValueType>{}(pair.Black);
+            return whiteHash ^ (blackHash << 1);
+        }
+    };
+}
+
+static_assert(std::is_trivially_copyable_v<PlayerPair<std::size_t>>);
