@@ -23,8 +23,8 @@ struct Node
 
 std::string monteCarloTreeSearch(const Position& position)
 {
-    std::unordered_map<Position, Node> nodes{};
-    nodes[position] = Node();
+    std::unordered_map<Position, Node*> nodes{};
+    nodes[position] = new Node();
     auto colour = position.getPlayer();
 
     std::size_t nodeCount = 1000;
@@ -36,13 +36,13 @@ std::string monteCarloTreeSearch(const Position& position)
         // Selection
         while (nodes.contains(nextPosition))
         {
-            parent = &(nodes[nextPosition]);
+            parent = nodes[nextPosition];
             nextPosition.play(*chooseRandomElement(nextPosition.generateMoves()));
         }
 
         // Expansion
-        nodes[Position(nextPosition)] = Node(parent);
-        auto& node = nodes[nextPosition]; // Do this nicer using emplace
+        auto* node = new Node(parent);
+        nodes[nextPosition] = node;
 
         // Rollout
         while (nextPosition.checkResult() == Result::None)
@@ -57,13 +57,12 @@ std::string monteCarloTreeSearch(const Position& position)
             wonGame = true;
 
         // Back Propogation
-        auto* nextNode = &node;
-        while (nextNode->mParent != nullptr)
+        while (node->mParent != nullptr)
         {
-            ++(nextNode->mPlayCount);
+            ++(node->mPlayCount);
             if (wonGame)
-                ++(nextNode->mWinCount);
-            nextNode = nextNode->mParent;
+                ++(node->mWinCount);
+            node = node->mParent;
         }
         --nodeCount;
     }
@@ -76,27 +75,30 @@ std::string monteCarloTreeSearch(const Position& position)
     {
         Position nextPosition(position);
         nextPosition.play(move);
-        auto node = nodes[nextPosition];
+        auto* node = nodes[nextPosition];
 
-        if (node.mPlayCount == 0) // We expect to look at all possible moves
+        if (node->mPlayCount == 0) // We expect to look at all possible moves
         {
             std::cout << "Unplayed top level move?" << std::endl;
-            assert(node.mWinCount == 0);
+            assert(node->mWinCount == 0);
             continue;
         }
 
-        double bestNodeRatio = bestNode ? bestNode->mWinCount / bestNode->mPlayCount : 0.0;
-        double nodeRatio = node.mWinCount / node.mPlayCount;
+        double bestNodeRatio = bestNode ? static_cast<double>(bestNode->mWinCount) / static_cast<double>(bestNode->mPlayCount) : 0.0;
+        double nodeRatio = static_cast<double>(node->mWinCount) / static_cast<double>(node->mPlayCount);
 
         if (nodeRatio >= bestNodeRatio) // If this is the first move we've seen, pick it
         {
             std::string ptnMove = moveToPtn(move, position.size());
-            std::cout << ptnMove << " is new best move, wins " << node.mWinCount << " out of " << node.mPlayCount << std::endl;
+            std::cout << ptnMove << " is new best move, wins " << node->mWinCount << " out of " << node->mPlayCount << std::endl;
             bestMove = &move;
-            bestNode = &node;
+            bestNode = node;
             continue;
         }
     }
+
+    for (auto [position, node] : nodes)
+        delete node;
 
     return moveToPtn(*bestMove, position.size());
 }
