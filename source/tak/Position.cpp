@@ -9,7 +9,7 @@ Position::Position(std::size_t size) :  mSize(size), mToPlay(Player::White), mOp
                                         mFlatReserves(PlayerPair{pieceCounts[size].first}),
                                         mCapReserves(PlayerPair{pieceCounts[size].second})
 {
-    mBoard.resize(mSize * mSize); // Our board is a 1d array
+    assert(size <= 8);
 }
 
 std::string Position::print() const
@@ -47,7 +47,7 @@ std::string Position::print() const
 
 void Position::place(const Move& place)
 {
-    assert(place.mIndex < mBoard.size());
+    assert(place.mIndex < mSize * mSize);
     assert(mBoard[place.mIndex].mTopStone == Stone::Blank);
 
     bool stoneIsBlack = place.mStone & StoneBits::Black;
@@ -80,7 +80,7 @@ void Position::place(const Move& place)
 
 void Position::move(const Move &move)
 {
-    assert(move.mIndex < mBoard.size());
+    assert(move.mIndex < mSize * mSize);
     assert(move.mCount <= mSize);
     assert(mOpeningSwapMoves == 0);
 
@@ -102,7 +102,7 @@ void Position::move(const Move &move)
     {
         nextIndex += offset;
 
-        assert(nextIndex < mBoard.size());
+        assert(nextIndex < mSize * mSize);
         if (movingLaterally)
             assert((nextIndex / mSize) == (move.mIndex / mSize)); // Stops us going off the right or left of the board
 
@@ -152,7 +152,7 @@ std::vector<Move> Position::generateMoves() const
         return generateOpeningMoves();
 
     std::vector<Move> moves;
-    for (int index = 0; index < mBoard.size(); ++index)
+    for (int index = 0; index < mSize * mSize; ++index)
     {
         const Square& square = mBoard[index];
         if (square.mTopStone == Stone::Blank)
@@ -207,7 +207,7 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
         for (std::size_t j = 1; j <= maxHandSize; ++j)
         {
             int nextIndex = index + j * offset;
-            if (nextIndex >= mBoard.size()) // Stops us going off the top or bottom of the board
+            if (nextIndex >= mSize * mSize) // Stops us going off the top or bottom of the board
             {
                 maxDistance = j - 1;
                 break;
@@ -259,7 +259,7 @@ std::vector<Move> Position::generateOpeningMoves() const
     std::vector<Move> moves;
 
     // Super simple, we can play a flat of the opposite colour in any empty square
-    for (std::size_t index = 0; index < mBoard.size(); ++index)
+    for (std::size_t index = 0; index < mSize * mSize; ++index)
     {
         const Square& square = mBoard[index];
         if (square.mTopStone == Stone::Blank)
@@ -291,7 +291,7 @@ Result Position::checkRoadWin() const {
     // TODO: Think about and optimise this
     Result result = Result::None;
     std::unordered_map<std::size_t, bool> squareInIsland;
-    for (std::size_t index = 0; index < mBoard.size(); ++index)
+    for (std::size_t index = 0; index < mSize * mSize; ++index)
     {
         Stone topStone = mBoard[index].mTopStone;
         if (topStone == Stone::Blank || isWall(topStone))
@@ -362,9 +362,9 @@ Result Position::checkFlatWin() const
     bool blackStonesGone = (mFlatReserves.Black == 0 && mCapReserves.Black == 0);
 
     bool boardFilled = true;
-    for (const auto& square : mBoard)
+    for (std::size_t index = 0; index < mSize * mSize; ++index)
     {
-        if (square.mTopStone == Stone::Blank)
+        if (mBoard[index].mTopStone == Stone::Blank)
         {
             boardFilled = false;
             break;
@@ -395,11 +395,12 @@ Result Position::checkResult() const
 PlayerPair<std::size_t> Position::checkFlatCount() const
 {
     PlayerPair<std::size_t> flatCounts{0};
-    for (const auto& square : mBoard)
+    for (std::size_t index = 0; index < mSize * mSize; ++index)
     {
-        if (square.mTopStone != Stone::Blank && isFlat(square.mTopStone))
+        Stone stone = mBoard[index].mTopStone;
+        if (stone != Stone::Blank && isFlat(stone))
         {
-            Player colour = (square.mTopStone & StoneBits::Black) ? Player::Black : Player::White;
+            Player colour = (stone & StoneBits::Black) ? Player::Black : Player::White;
             flatCounts[colour] += 1;
         }
     }
@@ -414,7 +415,7 @@ std::vector<std::size_t> Position::getNeighbours(std::size_t index) const
     {
         const int offset = getOffset(direction);
         const std::size_t neighbour = index + offset;
-        if (neighbour >= mBoard.size())
+        if (neighbour >= mSize * mSize)
             continue;
         if ((direction == Direction::Right || direction == Direction::Left))
             if ((neighbour / mSize) != (index / mSize)) // Stops us going off right or legt
@@ -437,7 +438,7 @@ bool Position::checkConnectsOppositeEdges(const std::vector<std::size_t>& island
     {
         if (index < mSize)
             connectsBottom = true;
-        if (index >= mBoard.size() - mSize)
+        if (index >= (mSize * mSize) - mSize)
             connectsTop = true;
         if (index % mSize == 0)
             connectsLeft = true;
@@ -448,33 +449,12 @@ bool Position::checkConnectsOppositeEdges(const std::vector<std::size_t>& island
     return ((connectsLeft && connectsRight) || (connectsTop && connectsBottom));
 }
 
-Position& Position::operator=(const Position& other) noexcept
-{
-    assert(mSize == other.mSize);
-    mBoard = other.mBoard;
-    mToPlay = other.mToPlay;
-    mOpeningSwapMoves = other.mOpeningSwapMoves;
-    mFlatReserves = other.mFlatReserves;
-    mCapReserves = other.mCapReserves;
-    return *this;
-}
-
-Position& Position::operator=(Position&& other) noexcept
-{
-    assert(mSize == other.mSize);
-    mBoard = other.mBoard;
-    mToPlay = other.mToPlay;
-    mOpeningSwapMoves = other.mOpeningSwapMoves;
-    mFlatReserves = other.mFlatReserves;
-    mCapReserves = other.mCapReserves;
-    return *this;
-}
-
 void Position::setSquare(std::size_t col, std::size_t rank, const std::string& tpsSquare)
 {
     assert(tpsSquare.starts_with('2') || tpsSquare.starts_with('1'));
 
     std::size_t index = axisToIndex(col, rank, mSize);
+    assert(index < mSize * mSize);
     Square& square = mBoard[index];
 
     PlayerPair<std::size_t> flats{0};

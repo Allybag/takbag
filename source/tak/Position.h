@@ -10,6 +10,9 @@
 #include <unordered_map>
 #include <functional>
 
+#include <array>
+#include <type_traits>
+
 static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> pieceCounts = {
         std::make_pair(3, std::make_pair(10, 0)),
         std::make_pair(4, std::make_pair(15, 0)),
@@ -21,8 +24,8 @@ static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> piec
 
 class Position
 {
-    const std::size_t mSize;
-    std::vector<Square> mBoard;
+    std::size_t mSize;
+    std::array<Square, 64> mBoard; // TODO: Template the array size rather than wasting space
     Player mToPlay;
     int mOpeningSwapMoves;
 
@@ -36,12 +39,12 @@ public:
 
     Position(const Position&) noexcept = default;
     Position(Position&&) noexcept = default;
-    Position& operator=(const Position& other) noexcept;
-    Position& operator=(Position&& other) noexcept;
+    Position& operator=(const Position& other) noexcept = default;
+    Position& operator=(Position&& other) noexcept = default;
     ~Position() = default;
 
     std::size_t size() const { return mSize; }
-    const Square& operator[](std::size_t index) const { return mBoard[index]; }
+    const Square& operator[](std::size_t index) const { assert(index < mSize * mSize); return mBoard[index]; }
     int getOffset(Direction direction) const;
 
     void play(const PtnTurn& ptn);
@@ -98,3 +101,5 @@ namespace std
         }
     };
 }
+
+static_assert(std::is_trivially_copyable_v<Position>);
