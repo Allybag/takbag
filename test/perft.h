@@ -13,7 +13,7 @@ std::size_t perft(const Position& position, std::size_t depth)
     {
         Position nextPos(position);
         nextPos.play(move);
-        nodes += perft(nextPos, depth - 1);
+        nodes += perft<checkWins>(nextPos, depth - 1);
     }
 
     return nodes;

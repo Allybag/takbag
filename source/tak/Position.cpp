@@ -178,20 +178,17 @@ std::vector<Move> Position::generateMoves() const
 void Position::addPlaceMoves(std::size_t index, std::vector<Move> &moves) const
 {
     StoneBits colour = (mToPlay == Player::Black) ? StoneBits::Black : StoneBits::Stone;
-    std::vector<Stone> potentialStones;
+
     if (mFlatReserves[mToPlay])
     {
-        potentialStones.push_back(static_cast<Stone>(Stone::WhiteFlat | colour));
-        potentialStones.push_back(static_cast<Stone>(Stone::WhiteWall | colour));
+        moves.emplace_back(index, static_cast<Stone>(Stone::WhiteFlat | colour));
+        moves.emplace_back(index, static_cast<Stone>(Stone::WhiteWall | colour));
     }
+
     if (mCapReserves[mToPlay])
     {
-        potentialStones.push_back(static_cast<Stone>(Stone::WhiteCap | colour));
+        moves.emplace_back(index, static_cast<Stone>(Stone::WhiteCap | colour));
     }
-
-    for (const auto& stone : potentialStones)
-        moves.emplace_back(index, stone);
-
 }
 
 void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
