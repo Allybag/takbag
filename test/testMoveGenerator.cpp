@@ -6,21 +6,7 @@
 #include "tak/Position.h"
 #include "tak/Game.h" // Game is basically the interface to Position
 
-std::size_t perft(const Position& position, std::size_t depth)
-{
-    std::size_t nodes = 0;
-    if (depth == 0 || position.checkResult() != Result::None)
-        return 1;
-
-    for (const auto& move : position.generateMoves())
-    {
-        Position nextPos(position);
-        nextPos.play(move);
-        nodes += perft(nextPos, depth - 1);
-    }
-
-    return nodes;
-}
+#include "perft.h"
 
 int main()
 {
