@@ -59,3 +59,4 @@ namespace std
 }
 
 static_assert(std::is_trivially_copyable_v<Square>);
+static_assert(sizeof(Square) == 8);

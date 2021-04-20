@@ -13,7 +13,7 @@
 #include <array>
 #include <type_traits>
 
-static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> pieceCounts = {
+static std::unordered_map<std::size_t, std::pair<uint8_t, uint8_t>> pieceCounts = {
         std::make_pair(3, std::make_pair(10, 0)),
         std::make_pair(4, std::make_pair(15, 0)),
         std::make_pair(5, std::make_pair(21, 1)),
@@ -24,13 +24,13 @@ static std::unordered_map<std::size_t, std::pair<std::size_t, std::size_t>> piec
 
 class Position
 {
-    std::size_t mSize;
     std::array<Square, 64> mBoard; // TODO: Template the array size rather than wasting space
+    PlayerPair<uint8_t> mFlatReserves;
+    PlayerPair<uint8_t> mCapReserves;
+    uint8_t mSize;
+    uint8_t mOpeningSwapMoves;
     Player mToPlay;
-    int mOpeningSwapMoves;
 
-    PlayerPair<std::size_t> mFlatReserves;
-    PlayerPair<std::size_t> mCapReserves;
 
     void place(const Move& place);
     void move(const Move& move);
@@ -103,3 +103,4 @@ namespace std
 }
 
 static_assert(std::is_trivially_copyable_v<Position>);
+static_assert(sizeof(Position) == 520); // A bit big...

@@ -5,11 +5,10 @@
 #include <sstream>
 #include <cassert>
 
-Position::Position(std::size_t size) :  mSize(size), mToPlay(Player::White), mOpeningSwapMoves(2),
-                                        mFlatReserves(PlayerPair{pieceCounts[size].first}),
-                                        mCapReserves(PlayerPair{pieceCounts[size].second})
+Position::Position(std::size_t size) :  mFlatReserves(PlayerPair{pieceCounts[size].first}),
+                                        mCapReserves(PlayerPair{pieceCounts[size].second}),
+                                        mSize(size), mOpeningSwapMoves(2), mToPlay(Player::White)
 {
-    assert(size <= 8);
 }
 
 std::string Position::print() const
@@ -195,18 +194,18 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
 {
     const Square& square = mBoard[index];
 
-    std::size_t maxHandSize = std::min(static_cast<std::size_t>(square.mCount), mSize);
+    auto maxHandSize = std::min(square.mCount, mSize);
     bool isCapStack = isCap(square.mTopStone);
 
     for (const auto direction : Directions)
     {
         const int offset = getOffset(direction);
 
-        std::size_t maxDistance = mSize;
+        uint8_t maxDistance = mSize;
         bool endsInSmash = false;
-        for (std::size_t j = 1; j <= maxHandSize; ++j)
+        for (int j = 1; j <= maxHandSize; ++j)
         {
-            int nextIndex = index + j * offset;
+            uint8_t nextIndex = index + j * offset;
             if (nextIndex >= mSize * mSize) // Stops us going off the top or bottom of the board
             {
                 maxDistance = j - 1;

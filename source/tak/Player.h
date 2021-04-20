@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-enum class Player
+enum class Player : uint8_t
 {
     White,
     Black
