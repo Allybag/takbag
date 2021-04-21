@@ -74,7 +74,7 @@ std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
         ++nodeCount;
     }
 
-    std::cout << "Searched " << nodeCount << " nodes" << std::endl;
+    // std::cout << "Searched " << nodeCount << " nodes" << std::endl;
 
     Move* bestMove = nullptr;
     Node* bestNode = nullptr;
@@ -99,7 +99,7 @@ std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
         if (nodeRatio >= bestNodeRatio) // If this is the first move we've seen, pick it
         {
             std::string ptnMove = moveToPtn(move, position.size());
-            std::cout << ptnMove << " is new best move, wins " << node->mWinCount << " out of " << node->mPlayCount << std::endl;
+            // std::cout << ptnMove << " is new best move, wins " << node->mWinCount << " out of " << node->mPlayCount << std::endl;
             bestMove = &move;
             bestNode = node;
             continue;
