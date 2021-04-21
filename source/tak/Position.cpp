@@ -51,11 +51,13 @@ void Position::place(const Move& place)
 
     bool stoneIsBlack = place.mStone & StoneBits::Black;
     bool playerIsBlack = (mToPlay == Player::Black);
+    Player colour = mToPlay;
     if (mOpeningSwapMoves)
     {
         assert(stoneIsBlack != playerIsBlack);
         assert(!(place.mStone & StoneBits::Standing)); // Only allowed to play flats for the first two ply
         mOpeningSwapMoves--;
+        colour = playerIsBlack ? Player::White : Player::Black;
     }
     else
         assert(stoneIsBlack == playerIsBlack);
@@ -66,12 +68,12 @@ void Position::place(const Move& place)
     if (isCap(place.mStone))
     {
         assert(mCapReserves[mToPlay]);
-        mCapReserves[mToPlay] -= 1;
+        mCapReserves[colour] -= 1;
     }
     else
     {
         assert(mFlatReserves[mToPlay]);
-        mFlatReserves[mToPlay] -= 1;
+        mFlatReserves[colour] -= 1;
     }
 
     togglePlayer();
