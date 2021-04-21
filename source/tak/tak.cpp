@@ -7,7 +7,7 @@ int main()
 {
     Engine engine;
 
-    Game game = Game(4);
+    Game game = Game(5);
     std::cout << game.print() << std::endl;
 
     std::string engineMove = engine.chooseMove(game.getPosition());

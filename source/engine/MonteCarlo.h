@@ -7,6 +7,7 @@
 #include <vector>
 #include <functional>
 #include <cstddef>
+#include <chrono>
 
 struct Node
 {
@@ -21,14 +22,16 @@ struct Node
     Node(Node* parent) : mParent(parent), mPlayCount(0), mWinCount(0) { }
 };
 
-std::string monteCarloTreeSearch(const Position& position)
+std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
 {
+    using namespace std::chrono;
+    auto endTime = steady_clock::now() + std::chrono::seconds(maxSeconds);
     std::unordered_map<Position, Node*> nodes{};
     nodes[position] = new Node();
     auto colour = position.getPlayer();
 
-    std::size_t nodeCount = 1000;
-    while (nodeCount != 0)
+    std::size_t nodeCount = 0;
+    while (steady_clock::now() < endTime)
     {
         Position nextPosition(position);
         Node* parent = nullptr;
@@ -68,8 +71,10 @@ std::string monteCarloTreeSearch(const Position& position)
                 ++(node->mWinCount);
             node = node->mParent;
         }
-        --nodeCount;
+        ++nodeCount;
     }
+
+    std::cout << "Searched " << nodeCount << " nodes" << std::endl;
 
     Move* bestMove = nullptr;
     Node* bestNode = nullptr;
