@@ -7,7 +7,12 @@ int main()
 {
     Engine engine;
 
-    Game game = Game(6);
+    Game game = Game(4);
+    std::cout << game.print() << std::endl;
+
+    std::string engineMove = engine.chooseMove(game.getPosition());
+    std::cout << "Engine plays " << engineMove << std::endl;
+    game.play(engineMove);
     std::cout << game.print() << std::endl;
 
     std::string ptn;
@@ -17,7 +22,10 @@ int main()
         game.play(ptn);
         std::cout << game.print() << std::endl;
 
-        std::string engineMove = engine.chooseMove(game.getPosition());
+        if (game.checkResult() != Result::None)
+            break;
+
+        engineMove = engine.chooseMove(game.getPosition());
         std::cout << "Engine plays " << engineMove << std::endl;
         game.play(engineMove);
         std::cout << game.print() << std::endl;

@@ -47,7 +47,11 @@ std::string monteCarloTreeSearch(const Position& position)
         // Rollout
         while (nextPosition.checkResult() == Result::None)
         {
-            nextPosition.play(*chooseRandomElement(nextPosition.generateMoves()));
+            auto moves = nextPosition.generateMoves();
+            auto move = *chooseRandomElement(moves);
+            while (move.mType == MoveType::Move)
+                move = *chooseRandomElement(moves);
+            nextPosition.play(move);
         }
 
         auto result = nextPosition.checkResult();
@@ -75,14 +79,14 @@ std::string monteCarloTreeSearch(const Position& position)
     {
         Position nextPosition(position);
         nextPosition.play(move);
-        auto* node = nodes[nextPosition];
 
-        if (node->mPlayCount == 0) // We expect to look at all possible moves
+        if (!(nodes.contains(nextPosition)))
         {
-            std::cout << "Unplayed top level move?" << std::endl;
-            assert(node->mWinCount == 0);
+            std::cout << "Unplayed top level move " << moveToPtn(move, position.size()) << std::endl;
             continue;
         }
+
+        auto* node = nodes.at(nextPosition);
 
         double bestNodeRatio = bestNode ? static_cast<double>(bestNode->mWinCount) / static_cast<double>(bestNode->mPlayCount) : 0.0;
         double nodeRatio = static_cast<double>(node->mWinCount) / static_cast<double>(node->mPlayCount);
