@@ -58,6 +58,8 @@ public:
     void setSquare(std::size_t col, std::size_t rank, const std::string& tpsSquare);
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
     Player getPlayer() const { return mToPlay; }
+    PlayerPair<std::size_t> checkFlatCount() const;
+    PlayerPair<uint8_t> getReserveCount() const { return mFlatReserves; }
 
     bool operator==(const Position& other) const;
     bool operator!=(const Position& other) const;
@@ -74,7 +76,6 @@ private:
 
     Result checkRoadWin() const;
     Result checkFlatWin() const;
-    PlayerPair<std::size_t> checkFlatCount() const;
 
 };
 
