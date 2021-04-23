@@ -30,7 +30,7 @@ public:
     Result checkResult() const;
 
     // TODO: This isn't the API we want
-    const Position& getPosition() { return mPosition; }
+    const Position& getPosition() const { return mPosition; }
 };
 
 std::vector<Game> readGames(const std::string& ptnFilePath);

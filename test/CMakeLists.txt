@@ -12,3 +12,8 @@ target_link_libraries(testMoveGenerator ptn)
 add_executable(bench bench.cpp)
 target_link_libraries(bench game)
 target_link_libraries(bench ptn)
+
+add_executable(testEngine testEngine.cpp)
+target_link_libraries(testEngine game)
+target_link_libraries(testEngine ptn)
+target_link_libraries(testEngine engine)

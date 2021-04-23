@@ -6,11 +6,11 @@ class Position;
 
 class Engine
 {
-    std::string chooseMoveNegamax(const Position& position);
     std::string chooseMoveFirst(const Position& position);
     std::string chooseMoveRandom(const Position& position);
 public:
     std::string chooseMove(const Position& position);
+    std::string chooseMoveNegamax(const Position& position, int depth);
 
     int evaluate(const Position& position);
     int negamax(const Position &position, int depth, int alpha, int beta, int colour);
