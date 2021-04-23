@@ -5,22 +5,20 @@
 static constexpr int winValue = 100;
 static constexpr int infinity = 10001; // Not really infinity, but pretty high
 
-// Returns a score from the point of view of the player to move
+// Returns a score from white's point of view
 int Engine::evaluate(const Position& position)
 {
     auto result = position.checkResult();
-    auto player = position.getPlayer();
-    int colour = player == Player::White ? 1 : -1;
 
     if (result != Result::None)
     {
         if (result == Result::Draw)
             return 0;
 
-        if ((player == Player::Black) == (result & StoneBits::Black))
-            return winValue;
+        if (result & StoneBits::Black)
+            return -winValue;
 
-        return -winValue;
+        return winValue;
     }
 
     auto flatCounts = position.checkFlatCount();
@@ -32,12 +30,12 @@ int Engine::evaluate(const Position& position)
     score -= reserveCounts[Player::White]; // A flat on the board is worth one point
     score += reserveCounts[Player::Black];
 
-    return score * colour;
+    return score;
 }
 
 std::string Engine::chooseMove(const Position& position)
 {
-    return chooseMoveRandom(position);
+    return chooseMoveNegamax(position, 3);
 }
 
 std::string Engine::chooseMoveFirst(const Position& position)
@@ -60,6 +58,7 @@ std::string Engine::chooseMoveNegamax(const Position& position, int depth)
 {
     auto moves = position.generateMoves();
 
+    int colour = position.getPlayer() == Player::Black ? 1 : -1;
     int bestScore = -infinity;
     Move* bestMove = nullptr;
     for (auto& move : moves)
@@ -67,7 +66,7 @@ std::string Engine::chooseMoveNegamax(const Position& position, int depth)
         auto nextPosition = Position(position);
         nextPosition.play(move);
 
-        int score = -negamax(nextPosition, depth, -infinity, infinity, 1);
+        int score = -negamax(nextPosition, depth, -infinity, infinity, colour);
         if (score > bestScore)
         {
             bestScore = score;
@@ -82,7 +81,7 @@ int Engine::negamax(const Position& position, int depth, int alpha, int beta, in
 {
     if (depth == 0 || position.checkResult() != Result::None)
         // depth !=0 => game is over, so we multiply to make early wins more positive, and early losses more negative
-        return evaluate(position) * (depth + 1);
+        return evaluate(position) * colour * (depth + 1);
 
     auto moves = position.generateMoves();
     // auto orderedMoves = orderMoves(moves);

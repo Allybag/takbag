@@ -17,7 +17,7 @@ void checkEngineBlocksWin(const std::string& engineMove, const Game& game)
     {
         auto nextPosition = Position(blockedGame.getPosition());
         nextPosition.play(move);
-        assert(nextPosition.checkResult() == Result::None);
+        boost::ut::expect(nextPosition.checkResult() == Result::None);
     }
 }
 
@@ -25,6 +25,7 @@ int main()
 {
     using namespace boost::ut;
 
+#if 1
     "Test Flat Counting"_test = []
     {
         // This isn't a great test, as it relies on the
@@ -33,13 +34,13 @@ int main()
 
         Game game(5);
         game.play("a1");
-        expect(engine.evaluate(game.getPosition()) == 3); // Black is a flat ahead, wahey!
+        expect(engine.evaluate(game.getPosition()) == -3); // Black is a flat ahead, wahey!
 
         game.play("e5");
         expect(engine.evaluate(game.getPosition()) == 0);
 
         game.play("e4");
-        expect(engine.evaluate(game.getPosition()) == -3); // Black is a flat behind, booo!
+        expect(engine.evaluate(game.getPosition()) == 3); // Black is a flat behind, booo!
     };
 
     "Test Negamax Search"_test = []
@@ -57,14 +58,14 @@ int main()
             Game missedThreatGame(game);
             missedThreatGame.play("d2"); // A random move that doesn't block the win
 
-            auto winningWhiteMove = engine.chooseMoveNegamax(missedThreatGame.getPosition(), 0);
+            auto winningWhiteMove = engine.chooseMoveNegamax(missedThreatGame.getPosition(), depth);
             std::string onlyWinningWhiteMove = "a4";
-            assert(winningWhiteMove == onlyWinningWhiteMove);
+            expect(winningWhiteMove == onlyWinningWhiteMove);
 
             missedThreatGame.play("b4"); // White misses the win...
-            auto winningBlackMove = engine.chooseMoveNegamax(missedThreatGame.getPosition(), 0);
+            auto winningBlackMove = engine.chooseMoveNegamax(missedThreatGame.getPosition(), depth);
             std::string onlyWinningBlackMove = "d1";
-            assert(winningBlackMove == onlyWinningBlackMove);
+            expect(winningBlackMove == onlyWinningBlackMove);
         }
 
         // At depth 1 we should block the enemy when they make a tak threat
@@ -105,7 +106,7 @@ int main()
 
         std::string onlyTinueMove = "1a2-1";
         auto engineTinueMove = engine.chooseMoveNegamax(game.getPosition(), 3);
-        assert(engineTinueMove == onlyTinueMove);
+        expect(engineTinueMove == onlyTinueMove);
         game.play(engineTinueMove);
 
         std::string blockWesternRoad = "Sa2";
@@ -114,5 +115,21 @@ int main()
         std::string onlyWinningMove = "4a1>112";
         auto engineWinningMove = engine.chooseMoveNegamax(game.getPosition(), 3);
         expect(engineWinningMove == onlyWinningMove);
+    };
+#endif
+    "Test Avoid Suicide"_test = []
+    {
+        Engine engine;
+        Game game(4);
+
+        std::string movesTillSuicidable = "a1 d4 b1 a2 c1 a3 1b1<1 b1 d1 b1< a4 b3 b4 c4 1b4-1 b4";
+        for (const auto& move : split(movesTillSuicidable, ' '))
+            game.play(move);
+
+        for (int depth = 1; depth <= 3; ++depth)
+        {
+            auto engineMove = engine.chooseMoveNegamax(game.getPosition(), depth);
+            checkEngineBlocksWin(engineMove, game); // The engine should choose something like a4- or 2b3+
+        }
     };
 }

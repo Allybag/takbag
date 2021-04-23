@@ -50,6 +50,13 @@ void Game::fillPtn(PtnTurn &ptn)
 
 std::string Game::print() const
 {
+    if (mPosition.checkResult() != Result::None)
+    {
+        for (const auto& move : mMoveList)
+            std::cout << move.mSourceString << " ";
+        std::cout << std::endl;
+    }
+    
     return mPosition.print();
 }
 
