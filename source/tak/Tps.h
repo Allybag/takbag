@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Position.h"
-
-#include <sstream>
+#include "other/StringSplit.h"
 
 // Tak Positional System (spec: https://www.reddit.com/r/Tak/wiki/tak_positional_system)
 
@@ -12,18 +11,6 @@
 // [TPS "x5/x5/x5/x5/x5 1 1"]
 // [TPS "x3,12,2S/x,22S,22C,11,21/121,212,12,1121C,1212S/21S,1,21,211S,12S/x,21S,2,x2 1 26"]
 // OpenTag TPS "BoardRepresentation PlayerToMove TurnNum" CloseTag
-
-std::vector<std::string> split(const std::string& s, char delimiter)
-{
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(s);
-    while (std::getline(tokenStream, token, delimiter))
-    {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
 
 Position positionFromTps(const std::string& tpsData)
 {
