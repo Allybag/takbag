@@ -104,7 +104,7 @@ void tei()
 
 int main()
 {
-    tei();
+    playCommandLine(5);
     return 0;
 }
 

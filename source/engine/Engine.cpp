@@ -2,6 +2,8 @@
 #include "tak/Position.h"
 #include "MonteCarlo.h"
 
+#include <chrono>
+
 static constexpr int winValue = 100;
 static constexpr int infinity = 10001; // Not really infinity, but pretty high
 
@@ -35,6 +37,15 @@ int Engine::evaluate(const Position& position)
 
 std::string Engine::chooseMove(const Position& position)
 {
+    using namespace std::chrono;
+    auto startTime = steady_clock::now();
+    mStats.reset();
+
+    auto move = chooseMoveNegamax(position, 4);
+
+    auto stopTime = steady_clock::now();
+    auto duration = duration_cast<microseconds>(stopTime - startTime);
+    std::cout << "Evaluated " << mStats.mNodeCount << " nodes in " << duration.count() << " mics" << std::endl;
     return chooseMoveNegamax(position, 3);
 }
 
@@ -69,6 +80,8 @@ std::string Engine::chooseMoveNegamax(const Position& position, int depth)
         int score = -negamax(nextPosition, depth, -infinity, infinity, colour);
         if (score > bestScore)
         {
+            auto ptnMove = moveToPtn(move, position.size());
+            std::cout << "New best move " << ptnMove << " with score " << score << std::endl;
             bestScore = score;
             bestMove = &move;
         }
@@ -80,8 +93,13 @@ std::string Engine::chooseMoveNegamax(const Position& position, int depth)
 int Engine::negamax(const Position& position, int depth, int alpha, int beta, int colour)
 {
     if (depth == 0 || position.checkResult() != Result::None)
-        // depth !=0 => game is over, so we multiply to make early wins more positive, and early losses more negative
-        return evaluate(position) * colour * (depth + 1);
+    {
+        int score = evaluate(position);
+        ++mStats.mNodeCount;
+
+        // depth !=0 => game is over, we subtract depth here to favour quick wins and long losses
+        return score * colour - depth;
+    }
 
     auto moves = position.generateMoves();
     // auto orderedMoves = orderMoves(moves);

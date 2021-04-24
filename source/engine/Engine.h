@@ -4,8 +4,17 @@
 
 class Position;
 
+struct EngineStats
+{
+    std::size_t mNodeCount;
+    EngineStats() : mNodeCount(0) { }
+    void reset() { mNodeCount = 0; }
+};
+
 class Engine
 {
+    EngineStats mStats;
+
     std::string chooseMoveFirst(const Position& position);
     std::string chooseMoveRandom(const Position& position);
 public:
