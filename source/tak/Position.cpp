@@ -419,7 +419,7 @@ std::vector<std::size_t> Position::getNeighbours(std::size_t index) const
         if (neighbour >= mSize * mSize)
             continue;
         if ((direction == Direction::Right || direction == Direction::Left))
-            if ((neighbour / mSize) != (index / mSize)) // Stops us going off right or legt
+            if ((neighbour / mSize) != (index / mSize)) // Stops us going off right or left
                 continue;
 
         neighbours.push_back(neighbour);
