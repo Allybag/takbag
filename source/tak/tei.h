@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "engine/Engine.h"
+#include "other/StringSplit.h"
 
 #include <cstddef>
 #include <vector>

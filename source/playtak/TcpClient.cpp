@@ -3,10 +3,18 @@
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <netdb.h> // addrinfo
+#include <unistd.h>
+#include <iostream>
 
 TcpClient::TcpClient() : mSocket(-1)
 {
     memset(mReceiveBuffer, 0, sizeof(mReceiveBuffer));
+}
+
+TcpClient::~TcpClient()
+{
+    if (mSocket != -1)
+        close(mSocket);
 }
 
 bool TcpClient::connect(const std::string& site, int port)
@@ -15,6 +23,7 @@ bool TcpClient::connect(const std::string& site, int port)
     if (mSocket != -1)
     {
         std::cout << "Abandoning old connection" << std::endl;
+        close(mSocket);
     }
 
     // This connection function is based on Beej's Network Programming Guide:

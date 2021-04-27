@@ -13,7 +13,7 @@ std::string ptnToServer(const std::string& ptn)
         // This is a move
         serverMove.append("M ");
 
-        int pieceCount = ptn[0] - '0'; // Unused
+        // int pieceCount = ptn[0] - '0'; // Unused
         auto rank = ptn[1];
         auto file = ptn[2];
         auto direction = ptn[3];
