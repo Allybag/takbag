@@ -2,6 +2,7 @@
 
 #include "TcpClient.h"
 
+#include <vector>
 #include <cstdint>
 
 enum class Colour
@@ -23,11 +24,36 @@ struct GameConfig
     bool mIsTournament;
 };
 
+struct Seek
+{
+    GameConfig mConfig;
+    std::string mSeekingPlayer;
+    std::string mSeekedPlayer; // Empty string if it's an open seek
+    Colour seekColour;
+};
+
+struct PlaytakGame
+{
+    std::size_t mGameId;
+    std::string mWhitePlayer;
+    std::string mBlackPlayer;
+};
+
 class PlaytakClient
 {
     TcpClient mClient;
+
+    // State of the Server
+    std::vector<Seek> mSeeks;
+    std::vector<PlaytakGame> mGames;
+    std::size_t mOnlineCount;
+
+    bool mStopping;
     bool send(const std::string& data);
 public:
     bool connect();
+
+    void stream();
+
 
 };

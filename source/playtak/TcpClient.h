@@ -13,7 +13,10 @@ class TcpClient
 public:
     TcpClient();
     ~TcpClient();
+
     bool connect(const std::string& site, int port);
     bool send(const std::string& data);
     std::string receive();
+
+    bool connected() { return mSocket != -1;}
 };

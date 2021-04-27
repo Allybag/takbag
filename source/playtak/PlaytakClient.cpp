@@ -14,14 +14,16 @@ bool PlaytakClient::connect()
         return false;
     }
 
-    // We expect a message saying welcome
-    std::string response = mClient.receive();
-
-    // We can't Login until we get a message sayin
-    std::string readyForLogin = "Login or Register\n";
-    while (!response.ends_with(readyForLogin))
+    // Can't login until we receive the ready message below
+    bool readyForLogin = false;
+    std::string readyMessage = "Login or Register";
+    while (!readyForLogin)
     {
-        response = mClient.receive();
+        std::string response = mClient.receive();
+        auto messages = split(response, 0xa);
+        for (const auto& message : messages)
+            if (message == readyMessage)
+                readyForLogin = true;
     }
 
     std::string loginCommand = "Login Guest";
@@ -35,5 +37,16 @@ bool PlaytakClient::send(const std::string &data)
     std::string dataToSend(data);
     dataToSend.push_back(0xa); // New Line character that PlayTak.com treats as End Of Message
     return mClient.send(dataToSend);
+}
+
+void PlaytakClient::stream()
+{
+    while (!mStopping && mClient.connected())
+    {
+        std::string response = mClient.receive();
+        auto messages = split(response, 0xa);
+        for (const auto& message : messages)
+            std::cout << message << std::endl;
+    }
 }
 

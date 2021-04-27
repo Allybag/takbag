@@ -8,6 +8,7 @@ int main()
 {
     PlaytakClient client;
     client.connect();
+    client.stream();
     return 0;
 }
 

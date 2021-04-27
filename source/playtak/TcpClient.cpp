@@ -80,7 +80,9 @@ std::string TcpClient::receive()
     if (received <= 0)
     {
         mReceiveBuffer[0] = '\0';
-        std::cout << "Socket receive closed." << std::endl;
+        close(mSocket);
+        mSocket = -1;
+        std::cout << "Socket closed by server" << std::endl;
         return std::string();
     }
     mReceiveBuffer[received] = '\0';
