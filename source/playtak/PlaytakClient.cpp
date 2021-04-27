@@ -3,10 +3,21 @@
 #include "ServerMove.h"
 
 #include <iostream>
+#include <chrono>
 
 static const std::string address = "playtak.com";
 static const int port = 10'000;
 
+void PlaytakClient::ping()
+{
+    while (!mStopping && mClient.connected())
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(30));
+        if (mClient.connected())
+            send("PING");
+    }
+
+}
 bool PlaytakClient::connect()
 {
     if (!mClient.connect(address, port))
@@ -29,6 +40,8 @@ bool PlaytakClient::connect()
     std::string loginCommand = "Login Guest";
     send(loginCommand);
 
+    mPingThread = std::thread(&PlaytakClient::ping, this);
+
     return true;
 }
 
@@ -48,5 +61,7 @@ void PlaytakClient::stream()
         for (const auto& message : messages)
             std::cout << message << std::endl;
     }
+
+    mPingThread.join();
 }
 

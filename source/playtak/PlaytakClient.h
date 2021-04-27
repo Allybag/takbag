@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <thread>
 
 enum class Colour
 {
@@ -42,6 +43,7 @@ struct PlaytakGame
 class PlaytakClient
 {
     TcpClient mClient;
+    std::thread mPingThread;
 
     // State of the Server
     std::vector<Seek> mSeeks;
@@ -50,6 +52,7 @@ class PlaytakClient
 
     bool mStopping;
     bool send(const std::string& data);
+    void ping();
 public:
     bool connect();
 
