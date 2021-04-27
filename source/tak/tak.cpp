@@ -2,10 +2,12 @@
 
 #include "tei.h"
 #include "cmdLine.h"
+#include "playtak/PlaytakClient.h"
 
 int main()
 {
-    playCommandLine(5);
+    PlaytakClient client;
+    client.connect();
     return 0;
 }
 
