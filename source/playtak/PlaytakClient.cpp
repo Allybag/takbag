@@ -47,6 +47,8 @@ bool PlaytakClient::connect()
 
 bool PlaytakClient::send(const std::string &data)
 {
+    // Shouldn't need a lock even though we call from two threads
+    // as a single TCP send is atomic, and our messages should be very small
     std::string dataToSend(data);
     dataToSend.push_back(0xa); // New Line character that PlayTak.com treats as End Of Message
     return mClient.send(dataToSend);
