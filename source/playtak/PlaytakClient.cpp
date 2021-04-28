@@ -2,7 +2,6 @@
 
 #include "ServerMove.h"
 
-#include <iostream>
 #include <chrono>
 
 static const std::string address = "playtak.com";
@@ -61,7 +60,7 @@ void PlaytakClient::stream()
         std::string response = mClient.receive();
         auto messages = split(response, 0xa);
         for (const auto& message : messages)
-            std::cout << message << std::endl;
+            mLogger << LogLevel::Info << "Received message: " << message << Flush;
     }
 
     mPingThread.join();

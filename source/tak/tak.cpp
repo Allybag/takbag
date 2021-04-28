@@ -7,9 +7,6 @@
 
 int main()
 {
-    playCommandLine(5);
-    return 0;
-
     PlaytakClient client;
     client.connect();
     client.stream();

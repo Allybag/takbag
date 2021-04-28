@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TcpClient.h"
+#include "log/Logger.h"
 
 #include <vector>
 #include <cstdint>
@@ -44,6 +45,7 @@ class PlaytakClient
 {
     TcpClient mClient;
     std::thread mPingThread;
+    Logger mLogger{"Playtak"};
 
     // State of the Server
     std::vector<Seek> mSeeks;

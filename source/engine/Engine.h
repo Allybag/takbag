@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "log/Logger.h"
 
 class Position;
 
@@ -14,6 +15,7 @@ struct EngineStats
 class Engine
 {
     EngineStats mStats;
+    Logger mLogger{"Engine"};
 
     std::string chooseMoveFirst(const Position& position);
     std::string chooseMoveRandom(const Position& position);

@@ -2,6 +2,7 @@
 
 #include "tak/Position.h"
 #include "Engine.h"
+#include "log/Logger.h"
 
 #include <unordered_map>
 #include <vector>
@@ -24,6 +25,8 @@ struct Node
 
 std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
 {
+    Logger logger("MonteCarlo");
+
     using namespace std::chrono;
     auto endTime = steady_clock::now() + std::chrono::seconds(maxSeconds);
     std::unordered_map<Position, Node*> nodes{};
@@ -74,7 +77,7 @@ std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
         ++nodeCount;
     }
 
-    // std::cout << "Searched " << nodeCount << " nodes" << std::endl;
+    logger << LogLevel::Info << "Searched " << nodeCount << " nodes" << Flush;
 
     Move* bestMove = nullptr;
     Node* bestNode = nullptr;
@@ -87,7 +90,7 @@ std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
 
         if (!(nodes.contains(nextPosition)))
         {
-            std::cout << "Unplayed top level move " << moveToPtn(move, position.size()) << std::endl;
+            logger << LogLevel::Warn << "Unplayed top level move " << moveToPtn(move, position.size()) << Flush;
             continue;
         }
 
@@ -99,7 +102,8 @@ std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
         if (nodeRatio >= bestNodeRatio) // If this is the first move we've seen, pick it
         {
             std::string ptnMove = moveToPtn(move, position.size());
-            // std::cout << ptnMove << " is new best move, wins " << node->mWinCount << " out of " << node->mPlayCount << std::endl;
+            logger << LogLevel::Info << ptnMove << " is new best move, wins " << node->mWinCount << " out of " << node->mPlayCount << Flush;
+
             bestMove = &move;
             bestNode = node;
             continue;

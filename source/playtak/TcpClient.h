@@ -1,5 +1,7 @@
 #pragma once
 
+#include "log/Logger.h"
+
 #include <string>
 
 // A generic TCP Client, can connect to a socket, and send and receive text
@@ -8,6 +10,8 @@ class TcpClient
 {
     char mReceiveBuffer[1024];
     int mSocket;
+
+    Logger mLogger{"TCP"};
 
     bool hasData();
 public:

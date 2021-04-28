@@ -245,11 +245,6 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
             for (const auto dropCount : dropCounts)
             {
                 moves.emplace_back(index, handSize, dropCount, direction);
-#if 0
-                Move moveMove(index, handSize, dropCount, direction);
-                std::cout << moveMove << std::endl;
-#endif
-
             }
         }
     }
@@ -337,14 +332,6 @@ Result Position::checkRoadWin() const {
         if (checkConnectsOppositeEdges(island))
         {
 
-#if 0
-            std::cout << "Island contains ";
-            for (const auto islandIndex : island)
-            {
-                std::cout << islandIndex << ",";
-            }
-            std::cout << std::endl;
-#endif
             bool roadIsBlack = topStone & StoneBits::Black;
             bool playerIsBlack = (mToPlay == Player::Black);
             result = static_cast<Result>((topStone & StoneBits::Black) | Result::WhiteRoad);

@@ -4,7 +4,6 @@
 #include <sys/select.h>
 #include <netdb.h> // addrinfo
 #include <unistd.h>
-#include <iostream>
 
 TcpClient::TcpClient() : mSocket(-1)
 {
@@ -22,7 +21,7 @@ bool TcpClient::connect(const std::string& site, int port)
     // create socket if it is not already created
     if (mSocket != -1)
     {
-        std::cout << "Abandoning old connection" << std::endl;
+        mLogger << LogLevel::Info << "Abandoning old connection" << Flush;
         close(mSocket);
     }
 
@@ -37,26 +36,26 @@ bool TcpClient::connect(const std::string& site, int port)
     int status = getaddrinfo(site.c_str(), std::to_string(port).c_str(), &hints, &serverInfo);
     if (status != 0)
     {
-        std::cout << "Address Info Disaster" << std::endl;
+        mLogger << LogLevel::Error << "Address Info Failure" << Flush;
         return false;
     }
 
     mSocket = socket(serverInfo->ai_family, serverInfo->ai_socktype, serverInfo->ai_protocol);
     if (mSocket == -1)
     {
-        std::cout << "Socket creation disaster" << std::endl;
+        mLogger << LogLevel::Error << "Socket Creation Failure" << Flush;
         return false;
     }
 
     int connected = ::connect(mSocket, serverInfo->ai_addr, serverInfo->ai_addrlen);
     if (connected == -1)
     {
-        std::cout << "Connection disaster" << std::endl;
+        mLogger << LogLevel::Error << "Connection Failure" << Flush;
         return false;
     }
 
     freeaddrinfo(serverInfo); // We leak this if we fail at any stage above, but whatever
-    std::cout << "Connected" << std::endl;
+    mLogger << LogLevel::Info << "Connected" << Flush;
     return true;
 }
 
@@ -67,7 +66,7 @@ bool TcpClient::send(const std::string& data) {
     else if (sent <= 0)
         return false;
 
-    std::cout << "TcpClient::send only sent " << sent << " bytes out of " << data.length() << std::endl;
+    mLogger << LogLevel::Warn << "TcpClient::send only sent " << sent << " bytes out of " << data.length() << Flush;
     return true;
 }
 
@@ -82,7 +81,7 @@ std::string TcpClient::receive()
         mReceiveBuffer[0] = '\0';
         close(mSocket);
         mSocket = -1;
-        std::cout << "Socket closed by server" << std::endl;
+        mLogger << LogLevel::Info << "Socket closed by server" << Flush;
         return std::string();
     }
     mReceiveBuffer[received] = '\0';

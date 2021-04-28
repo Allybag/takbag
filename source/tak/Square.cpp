@@ -1,5 +1,8 @@
 #include "Square.h"
 
+#include "log/Logger.h"
+static Logger logger{"Square"};
+
 #include <cassert>
 #include <sstream>
 
@@ -50,7 +53,7 @@ void Square::add(Square& source, uint8_t count)
 
     if (mCount + count >= 32)
     {
-        std::cout << "Dropping bottom 6 stones from stack of " << mCount + count << " stones" << std::endl;
+        logger << LogLevel::Warn << "Dropping bottom 6 stones from stack of " << mCount + count << " stones" << Flush;
         mCount -= 6;
         mStack >>= 6;
     }

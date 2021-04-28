@@ -45,8 +45,8 @@ std::string Engine::chooseMove(const Position& position)
 
     auto stopTime = steady_clock::now();
     auto duration = duration_cast<microseconds>(stopTime - startTime);
-    std::cout << "Evaluated " << mStats.mNodeCount << " nodes in " << duration.count() << " mics" << std::endl;
-    return chooseMoveNegamax(position, 3);
+    mLogger << LogLevel::Info << "Evaluated " << mStats.mNodeCount << " nodes in " << duration.count() << " mics" << Flush;
+    return chooseMoveNegamax(position, 2);
 }
 
 std::string Engine::chooseMoveFirst(const Position& position)
@@ -81,7 +81,7 @@ std::string Engine::chooseMoveNegamax(const Position& position, int depth)
         if (score > bestScore)
         {
             auto ptnMove = moveToPtn(move, position.size());
-            std::cout << "New best move " << ptnMove << " with score " << score << std::endl;
+            mLogger << LogLevel::Debug << "New best move " << ptnMove << " with score " << score << Flush;
             bestScore = score;
             bestMove = &move;
         }
