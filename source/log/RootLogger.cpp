@@ -20,7 +20,11 @@ void RootLogger::log(LogLevel logLevel, const std::string& message, const std::s
     logLine << "[" << funcName << "]" << " ";
     logLine << message;
 
-    std::cout << logLine.str() << std::endl;
+    if (mLogToStdOut)
+        std::cout << logLine.str() << std::endl;
+
+    if (mLogFile.is_open())
+        mLogFile << logLine.str() << std::endl;
 }
 
 RootLogger rootLogger;

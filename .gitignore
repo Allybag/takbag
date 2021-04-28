@@ -37,3 +37,6 @@ cmake-build*
 
 # Vim
 .*.sw*
+
+# Log Files
+*.log

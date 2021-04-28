@@ -3,10 +3,14 @@
 #include "LogLevel.h"
 
 #include <string>
+#include <fstream>
+#include <iomanip>
 
 class RootLogger
 {
-    LogLevel mGlobalLogLevel {LogLevel::Info};
+    bool mLogToStdOut{ true };
+    LogLevel mGlobalLogLevel{ LogLevel::Info };
+    std::ofstream mLogFile{ "tak.log" };
 
 public:
     void log(LogLevel logLevel, const std::string& message, const std::string& funcName, const std::string& logName);
