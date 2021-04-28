@@ -10,7 +10,8 @@ enum class LogLevel : uint8_t
     Error,
     Info,
     Debug,
-    Trace
+    Trace,
+    Unset,
 };
 
 inline std::string logLevelToStr(LogLevel logLevel)
@@ -29,6 +30,8 @@ inline std::string logLevelToStr(LogLevel logLevel)
             return "DEBUG";
         case LogLevel::Trace:
             return "TRACE";
+        case LogLevel::Unset:
+            return "UNSET";
     }
 
     assert(false);

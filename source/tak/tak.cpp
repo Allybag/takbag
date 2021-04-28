@@ -5,18 +5,9 @@
 #include "playtak/PlaytakClient.h"
 #include "log/Logger.h"
 
-struct LogTester
-{
-    Logger mLogger{"Test"};
-
-    void bag() { Log(LogLevel::Info, "Hello"); }
-};
-
-
 int main()
 {
-    LogTester logTester;
-    logTester.bag();
+    playCommandLine(5);
     return 0;
 
     PlaytakClient client;
