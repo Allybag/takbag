@@ -22,9 +22,11 @@ struct GameConfig
     std::size_t mKomi; // This is actually double the komi value
     std::size_t mFlatsCount;
     std::size_t mCapsCount;
-    bool mIsRated;
+    bool mIsPointless; // Nohat term for "Unrated"
     bool mIsTournament;
 };
+
+extern const GameConfig defaultConfig;
 
 struct Seek
 {
@@ -57,8 +59,8 @@ class PlaytakClient
     void ping();
 public:
     bool connect();
-
     void stream();
 
+    void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any, const std::string opponent = "Ally");
 
 };

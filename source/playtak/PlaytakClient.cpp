@@ -6,6 +6,7 @@
 
 static const std::string address = "playtak.com";
 static const int port = 10'000;
+const GameConfig defaultConfig = GameConfig{5, 600, 10, 0, 21, 1, false, false};
 
 void PlaytakClient::ping()
 {
@@ -49,6 +50,7 @@ bool PlaytakClient::send(const std::string &data)
     // Shouldn't need a lock even though we call from two threads
     // as a single TCP send is atomic, and our messages should be very small
     std::string dataToSend(data);
+    mLogger << LogLevel::Info << "Sending message: " << data << Flush;
     dataToSend.push_back(0xa); // New Line character that PlayTak.com treats as End Of Message
     return mClient.send(dataToSend);
 }
@@ -64,5 +66,22 @@ void PlaytakClient::stream()
     }
 
     mPingThread.join();
+}
+
+void PlaytakClient::seek(const GameConfig& gameConfig, Colour colour, const std::string opponent)
+{
+    // Seek no time incr W/B/A komi pieces capstones unrated tournament opponent
+    std::stringstream seekRequest;
+    seekRequest << "Seek " << gameConfig.mSize << " ";
+    seekRequest << gameConfig.mTime << " " << gameConfig.mIncrement << " ";
+    seekRequest << static_cast<char>(colour) << " " << gameConfig.mKomi << " ";
+    seekRequest << gameConfig.mFlatsCount << " " << gameConfig.mCapsCount << " ";
+    seekRequest << gameConfig.mIsPointless << " " << gameConfig.mIsTournament << " ";
+
+    if (!opponent.empty())
+        seekRequest << opponent;
+
+    send(seekRequest.str());
+
 }
 

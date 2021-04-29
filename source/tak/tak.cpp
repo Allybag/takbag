@@ -9,6 +9,7 @@ int main()
 {
     PlaytakClient client;
     client.connect();
+    client.seek();
     client.stream();
     return 0;
 }
