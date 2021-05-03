@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Position.h"
-#include "other/StringSplit.h"
+#include "other/StringOps.h"
 
 // Tak Positional System (spec: https://www.reddit.com/r/Tak/wiki/tak_positional_system)
 

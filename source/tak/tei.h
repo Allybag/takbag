@@ -2,7 +2,7 @@
 
 #include "Game.h"
 #include "engine/Engine.h"
-#include "other/StringSplit.h"
+#include "other/StringOps.h"
 
 #include <cstddef>
 #include <vector>

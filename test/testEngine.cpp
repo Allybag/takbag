@@ -6,7 +6,7 @@
 #include "tak/Position.h"
 #include "tak/Game.h" // Game is basically the interface to Position
 #include "engine/Engine.h"
-#include "other/StringSplit.h"
+#include "other/StringOps.h"
 
 void checkEngineBlocksWin(const std::string& engineMove, const Game& game)
 { // The move the engine plays should leave us unable to road on the next turn

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "other/StringSplit.h"
+#include "other/StringOps.h"
 #include <vector>
 
 std::string ptnToServer(const std::string& ptn)
