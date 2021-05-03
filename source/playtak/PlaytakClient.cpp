@@ -42,6 +42,7 @@ bool PlaytakClient::connect()
 
     mPingThread = std::thread(&PlaytakClient::ping, this);
 
+    mStopping = false;
     return true;
 }
 

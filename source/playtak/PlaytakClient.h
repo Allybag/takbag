@@ -115,7 +115,7 @@ public:
     bool sendMove(const std::string& move);
     std::vector<PlaytakMessage> receiveMessages();
 
-    void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any, const std::string opponent = "Guest790");
+    void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any, const std::string opponent = "Guest850");
 
     PlaytakMessage parseMessage(const std::string& message);
 };
