@@ -55,9 +55,9 @@ public:
         if (shouldLog())
             rootLogger.log(mActiveLevel, mActiveStream.str(), flushMessage.mFuncName, mName);
 
-        mActiveLevel = LogLevel::Unset;
         std::stringstream emptyStream;
         std::swap(mActiveStream, emptyStream);
+        mActiveLevel = LogLevel::Unset;
         return *this;
     }
 };

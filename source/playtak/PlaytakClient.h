@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstdint>
 #include <thread>
+#include <mutex>
 
 enum class Colour
 {
@@ -95,6 +96,7 @@ class PlaytakClient
     TcpClient mClient;
     std::thread mPingThread;
     Logger mLogger{"Playtak"};
+    std::mutex mSendLock;
 
     // State of the Server
     std::vector<Seek> mSeeks;
