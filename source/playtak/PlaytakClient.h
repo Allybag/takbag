@@ -43,6 +43,53 @@ struct PlaytakGame
     std::string mBlackPlayer;
 };
 
+enum class PlaytakMessageType : uint8_t
+{
+    ConnectionSuccess, // Welcome!
+    ReadyForLogin, // Login or Register
+    LoginSuccess, // Welcome Username!
+    AddGame, // GameList Add
+    RemoveGame, // GameList Remove
+    StartGame, // Game Start
+    GameUpdate, // Game#
+    AddSeek, // Seek Add
+    RemoveSeek, // Seek remove
+    Observe, // Observer
+    GlobalChat, // Shout
+    ChatJoin, // Joined
+    ChatLeave, // Left
+    RoomChat, // ShoutRoom
+    PrivateChat, // Tell
+    PrivateChatSent, // Told
+    Announcement, // Message
+    Error, // Error
+    OnlineCount, // Online
+    Nak, // NOK
+    Ack, // OK
+
+};
+
+inline bool isRelevant(PlaytakMessageType type)
+{
+    switch (type)
+    {
+        case PlaytakMessageType::StartGame:
+        case PlaytakMessageType::GameUpdate:
+            return true;
+        default:
+            return false;
+    }
+}
+
+struct PlaytakMessage
+{
+    PlaytakMessageType mType;
+    std::string mData;
+
+    explicit PlaytakMessage(PlaytakMessageType type) : PlaytakMessage(type, "") { }
+    PlaytakMessage(PlaytakMessageType type, std::string data) : mType(type), mData(std::move(data)) { }
+};
+
 class PlaytakClient
 {
     TcpClient mClient;
@@ -54,13 +101,21 @@ class PlaytakClient
     std::vector<PlaytakGame> mGames;
     std::size_t mOnlineCount;
 
+    // Our state
+    std::string mName;
+    std::size_t mActiveGameId;
+
     bool mStopping;
     bool send(const std::string& data);
     void ping();
 public:
-    bool connect();
     void stream();
+    bool connect();
+    bool connected();
+    bool sendMove(const std::string& move);
+    std::vector<PlaytakMessage> receiveMessages();
 
-    void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any, const std::string opponent = "Ally");
+    void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any, const std::string opponent = "Guest790");
 
+    PlaytakMessage parseMessage(const std::string& message);
 };

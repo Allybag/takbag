@@ -41,7 +41,7 @@ std::string Engine::chooseMove(const Position& position)
     auto startTime = steady_clock::now();
     mStats.reset();
 
-    auto move = chooseMoveNegamax(position, 4);
+    auto move = chooseMoveNegamax(position, 2);
 
     auto stopTime = steady_clock::now();
     auto duration = duration_cast<microseconds>(stopTime - startTime);

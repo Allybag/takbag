@@ -19,7 +19,7 @@ std::string ptnToServer(const std::string& ptn)
         auto direction = ptn[3];
 
         std::vector<char> dropCounts;
-        for (std::size_t i = 3; i < ptn.size(); ++i)
+        for (std::size_t i = 4; i < ptn.size(); ++i)
             dropCounts.push_back(ptn[i]);
 
         std::string sourceSquare;
@@ -79,6 +79,10 @@ std::string ptnToServer(const std::string& ptn)
                 assert(false);
         }
     }
+
+    for (auto& c : serverMove)
+        c = std::toupper(c); // We want everything always upper case
+
     return serverMove;
 }
 
@@ -99,8 +103,8 @@ std::string serverToPtn(const std::string& serverMove)
         ptn.push_back(std::tolower(square[0]));
         ptn.push_back(square[1]);
 
-        auto rankDifference = tokens[1][0] - tokens[2][0];
-        auto fileDifference = tokens[1][0] - tokens[2][0];
+        auto rankDifference = tokens[2][0] - tokens[1][0];
+        auto fileDifference = tokens[2][1] - tokens[1][1];
 
         char direction = 0;
         if (rankDifference > 0)
