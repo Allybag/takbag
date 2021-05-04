@@ -53,6 +53,7 @@ enum class PlaytakMessageType : uint8_t
     RemoveGame, // GameList Remove
     StartGame, // Game Start
     GameUpdate, // Game#
+    GameOver, // Game# Over
     AddSeek, // Seek Add
     RemoveSeek, // Seek remove
     Observe, // Observer
@@ -76,6 +77,7 @@ inline bool isRelevant(PlaytakMessageType type)
     {
         case PlaytakMessageType::StartGame:
         case PlaytakMessageType::GameUpdate:
+        case PlaytakMessageType::GameOver:
             return true;
         default:
             return false;
@@ -117,7 +119,7 @@ public:
     bool sendMove(const std::string& move);
     std::vector<PlaytakMessage> receiveMessages();
 
-    void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any, const std::string opponent = "Guest850");
+    void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any, const std::string opponent = "");
 
     PlaytakMessage parseMessage(const std::string& message);
 };

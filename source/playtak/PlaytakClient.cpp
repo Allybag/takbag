@@ -115,6 +115,11 @@ PlaytakMessage PlaytakClient::parseMessage(const std::string& message)
             auto serverMove = join(tokens, ' ', 1, 0);
             return PlaytakMessage(PlaytakMessageType::GameUpdate, serverToPtn(serverMove));
         }
+        else if (operation == "Over")
+        {
+            mActiveGameId = 0;
+            return PlaytakMessage(PlaytakMessageType::GameOver);
+        }
         return PlaytakMessage(PlaytakMessageType::Ack);
     }
     else if (command == "GameList")

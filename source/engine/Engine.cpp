@@ -27,7 +27,7 @@ int Engine::evaluatePos(const Position& position)
 
     auto reserveCounts = position.getReserveCount();
     score -= reserveCounts[Player::White] * 8; // We want flats on the board
-    score -= reserveCounts[Player::White] * 8; //
+    score += reserveCounts[Player::Black] * 8;
 
     auto size = position.size();
     for (std::size_t index = 0; index < size * size; ++index)
@@ -144,6 +144,9 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
             bestMove = &move;
         }
     }
+
+    auto ptnMove = moveToPtn(*bestMove, position.size());
+    mLogger << LogLevel::Info << "New best move " << ptnMove << " with score " << bestScore << Flush;
 
     return *bestMove;
 }

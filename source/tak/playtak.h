@@ -31,7 +31,7 @@ void playtak()
                     client.sendMove(engineMove);
                 }
             }
-            if (message.mType == PlaytakMessageType::GameUpdate)
+            else if (message.mType == PlaytakMessageType::GameUpdate)
             {
                 auto opponentMove = message.mData;
                 logger << LogLevel::Info << "Received move " << opponentMove << Flush;
@@ -40,6 +40,11 @@ void playtak()
                 logger << LogLevel::Info << "Sending move " << engineMove << Flush;
                 game.play(engineMove);
                 client.sendMove(engineMove);
+            }
+            else if (message.mType == PlaytakMessageType::GameOver)
+            {
+                logger << LogLevel::Info << "Game Over!" << Flush;
+                client.seek();
             }
 
         }

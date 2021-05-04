@@ -4,6 +4,7 @@ project(takbag)
 # Use C++20, with all warnings
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Weverything")
+set(CMAKE_CXX_FLAGS_RELEASE "-flto -O3")
 
 # Except for
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat -Wno-c++98-compat-pedantic") # Who cares about C++98?
