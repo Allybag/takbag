@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <cassert>
+#include <bit>
 
 Position::Position(std::size_t size) :  mFlatReserves(PlayerPair{pieceCounts[size].first}),
                                         mCapReserves(PlayerPair{pieceCounts[size].second}),
@@ -314,10 +315,10 @@ Result Position::checkRoadWin() const {
         while (parents != 0)
         {
             uint64_t children = 0;
-            for (std::size_t parentIndex = 0; parentIndex < mSize * mSize; ++parentIndex)
+            while (parents != 0)
             {
-                if (!(parents & (1 << parentIndex)))
-                    continue; // We have to iterate through the
+                auto parentIndex = std::countr_zero(parents);
+                parents -= (1 << parentIndex);
                 island |= (1 << parentIndex);
                 squareInIsland |= (1 << parentIndex);
                 for (const auto neighbour : mNeighbourMap[mSize * 64 + parentIndex])
@@ -434,10 +435,10 @@ bool Position::checkConnectsOppositeEdges(uint64_t island) const
     bool connectsLeft = false;
     bool connectsRight = false;
 
-    for (std::size_t index = 0; index < mSize * mSize; ++index)
+    while (island != 0)
     {
-        if (!(island & (1 << index)))
-            continue; // We have to iterate through the uint64_t looking for set bits
+        auto index = std::countr_zero(island);
+        island -= (1 << index);
 
         if (index < mSize)
             connectsBottom = true;
