@@ -9,6 +9,14 @@ Position::Position(std::size_t size) :  mFlatReserves(PlayerPair{pieceCounts[siz
                                         mCapReserves(PlayerPair{pieceCounts[size].second}),
                                         mSize(size), mOpeningSwapMoves(2), mToPlay(Player::White)
 {
+    if (!mNeighbourMap.contains(mSize * 64))
+    {
+        for (std::size_t index = 0; index < mSize * mSize; ++index)
+        {
+            auto neighbours = getNeighbours(index);
+            mNeighbourMap[(mSize * 64) + index] = neighbours;
+        }
+    }
 }
 
 std::string Position::print() const
@@ -286,15 +294,17 @@ Result Position::checkRoadWin() const {
     // We then look at each island, and check if it connects two sides
     // TODO: Think about and optimise this
     Result result = Result::None;
-    std::unordered_map<std::size_t, bool> squareInIsland;
-    for (std::size_t index = 0; index < mSize * mSize; ++index)
+    uint64_t squareInIsland = 0; // We use this as if it were a map, but with much faster lookup
+
+    int nextDiagonalOffset = mSize + 1; // All roads must pass through a square on the main diagonal
+    for (std::size_t index = 0; index < mSize * mSize; index += nextDiagonalOffset)
     {
         Stone topStone = mBoard[index].mTopStone;
         if (topStone == Stone::Blank || isWall(topStone))
             continue;
 
         uint8_t colour = topStone & StoneBits::Black;
-        if (squareInIsland[index])
+        if (squareInIsland & (1 << index))
             continue;
 
         // We do a breadth first search
@@ -307,10 +317,10 @@ Result Position::checkRoadWin() const {
             for (const auto parent : parents)
             {
                 island.push_back(parent);
-                squareInIsland[parent] = true;
-                for (const auto neighbour : getNeighbours(parent))
+                squareInIsland |= 1 << parent;
+                for (const auto neighbour : mNeighbourMap[mSize * 64 + parent])
                 {
-                    if (squareInIsland[neighbour])
+                    if (squareInIsland & (1 << neighbour))
                         continue; // Already assigned to an island
 
                     Stone neighbourStone = mBoard[neighbour].mTopStone;

@@ -31,6 +31,8 @@ class Position
     uint8_t mOpeningSwapMoves;
     Player mToPlay;
 
+    // Optimisations
+    inline static std::unordered_map<std::size_t, std::vector<std::size_t>> mNeighbourMap;
 
     void place(const Move& place);
     void move(const Move& move);
