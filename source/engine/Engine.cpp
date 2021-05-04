@@ -3,6 +3,7 @@
 #include "MonteCarlo.h"
 
 #include <chrono>
+#include <algorithm>
 
 static constexpr int winValue = 100;
 static constexpr int infinity = 10001; // Not really infinity, but pretty high
@@ -11,18 +12,14 @@ static constexpr int infinity = 10001; // Not really infinity, but pretty high
 int Engine::evaluate(const Position& position)
 {
     auto result = position.checkResult();
-
     if (result != Result::None)
-    {
-        if (result == Result::Draw)
-            return 0;
+        return evaluateResult(result);
 
-        if (result & StoneBits::Black)
-            return -winValue;
+    return evaluatePos(position);
+}
 
-        return winValue;
-    }
-
+int Engine::evaluatePos(const Position& position)
+{
     auto flatCounts = position.checkFlatCount();
     int score = 0;
     score += static_cast<int>(flatCounts[Player::White]) * 2; // A top flat on the board is worth two points
@@ -35,43 +32,83 @@ int Engine::evaluate(const Position& position)
     return score;
 }
 
+int Engine::evaluateResult(Result result)
+{
+    assert(result != Result::None);
+    if (result == Result::Draw)
+        return 0;
+
+    if (result & StoneBits::Black)
+        return -winValue;
+
+    return winValue;
+}
+
 std::string Engine::chooseMove(const Position& position)
 {
     using namespace std::chrono;
     auto startTime = steady_clock::now();
     mStats.reset();
 
-    auto move = chooseMoveNegamax(position, 3);
+    auto move = deepeningSearch(position);
 
     auto stopTime = steady_clock::now();
     auto duration = duration_cast<microseconds>(stopTime - startTime);
     mLogger << LogLevel::Info << "Evaluated " << mStats.mNodeCount << " nodes in " << duration.count() << " mics" << Flush;
-    return chooseMoveNegamax(position, 2);
+    return moveToPtn(move, position.size());
 }
 
-std::string Engine::chooseMoveFirst(const Position& position)
+Move Engine::chooseMoveFirst(const Position& position)
 {
     assert(position.checkResult() == Result::None);
     auto moves = position.generateMoves();
     auto move = moves.front();
-    return moveToPtn(move, position.size());
+    return move;
 }
 
-std::string Engine::chooseMoveRandom(const Position& position)
+Move Engine::chooseMoveRandom(const Position& position)
 {
     assert(position.checkResult() == Result::None);
     auto moves = position.generateMoves();
     auto randomMove = chooseRandomElement(moves);
-    return moveToPtn(*randomMove, position.size());
+    return *randomMove;
 }
 
-std::string Engine::chooseMoveNegamax(const Position& position, int depth)
+Move Engine::deepeningSearch(const Position& position, int maxSeconds)
+{
+    using namespace std::chrono;
+    auto endTime = steady_clock::now() + std::chrono::seconds(maxSeconds);
+    int depth = 0;
+    Move move = chooseMoveNegamax(position, nullptr, 0);
+    while (steady_clock::now() < endTime)
+    {
+        ++depth;
+        move = chooseMoveNegamax(position, &move, depth);
+        mLogger << LogLevel::Info << "Searched to depth  " << depth << Flush;
+    }
+
+    return move;
+
+}
+
+Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, int depth)
 {
     auto moves = position.generateMoves();
 
     int colour = position.getPlayer() == Player::Black ? 1 : -1;
     int bestScore = -infinity;
-    Move* bestMove = nullptr;
+
+    Move* bestMove = potentialMove;
+    if (bestMove != nullptr)
+    {
+        for (auto it = moves.begin(); it != moves.end(); ++it)
+            if (*bestMove == *it)
+            {
+                std::iter_swap(it, moves.begin());
+                break;
+            }
+    }
+
     for (auto& move : moves)
     {
         auto nextPosition = Position(position);
@@ -87,22 +124,30 @@ std::string Engine::chooseMoveNegamax(const Position& position, int depth)
         }
     }
 
-    return moveToPtn(*bestMove, position.size());
+    return *bestMove;
 }
 
 int Engine::negamax(const Position& position, int depth, int alpha, int beta, int colour)
 {
-    if (depth == 0 || position.checkResult() != Result::None)
+    auto result = position.checkResult();
+    if (result != Result::None)
     {
-        int score = evaluate(position);
         ++mStats.mNodeCount;
 
-        // depth !=0 => game is over, we subtract depth here to favour quick wins and long losses
-        return score * colour - depth;
+        // We subtract depth here to favour quick wins and long losses
+        int score = evaluateResult(result);
+        return colour * score * (depth + 1);
+    }
+
+    if (depth == 0)
+    {
+        ++mStats.mNodeCount;
+
+        int score = evaluatePos(position);
+        return colour * score;
     }
 
     auto moves = position.generateMoves();
-    // auto orderedMoves = orderMoves(moves);
 
     int score = -infinity;
     for (auto& move : moves)

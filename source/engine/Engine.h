@@ -2,6 +2,8 @@
 
 #include <string>
 #include "log/Logger.h"
+#include "tak/Move.h"
+#include "tak/Result.h"
 
 class Position;
 
@@ -17,11 +19,15 @@ class Engine
     EngineStats mStats;
     Logger mLogger{"Engine"};
 
-    std::string chooseMoveFirst(const Position& position);
-    std::string chooseMoveRandom(const Position& position);
+    Move chooseMoveFirst(const Position& position);
+    Move chooseMoveRandom(const Position& position);
+    Move deepeningSearch(const Position& position, int maxSeconds = 1);
+
+    int evaluatePos(const Position& position);
+    int evaluateResult(Result result);
 public:
     std::string chooseMove(const Position& position);
-    std::string chooseMoveNegamax(const Position& position, int depth);
+    Move chooseMoveNegamax(const Position& position, Move* move, int depth);
 
     int evaluate(const Position& position);
     int negamax(const Position &position, int depth, int alpha, int beta, int colour);
