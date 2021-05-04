@@ -5,8 +5,8 @@
 #include <chrono>
 #include <algorithm>
 
-static constexpr int winValue = 100;
-static constexpr int infinity = 10001; // Not really infinity, but pretty high
+static constexpr int winValue = 1000;
+static constexpr int infinity = 100001; // Not really infinity, but pretty high
 
 // Returns a score from white's point of view
 int Engine::evaluate(const Position& position)
@@ -22,12 +22,33 @@ int Engine::evaluatePos(const Position& position)
 {
     auto flatCounts = position.checkFlatCount();
     int score = 0;
-    score += static_cast<int>(flatCounts[Player::White]) * 2; // A top flat on the board is worth two points
-    score -= static_cast<int>(flatCounts[Player::Black]) * 2;
+    score += static_cast<int>(flatCounts[Player::White]) * 12; // We wanna control top flats
+    score -= static_cast<int>(flatCounts[Player::Black]) * 12;
 
     auto reserveCounts = position.getReserveCount();
-    score -= reserveCounts[Player::White]; // A flat on the board is worth one point
-    score += reserveCounts[Player::Black];
+    score -= reserveCounts[Player::White] * 8; // We want flats on the board
+    score -= reserveCounts[Player::White] * 8; //
+
+    auto size = position.size();
+    for (std::size_t index = 0; index < size * size; ++index)
+    {
+        auto square = position[index];
+        auto topStone = square.mTopStone;
+        if (square.mTopStone == Stone::Blank)
+            continue;
+
+        auto colour = topStone & StoneBits::Black ? -1 : 1;
+
+        if (isCap(square.mTopStone))
+            score += 9 * colour; // We want to use our cap rather than walls if possible
+
+        score += square.mCount * colour; // Wanna control stacks
+        if (topStone & StoneBits::Standing)
+            score += square.mCount * colour; // Wanna control stacks especially with
+
+        if ((index < size) || (index >= (size * size) - size) || (index % size == 0) || (index % size == size - 1))
+            score -= colour; // Lose a point for a square on the edge
+    }
 
     return score;
 }
@@ -50,7 +71,7 @@ std::string Engine::chooseMove(const Position& position)
     auto startTime = steady_clock::now();
     mStats.reset();
 
-    auto move = deepeningSearch(position);
+    auto move = deepeningSearch(position, 2);
 
     auto stopTime = steady_clock::now();
     auto duration = duration_cast<microseconds>(stopTime - startTime);
@@ -84,7 +105,7 @@ Move Engine::deepeningSearch(const Position& position, int maxSeconds)
     {
         ++depth;
         move = chooseMoveNegamax(position, &move, depth);
-        mLogger << LogLevel::Info << "Searched to depth  " << depth << Flush;
+        mLogger << LogLevel::Info << "Best Move: " << moveToPtn(move, position.size()) << ", depth: " << depth << Flush;
     }
 
     return move;

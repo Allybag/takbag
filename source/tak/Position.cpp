@@ -189,17 +189,18 @@ void Position::addPlaceMoves(std::size_t index, std::vector<Move> &moves) const
 {
     StoneBits colour = (mToPlay == Player::Black) ? StoneBits::Black : StoneBits::Stone;
 
+    if (mCapReserves[mToPlay])
+    {
+        moves.emplace_back(index, static_cast<Stone>(Stone::WhiteCap | colour));
+    }
+
     if (mFlatReserves[mToPlay])
     {
         moves.emplace_back(index, static_cast<Stone>(Stone::WhiteFlat | colour));
         moves.emplace_back(index, static_cast<Stone>(Stone::WhiteWall | colour));
     }
-
-    if (mCapReserves[mToPlay])
-    {
-        moves.emplace_back(index, static_cast<Stone>(Stone::WhiteCap | colour));
-    }
 }
+
 
 void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
 {
