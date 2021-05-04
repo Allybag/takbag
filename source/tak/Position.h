@@ -74,7 +74,7 @@ private:
 
     static std::vector<uint32_t> generateDropCounts(std::size_t handSize, std::size_t maxDistance, bool endsInSmash);
     std::vector<std::size_t> getNeighbours(std::size_t index) const;
-    bool checkConnectsOppositeEdges(const std::vector<std::size_t>& island) const;
+    bool checkConnectsOppositeEdges(uint64_t island) const;
 
     Result checkRoadWin() const;
     Result checkFlatWin() const;

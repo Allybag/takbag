@@ -308,17 +308,19 @@ Result Position::checkRoadWin() const {
             continue;
 
         // We do a breadth first search
-        std::vector<std::size_t> parents;
-        parents.push_back(index);
-        std::vector<std::size_t> island;
-        while (!parents.empty())
+        uint64_t parents = 0;
+        parents |= (1 << index);
+        uint64_t island = 0;
+        while (parents != 0)
         {
-            std::vector<std::size_t> children;
-            for (const auto parent : parents)
+            uint64_t children = 0;
+            for (std::size_t parentIndex = 0; parentIndex < mSize * mSize; ++parentIndex)
             {
-                island.push_back(parent);
-                squareInIsland |= 1 << parent;
-                for (const auto neighbour : mNeighbourMap[mSize * 64 + parent])
+                if (!(parents & (1 << parentIndex)))
+                    continue; // We have to iterate through the
+                island |= (1 << parentIndex);
+                squareInIsland |= (1 << parentIndex);
+                for (const auto neighbour : mNeighbourMap[mSize * 64 + parentIndex])
                 {
                     if (squareInIsland & (1 << neighbour))
                         continue; // Already assigned to an island
@@ -332,10 +334,10 @@ Result Position::checkRoadWin() const {
                     if (isWall(neighbourStone))
                         continue; // Wall
 
-                    children.push_back(neighbour);
+                    children |= ( 1 << neighbour);
                 }
             }
-            std::swap(parents, children);
+            parents = children;
         }
 
 
@@ -425,15 +427,18 @@ std::vector<std::size_t> Position::getNeighbours(std::size_t index) const
     return neighbours;
 }
 
-bool Position::checkConnectsOppositeEdges(const std::vector<std::size_t>& island) const
+bool Position::checkConnectsOppositeEdges(uint64_t island) const
 {
     bool connectsTop = false;
     bool connectsBottom = false;
     bool connectsLeft = false;
     bool connectsRight = false;
 
-    for (const auto index : island)
+    for (std::size_t index = 0; index < mSize * mSize; ++index)
     {
+        if (!(island & (1 << index)))
+            continue; // We have to iterate through the uint64_t looking for set bits
+
         if (index < mSize)
             connectsBottom = true;
         if (index >= (mSize * mSize) - mSize)
