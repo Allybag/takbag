@@ -30,23 +30,6 @@ int main()
 {
     using namespace boost::ut;
 
-    "Test Flat Counting"_test = []
-    {
-        // This isn't a great test, as it relies on the
-        // "Flat Count is worth 2, flat on the board is worth 1" temporary scoring logic
-        Engine engine;
-
-        Game game(5);
-        game.play("a1");
-        expect(engine.evaluate(game.getPosition()) == -3); // Black is a flat ahead, wahey!
-
-        game.play("e5");
-        expect(engine.evaluate(game.getPosition()) == 0);
-
-        game.play("e4");
-        expect(engine.evaluate(game.getPosition()) == 3); // Black is a flat behind, booo!
-    };
-
     "Test Negamax Search"_test = []
     {
         Engine engine;

@@ -32,7 +32,9 @@ class Position
     Player mToPlay;
 
     // Optimisations
-    inline static std::unordered_map<std::size_t, std::vector<std::size_t>> mNeighbourMap;
+    inline static std::vector<const std::vector<std::uint32_t>> mDropCountMap;
+    inline static std::vector<const std::vector<std::size_t>> mNeighbourMap;
+    inline static std::size_t mNeighbourMapSize;
 
     void place(const Move& place);
     void move(const Move& move);

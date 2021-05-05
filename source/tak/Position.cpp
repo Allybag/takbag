@@ -6,17 +6,32 @@
 #include <cassert>
 #include <bit>
 
+static constexpr std::size_t gHighMoveCount = 256;
+
 Position::Position(std::size_t size) :  mFlatReserves(PlayerPair{pieceCounts[size].first}),
                                         mCapReserves(PlayerPair{pieceCounts[size].second}),
                                         mSize(size), mOpeningSwapMoves(2), mToPlay(Player::White)
 {
-    if (!mNeighbourMap.contains(mSize * 64))
+    if (mNeighbourMapSize != mSize)
     {
+        mNeighbourMap.clear();
         for (std::size_t index = 0; index < mSize * mSize; ++index)
         {
             auto neighbours = getNeighbours(index);
-            mNeighbourMap[(mSize * 64) + index] = neighbours;
+            mNeighbourMap.push_back(neighbours);
         }
+        mNeighbourMapSize = mSize;
+    }
+    if (mDropCountMap.empty())
+    {
+        // 1 1 false 1 1 true ... 1 8 false 1 8 true 2 1 false
+        for (std::size_t handSize = 1; handSize <= 8; ++handSize)
+            for (std::size_t maxDistance = 1; maxDistance <= 8; ++maxDistance)
+                for (bool endsInSmash : {false, true})
+                {
+                    auto dropCounts = generateDropCounts(handSize, maxDistance, endsInSmash);
+                    mDropCountMap.push_back(dropCounts);
+                }
     }
 }
 
@@ -162,6 +177,8 @@ std::vector<Move> Position::generateMoves() const
         return generateOpeningMoves();
 
     std::vector<Move> moves;
+    moves.reserve(gHighMoveCount);
+
     for (int index = 0; index < mSize * mSize; ++index)
     {
         const Square& square = mBoard[index];
@@ -251,7 +268,8 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
 
         for (std::size_t handSize = 1; handSize <= maxHandSize; ++handSize)
         {
-            auto dropCounts = generateDropCounts(handSize, maxDistance, endsInSmash);
+            const auto dropCountIndex = (handSize - 1) * 16 + (maxDistance - 1) * 2 + endsInSmash;
+            const auto& dropCounts = mDropCountMap[dropCountIndex];
             for (const auto dropCount : dropCounts)
             {
                 moves.emplace_back(index, handSize, dropCount, direction);
@@ -279,8 +297,6 @@ std::vector<Move> Position::generateOpeningMoves() const
     return moves;
 }
 
-// TODO: Might be able to make this constexpr with C++20 constexpr vectors
-// Can only be called in (8 * 8 * 2 = 128) possible configurations
 std::vector<uint32_t> Position::generateDropCounts(std::size_t handSize, std::size_t maxDistance, bool endsInSmash)
 {
     std::vector<uint32_t> dropCountVec;
@@ -322,7 +338,7 @@ Result Position::checkRoadWin() const {
                 parents -= (1 << parentIndex);
                 island |= (1 << parentIndex);
                 squareInIsland |= (1 << parentIndex);
-                for (const auto neighbour : mNeighbourMap[mSize * 64 + parentIndex])
+                for (const auto neighbour : mNeighbourMap[parentIndex])
                 {
                     if (squareInIsland & (1 << neighbour))
                         continue; // Already assigned to an island
