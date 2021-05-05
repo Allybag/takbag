@@ -40,7 +40,7 @@ std::string Square::print() const
 
     // TODO: Test this bit twiddling
     for (std::size_t i = mCount - 1; i != 0; --i) // We start at mCount - 1 as we have already printed the top stone
-        output << (mStack & (1 << (i - 1)) ? "f" : "F");
+        output << (mStack & (1LL << (i - 1)) ? "f" : "F");
 
     return output.str();
 }
@@ -66,7 +66,7 @@ void Square::add(Square& source, uint8_t count)
     }
 
     // TODO: Test all this!
-    uint32_t movingMask = (1 << count ) - 1;
+    uint32_t movingMask = (1LL << count ) - 1;
 
     uint32_t movingStones = (source.mStack & movingMask); // Just the stones we need to move
     movingStones = movingStones << mCount;
@@ -119,19 +119,19 @@ Square::Square(Square& source, uint8_t count)
 void Square::clearBeyondStack()
 {
     // TODO: Test this
-    uint32_t mask = (1 << mCount) - 1;
+    uint32_t mask = (1LL << mCount) - 1;
     mStack &= mask;
 }
 
 void Square::setTopFromStack()
 {
-    mTopStone = (mCount == 0 ? Stone::Blank : (mStack & 1 << (mCount - 1)) ? Stone::BlackFlat : Stone::WhiteFlat);
+    mTopStone = (mCount == 0 ? Stone::Blank : (mStack & 1LL << (mCount - 1)) ? Stone::BlackFlat : Stone::WhiteFlat);
 }
 
 void Square::checkValid() const
 {
     bool topStoneIsBlack = mTopStone & StoneBits::Black;
-    bool topOfStackIsBlack = (mStack & 1 << (mCount - 1));
+    bool topOfStackIsBlack = (mStack & 1LL << (mCount - 1));
     assert(topStoneIsBlack == topOfStackIsBlack);
 }
 

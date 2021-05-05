@@ -130,4 +130,25 @@ int main()
             checkEngineBlocksWin(engineMove, game); // The engine should choose something like a4- or 2b3+
         }
     };
+
+    "Test Missed 6s Road"_test = []
+    {
+        Engine engine;
+        Game game(6);
+
+        std::string movesTillMissedRoad = "a1 f6 b2 a4 c2 Ca2 d2 a3 e2 a5 a6 b5 b6 c5 c6 d5";
+        for (const auto& move : split(movesTillMissedRoad, ' '))
+            game.play(move);
+
+        game.play("e5");
+        game.play("d6");
+        game.checkResult();
+
+        for (int depth = 1; depth <= 3; ++depth)
+        {
+            auto engineMove = searchToDepth(engine, game.getPosition(), depth);
+            std::cout << engineMove << std::endl;
+            checkEngineBlocksWin(engineMove, game);
+        }
+    };
 }

@@ -135,15 +135,18 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
 
     for (auto& move : moves)
     {
-        auto now = timeInMics();
-        if (now > mStopSearchingTime)
+        if (mStopSearchingTime != 0)
         {
-            if (potentialMove == nullptr)
-                mLogger << LogLevel::Warn << "Hit time limit but no move to return!" << Flush;
-            else
+            auto now = timeInMics();
+            if (now > mStopSearchingTime)
             {
-                mLogger << LogLevel::Info << "Aborting search " << Flush;
-                return *potentialMove;
+                if (potentialMove == nullptr)
+                    mLogger << LogLevel::Warn << "Hit time limit but no move to return!" << Flush;
+                else
+                {
+                    mLogger << LogLevel::Info << "Aborting search " << Flush;
+                    return *potentialMove;
+                }
             }
         }
 
@@ -163,11 +166,10 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
     auto ptnMove = moveToPtn(*bestMove, position.size());
     mLogger << LogLevel::Info << "New best move " << ptnMove << " with score " << bestScore << Flush;
 
-    if (std::abs(bestScore) >= winValue)
+    if (std::abs(bestScore) >= winValue && mStopSearchingTime != 0)
     {
         mStopSearchingTime = timeInMics();
         mLogger << LogLevel::Info << "Stopping search after finding end of game" << Flush;
-
     }
 
     return *bestMove;

@@ -322,12 +322,12 @@ Result Position::checkRoadWin() const {
             continue;
 
         uint8_t colour = topStone & StoneBits::Black;
-        if (squareInIsland & (1 << index))
+        if (squareInIsland & (1LL << index))
             continue;
 
         // We do a breadth first search
         uint64_t parents = 0;
-        parents |= (1 << index);
+        parents |= (1LL << index);
         uint64_t island = 0;
         while (parents != 0)
         {
@@ -335,12 +335,12 @@ Result Position::checkRoadWin() const {
             while (parents != 0)
             {
                 auto parentIndex = std::countr_zero(parents);
-                parents -= (1 << parentIndex);
-                island |= (1 << parentIndex);
-                squareInIsland |= (1 << parentIndex);
+                parents -= (1LL << parentIndex);
+                island |= (1LL << parentIndex);
+                squareInIsland |= (1LL << parentIndex);
                 for (const auto neighbour : mNeighbourMap[parentIndex])
                 {
-                    if (squareInIsland & (1 << neighbour))
+                    if (squareInIsland & (1LL << neighbour))
                         continue; // Already assigned to an island
 
                     Stone neighbourStone = mBoard[neighbour].mTopStone;
@@ -352,7 +352,7 @@ Result Position::checkRoadWin() const {
                     if (isWall(neighbourStone))
                         continue; // Wall
 
-                    children |= ( 1 << neighbour);
+                    children |= ( 1LL << neighbour);
                 }
             }
             parents = children;
@@ -455,7 +455,7 @@ bool Position::checkConnectsOppositeEdges(uint64_t island) const
     while (island != 0)
     {
         auto index = std::countr_zero(island);
-        island -= (1 << index);
+        island -= (1LL << index);
 
         if (index < mSize)
             connectsBottom = true;
