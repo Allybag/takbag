@@ -54,6 +54,7 @@ enum class PlaytakMessageType : uint8_t
     StartGame, // Game Start
     GameUpdate, // Game#
     GameOver, // Game# Over
+    GameTime, // Game# Time
     AddSeek, // Seek Add
     RemoveSeek, // Seek remove
     Observe, // Observer
@@ -78,6 +79,7 @@ inline bool isRelevant(PlaytakMessageType type)
         case PlaytakMessageType::StartGame:
         case PlaytakMessageType::GameUpdate:
         case PlaytakMessageType::GameOver:
+        case PlaytakMessageType::GameTime:
             return true;
         default:
             return false;
@@ -120,6 +122,7 @@ public:
     std::vector<PlaytakMessage> receiveMessages();
 
     void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any, const std::string opponent = "");
+    void acceptSeek(std::size_t gameNum);
 
     PlaytakMessage parseMessage(const std::string& message);
 };

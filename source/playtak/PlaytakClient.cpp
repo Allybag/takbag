@@ -120,6 +120,10 @@ PlaytakMessage PlaytakClient::parseMessage(const std::string& message)
             mActiveGameId = 0;
             return PlaytakMessage(PlaytakMessageType::GameOver);
         }
+        else if (operation == "Time")
+        {
+            return PlaytakMessage(PlaytakMessageType::GameTime, join(tokens, ' ', 2));
+        }
         return PlaytakMessage(PlaytakMessageType::Ack);
     }
     else if (command == "GameList")
@@ -169,5 +173,12 @@ bool PlaytakClient::sendMove(const std::string& move)
     data.push_back(' ');
     data.append(ptnToServer(move));
     return send(data);
+}
+
+void PlaytakClient::acceptSeek(std::size_t gameNum)
+{
+    std::string data = "Accept ";
+    data.append(std::to_string(gameNum));
+    send(data);
 }
 
