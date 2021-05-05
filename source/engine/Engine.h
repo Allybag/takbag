@@ -1,9 +1,10 @@
 #pragma once
 
-#include <string>
 #include "log/Logger.h"
 #include "tak/Move.h"
 #include "tak/Result.h"
+
+#include <string>
 
 class Position;
 
@@ -18,15 +19,16 @@ class Engine
 {
     EngineStats mStats;
     Logger mLogger{"Engine"};
+    int64_t mStopSearchingTime{0};
 
     Move chooseMoveFirst(const Position& position);
     Move chooseMoveRandom(const Position& position);
-    Move deepeningSearch(const Position& position, int maxSeconds = 1);
+    Move deepeningSearch(const Position& position);
 
     int evaluatePos(const Position& position);
     int evaluateResult(Result result);
 public:
-    std::string chooseMove(const Position& position);
+    std::string chooseMove(const Position& position, int timeLimitSeconds = 3);
     Move chooseMoveNegamax(const Position& position, Move* move, int depth);
 
     int evaluate(const Position& position);

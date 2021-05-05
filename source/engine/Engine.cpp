@@ -2,8 +2,8 @@
 #include "tak/Position.h"
 #include "MonteCarlo.h"
 
-#include <chrono>
 #include <algorithm>
+#include "other/Time.h"
 
 static constexpr int winValue = 1000;
 static constexpr int infinity = 100001; // Not really infinity, but pretty high
@@ -65,17 +65,21 @@ int Engine::evaluateResult(Result result)
     return winValue;
 }
 
-std::string Engine::chooseMove(const Position& position)
+std::string Engine::chooseMove(const Position& position, int timeLimitSeconds)
 {
-    using namespace std::chrono;
-    auto startTime = steady_clock::now();
+    auto startTime = timeInMics();
+
+    timeLimitSeconds = std::max(1, timeLimitSeconds); // Need at least a second
+    mStopSearchingTime = startTime + (timeLimitSeconds * micsInSecond);
+
+    auto move = deepeningSearch(position);
+
+    auto stopTime = timeInMics();
+    auto duration = stopTime - startTime;
+    mLogger << LogLevel::Info << "Evaluated " << mStats.mNodeCount << " nodes in " << duration << " mics" << Flush;
+
     mStats.reset();
-
-    auto move = deepeningSearch(position, 2);
-
-    auto stopTime = steady_clock::now();
-    auto duration = duration_cast<microseconds>(stopTime - startTime);
-    mLogger << LogLevel::Info << "Evaluated " << mStats.mNodeCount << " nodes in " << duration.count() << " mics" << Flush;
+    mStopSearchingTime = 0;
     return moveToPtn(move, position.size());
 }
 
@@ -95,13 +99,12 @@ Move Engine::chooseMoveRandom(const Position& position)
     return *randomMove;
 }
 
-Move Engine::deepeningSearch(const Position& position, int maxSeconds)
+Move Engine::deepeningSearch(const Position& position)
 {
     using namespace std::chrono;
-    auto endTime = steady_clock::now() + std::chrono::seconds(maxSeconds);
     int depth = 0;
     Move move = chooseMoveNegamax(position, nullptr, 0);
-    while (steady_clock::now() < endTime)
+    while (timeInMics() < mStopSearchingTime)
     {
         ++depth;
         move = chooseMoveNegamax(position, &move, depth);
@@ -132,6 +135,18 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
 
     for (auto& move : moves)
     {
+        auto now = timeInMics();
+        if (now > mStopSearchingTime)
+        {
+            if (potentialMove == nullptr)
+                mLogger << LogLevel::Warn << "Hit time limit but no move to return!" << Flush;
+            else
+            {
+                mLogger << LogLevel::Info << "Aborting search " << Flush;
+                return *potentialMove;
+            }
+        }
+
         auto nextPosition = Position(position);
         nextPosition.play(move);
 
@@ -147,6 +162,13 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
 
     auto ptnMove = moveToPtn(*bestMove, position.size());
     mLogger << LogLevel::Info << "New best move " << ptnMove << " with score " << bestScore << Flush;
+
+    if (std::abs(bestScore) >= winValue)
+    {
+        mStopSearchingTime = timeInMics();
+        mLogger << LogLevel::Info << "Stopping search after finding end of game" << Flush;
+
+    }
 
     return *bestMove;
 }
