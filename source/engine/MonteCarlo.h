@@ -32,7 +32,7 @@ bool resultIsAWin(Player colour, Result result)
     return false; // Draws count as losses
 }
 
-Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
+Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const std::vector<Move>& movesToConsider = {})
 {
     Logger logger("MonteCarlo");
 
@@ -43,6 +43,8 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
     nodes[position] = root;
     auto colour = position.getPlayer();
 
+    bool givenMoves = !movesToConsider.empty();
+
     std::size_t nodeCount = 0;
     while (steady_clock::now() < endTime)
     {
@@ -52,8 +54,15 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
         // Selection
         while (nodes.contains(nextPosition))
         {
+            auto moves = std::vector<Move>{};
+
+            // We might be selecting between a pre chosen group of moves
+            if (givenMoves && parent == nullptr)
+                moves = movesToConsider;
+            else
+                moves = nextPosition.generateMoves();
+
             parent = nodes[nextPosition];
-            auto moves = nextPosition.generateMoves();
             auto move = *chooseRandomElement(moves);
             nextPosition.play(move);
 
@@ -130,7 +139,12 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
     Move* bestMove = nullptr;
     Node* bestNode = nullptr;
 
-    auto moves = position.generateMoves();
+    std::vector<Move> moves;
+    // We might be selecting between a pre chosen group of moves
+    if (givenMoves)
+        moves = movesToConsider;
+    else
+        moves = position.generateMoves();
     for (auto& move : moves)
     {
         Position nextPosition(position);

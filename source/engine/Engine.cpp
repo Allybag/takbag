@@ -104,14 +104,19 @@ Move Engine::deepeningSearch(const Position& position)
     using namespace std::chrono;
     int depth = 0;
     Move move = chooseMoveNegamax(position, nullptr, 0);
+    std::vector<Move> topMoves;
     while (timeInMics() < mStopSearchingTime)
     {
         ++depth;
-        auto topMoves = chooseMovesNegamax(position, &move, depth);
+        topMoves = chooseMovesNegamax(position, &move, depth);
         move = topMoves.front();
-        mLogger << LogLevel::Info << "Best Move: " << moveToPtn(move, position.size()) << ", depth: " << depth << Flush;
+
+        if (timeInMics() < mStopSearchingTime)
+            mLogger << LogLevel::Info << "Searched to depth " << depth << Flush;
     }
 
+    // We use a 2 second Monte Carlo search as a tie breaker
+    move = monteCarloTreeSearch(position, 2, topMoves);
     return move;
 
 }
