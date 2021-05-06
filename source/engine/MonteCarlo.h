@@ -23,14 +23,24 @@ struct Node
     Node(Node* parent) : mParent(parent), mPlayCount(0), mWinCount(0) { }
 };
 
-std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
+bool resultIsAWin(Player colour, Result result)
+{
+    if ((colour == Player::Black && result & StoneBits::Black) ||
+        (colour == Player::White && !(result & StoneBits::Black)))
+        return true;
+
+    return false; // Draws count as losses
+}
+
+Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
 {
     Logger logger("MonteCarlo");
 
     using namespace std::chrono;
     auto endTime = steady_clock::now() + std::chrono::seconds(maxSeconds);
     std::unordered_map<Position, Node*> nodes{};
-    nodes[position] = new Node();
+    auto root = new Node();
+    nodes[position] = root;
     auto colour = position.getPlayer();
 
     std::size_t nodeCount = 0;
@@ -43,7 +53,40 @@ std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
         while (nodes.contains(nextPosition))
         {
             parent = nodes[nextPosition];
-            nextPosition.play(*chooseRandomElement(nextPosition.generateMoves()));
+            auto moves = nextPosition.generateMoves();
+            auto move = *chooseRandomElement(moves);
+            nextPosition.play(move);
+
+            auto result = nextPosition.checkResult();
+            if (result != Result::None)
+            {
+                bool wonGame = resultIsAWin(colour, result);
+
+                // If this was an immediate win or loss
+                if (parent == root)
+                {
+                    if (wonGame)
+                        return move; // We can win immediately, wahey!
+                    else
+                    {
+                        // This move actually gave the opponent the win!
+                        // Let's just reset and hope this doesn't happen again
+                        nextPosition = position;
+                    }
+                }
+                else
+                {
+                    // Backpropogate the result
+                    while (parent->mParent != nullptr)
+                    {
+                        ++(parent->mPlayCount);
+                        if (wonGame)
+                            ++(parent->mWinCount);
+                        parent = parent->mParent;
+                    }
+                    ++nodeCount;
+                }
+            }
         }
 
         // Expansion
@@ -51,20 +94,16 @@ std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
         nodes[nextPosition] = node;
 
         // Rollout
-        while (nextPosition.checkResult() == Result::None)
+        auto result = Result::None; // We checked for this earlier
+        while (result == Result::None)
         {
             auto moves = nextPosition.generateMoves();
             auto move = *chooseRandomElement(moves);
-            while (move.mType == MoveType::Move)
-                move = *chooseRandomElement(moves);
             nextPosition.play(move);
+            result = nextPosition.checkResult();
         }
 
-        auto result = nextPosition.checkResult();
-        bool wonGame = false;
-        if ((colour == Player::Black && result & StoneBits::Black) ||
-            (colour == Player::White && !(result & StoneBits::Black) && result != Result::Draw))
-            wonGame = true;
+        bool wonGame = resultIsAWin(colour, result);
 
         // Back Propogation
         while (node->mParent != nullptr)
@@ -113,5 +152,5 @@ std::string monteCarloTreeSearch(const Position& position, int maxSeconds = 1)
     for (auto [position, node] : nodes)
         delete node;
 
-    return moveToPtn(*bestMove, position.size());
+    return *bestMove;
 }
