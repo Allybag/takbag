@@ -20,10 +20,7 @@ int Engine::evaluate(const Position& position)
 
 int Engine::evaluatePos(const Position& position)
 {
-    auto flatCounts = position.checkFlatCount();
     int score = 0;
-    score += static_cast<int>(flatCounts[Player::White]) * 12; // We wanna control top flats
-    score -= static_cast<int>(flatCounts[Player::Black]) * 12;
 
     auto reserveCounts = position.getReserveCount();
     score -= reserveCounts[Player::White] * 8; // We want flats on the board
@@ -38,6 +35,9 @@ int Engine::evaluatePos(const Position& position)
             continue;
 
         auto colour = topStone & StoneBits::Black ? -1 : 1;
+
+        if (isFlat(square.mTopStone))
+            score += 12 * colour; // We want a high flat count
 
         if (isCap(square.mTopStone))
             score += 9 * colour; // We want to use our cap rather than walls if possible

@@ -16,17 +16,17 @@ int main()
     using namespace boost::ut;
     using namespace std::chrono;
 
-    "Perft 5s Opening Bench"_test = []
+    "Perft 6s Opening Bench"_test = []
     {
-        Game game(5);
+        Game game(6);
         Position pos = game.getPosition();
 
         auto before = steady_clock::now();
-        expect(perft(pos, 4) == 2'999'784);
+        expect(perft(pos, 4) == 13'586'048);
         auto after = steady_clock::now();
         auto time = duration_cast<microseconds>(after - before);
 
-        std::cout << "Checking four opening moves of a 5s game took " << time.count() << " mics" << std::endl;
+        std::cout << "Checking four opening moves of a 6s game took " << time.count() << " mics" << std::endl;
     };
 
     "Stacky Perft"_test = []

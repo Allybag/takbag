@@ -317,13 +317,14 @@ Result Position::checkRoadWin() const {
     int nextDiagonalOffset = mSize + 1; // All roads must pass through a square on the main diagonal
     for (std::size_t index = 0; index < mSize * mSize; index += nextDiagonalOffset)
     {
+        if (squareInIsland & (1LL << index))
+            continue;
+
         Stone topStone = mBoard[index].mTopStone;
         if (topStone == Stone::Blank || isWall(topStone))
             continue;
 
         uint8_t colour = topStone & StoneBits::Black;
-        if (squareInIsland & (1LL << index))
-            continue;
 
         // We do a breadth first search
         uint64_t parents = 0;
