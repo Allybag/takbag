@@ -1,10 +1,12 @@
 #include "Game.h"
 
+#ifndef LOW_MEMORY_COMPILE
 #include "ptn/Generator.h"
 #include "ptn/Parser.h"
 #include "ptn/Lexer.h"
 
 #include <fstream>
+#endif
 
 void Game::play(const std::string& ptnString)
 {
@@ -84,6 +86,7 @@ Result Game::checkResult() const
     return mPosition.checkResult();
 }
 
+#ifndef LOW_MEMORY_COMPILE
 // Utility function to extract all games from a PTN file containing one or more games
 std::vector<Game> readGames(const std::string& ptnFilePath)
 {
@@ -117,3 +120,5 @@ Game readGame(const std::string& ptnFilePath)
     assert(games.size() == 1);
     return games.front();
 }
+#endif
+

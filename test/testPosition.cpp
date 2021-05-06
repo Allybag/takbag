@@ -38,6 +38,7 @@ int main()
         expect(game.moveCount() == 87);
     };
 
+#ifndef LOW_MEMORY_COMPILE
     "Basic Flat Win"_test = []
     {
         std::string ptnFile("games/FlatLoss.ptn"); // My first game which went to flats, loss against TakticianBot
@@ -65,4 +66,5 @@ int main()
         Game game = readGame(ptnFile);
         expect(game.checkResult() == Result::WhiteRoad);
     };
+#endif
 }

@@ -119,6 +119,7 @@ int main()
         }
     };
 
+#ifndef LOW_MEMORY_COMPILE
     "Test Avoid Suicide 2"_test = []
     {
         Engine engine;
@@ -130,6 +131,7 @@ int main()
             checkEngineBlocksWin(engineMove, game); // The engine should choose something like a4- or 2b3+
         }
     };
+#endif
 
     "Test Missed 6s Road"_test = []
     {
