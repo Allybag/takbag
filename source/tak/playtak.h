@@ -10,7 +10,7 @@ void playtak()
     Logger logger("player");
     PlaytakClient client;
 
-    std::size_t gameSize = 5;
+    std::size_t gameSize = 6;
     client.connect();
     client.seek();
     Engine engine;

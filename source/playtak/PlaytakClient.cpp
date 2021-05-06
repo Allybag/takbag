@@ -6,7 +6,7 @@
 
 static const std::string address = "playtak.com";
 static const int port = 10'000;
-const GameConfig defaultConfig = GameConfig{5, 300, 10, 0, 21, 1, false, false};
+const GameConfig defaultConfig = GameConfig{6, 180, 5, 0, 30, 1, false, false};
 
 void PlaytakClient::ping()
 {
