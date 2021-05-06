@@ -4,6 +4,7 @@
 #include <sys/select.h>
 #include <netdb.h> // addrinfo
 #include <unistd.h>
+#include <cstring> // memset for some reason
 
 TcpClient::TcpClient() : mSocket(-1)
 {

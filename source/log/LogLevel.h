@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <cassert>
 
 enum class LogLevel : uint8_t
 {

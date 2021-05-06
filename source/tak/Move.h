@@ -1,11 +1,13 @@
 #pragma once
 
 #include "Stone.h"
+#include "Direction.h"
+
 #include <iostream>
 #include <string>
 #include <utility>
+#include <tuple>
 #include <cstdint>
-#include "Direction.h"
 
 
 enum class MoveType
