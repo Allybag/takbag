@@ -5,6 +5,7 @@
 #include "tak/Result.h"
 
 #include <string>
+#include <vector>
 
 class Position;
 

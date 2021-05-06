@@ -108,15 +108,21 @@ Move Engine::deepeningSearch(const Position& position)
     while (timeInMics() < mStopSearchingTime)
     {
         ++depth;
-        topMoves = chooseMovesNegamax(position, &move, depth);
+        auto potentialMoves = chooseMovesNegamax(position, &move, depth);
         move = topMoves.front();
 
+        // If not we've almost certainly just aborted a search
         if (timeInMics() < mStopSearchingTime)
+        {
             mLogger << LogLevel::Info << "Searched to depth " << depth << Flush;
+            topMoves = potentialMoves;
+        }
     }
 
     // We use a 2 second Monte Carlo search as a tie breaker
-    move = monteCarloTreeSearch(position, 2, topMoves);
+    if (topMoves.size() > 1)
+        move = monteCarloTreeSearch(position, 2, topMoves);
+
     return move;
 
 }
