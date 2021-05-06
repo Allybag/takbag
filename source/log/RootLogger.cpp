@@ -1,19 +1,22 @@
 #include "RootLogger.h"
 
 #include <ctime>
+#include <sys/time.h>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 
 void RootLogger::log(LogLevel logLevel, const std::string& message, const std::string& funcName, const std::string& logName)
 {
-    auto epochTime = std::time(nullptr);
-    auto now = std::localtime(&epochTime);
+    struct timeval epochTime;
+    gettimeofday(&epochTime, nullptr);
+    auto now = std::localtime(&epochTime.tv_sec);
 
     std::stringstream logLine;
     logLine << std::setfill('0') << std::setw(2);
     using std::setw;
-    logLine << setw(2) << now->tm_hour << ":" << setw(2) << now->tm_min << ":" << setw(2) << now->tm_sec << " ";
+    logLine << setw(2) << now->tm_hour << ":" << setw(2) << now->tm_min << ":" << setw(2) << now->tm_sec;
+    logLine << "." << setw(6) << epochTime.tv_usec << " ";
 
     logLine << "[" << logLevelToStr(logLevel) << "]" << " ";
     logLine << "[" << logName << "]" << " ";
