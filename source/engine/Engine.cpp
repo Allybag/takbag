@@ -107,7 +107,8 @@ Move Engine::deepeningSearch(const Position& position)
     while (timeInMics() < mStopSearchingTime)
     {
         ++depth;
-        move = chooseMoveNegamax(position, &move, depth);
+        auto topMoves = chooseMovesNegamax(position, &move, depth);
+        move = topMoves.front();
         mLogger << LogLevel::Info << "Best Move: " << moveToPtn(move, position.size()) << ", depth: " << depth << Flush;
     }
 
@@ -116,6 +117,11 @@ Move Engine::deepeningSearch(const Position& position)
 }
 
 Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, int depth)
+{
+    return chooseMovesNegamax(position, potentialMove, depth).front();
+}
+
+std::vector<Move> Engine::chooseMovesNegamax(const Position& position, Move* potentialMove, int depth)
 {
     auto moves = position.generateMoves();
 
@@ -133,6 +139,7 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
             }
     }
 
+    std::vector<Move> topMoves;
     for (auto& move : moves)
     {
         if (mStopSearchingTime != 0)
@@ -145,7 +152,7 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
                 else
                 {
                     mLogger << LogLevel::Info << "Aborting search " << Flush;
-                    return *potentialMove;
+                    return topMoves;
                 }
             }
         }
@@ -160,11 +167,17 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
             mLogger << LogLevel::Debug << "New best move " << ptnMove << " with score " << score << Flush;
             bestScore = score;
             bestMove = &move;
+            topMoves.clear();
+            topMoves.push_back(move);
+        }
+        else if (score == bestScore)
+        {
+            topMoves.push_back(move);
         }
     }
 
     auto ptnMove = moveToPtn(*bestMove, position.size());
-    mLogger << LogLevel::Info << "New best move " << ptnMove << " with score " << bestScore << Flush;
+    mLogger << LogLevel::Info << topMoves.size() << " Best moves including " << ptnMove << " with score " << bestScore << Flush;
 
     if (std::abs(bestScore) >= winValue && mStopSearchingTime != 0)
     {
@@ -172,7 +185,7 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
         mLogger << LogLevel::Info << "Stopping search after finding end of game" << Flush;
     }
 
-    return *bestMove;
+    return topMoves;
 }
 
 int Engine::negamax(const Position& position, int depth, int alpha, int beta, int colour)
