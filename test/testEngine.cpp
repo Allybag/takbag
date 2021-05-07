@@ -7,6 +7,7 @@
 #include "tak/Game.h" // Game is basically the interface to Position
 #include "engine/Engine.h"
 #include "other/StringOps.h"
+#include "utility.h"
 
 void checkEngineBlocksWin(const std::string& engineMove, const Game& game)
 { // The move the engine plays should leave us unable to road on the next turn
@@ -19,11 +20,6 @@ void checkEngineBlocksWin(const std::string& engineMove, const Game& game)
         nextPosition.play(move);
         boost::ut::expect(nextPosition.checkResult() == Result::None);
     }
-}
-
-std::string searchToDepth(Engine& engine, const Position& position, int depth)
-{
-    return moveToPtn(engine.chooseMoveNegamax(position, nullptr, depth), position.size());
 }
 
 int main()

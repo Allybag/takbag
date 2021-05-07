@@ -6,7 +6,7 @@
 #include "tak/Position.h"
 #include "tak/Game.h" // Game is basically the interface to Position
 
-#include "perft.h"
+#include "utility.h"
 
 int main()
 {

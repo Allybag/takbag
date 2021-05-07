@@ -6,27 +6,42 @@
 #include "tak/Position.h"
 #include "tak/Game.h" // Game is basically the interface to Position
 #include "other/StringOps.h"
+#include "other/Time.h"
 
-#include "perft.h"
+#include "utility.h"
 
-#include <chrono>
+// Some of these functions will probably take ages if running unoptimised
 
 int main()
 {
     using namespace boost::ut;
-    using namespace std::chrono;
 
     "Perft 6s Opening Bench"_test = []
     {
         Game game(6);
         Position pos = game.getPosition();
 
-        auto before = steady_clock::now();
+        auto before = timeInMics();
         expect(perft(pos, 4) == 13'586'048);
-        auto after = steady_clock::now();
-        auto time = duration_cast<microseconds>(after - before);
+        auto after = timeInMics();
+        auto duration = after - before;
 
-        std::cout << "Checking four opening moves of a 6s game took " << time.count() << " mics" << std::endl;
+        std::cout << "Checking four opening moves of a 6s game took " << duration << " mics" << std::endl;
+    };
+
+    "Depth 5 6s Opening Search Bench"_test = []
+    {
+        Game game(6);
+        Engine engine;
+        Position pos = game.getPosition();
+
+        auto before = timeInMics();
+        auto engineMove = searchToDepth(engine, pos, 5);
+        auto after = timeInMics();
+        auto duration = after - before;
+
+        game.play(engineMove);
+        std::cout << "Searching to depth 5 from open of a 6s game took " << duration << " mics" << std::endl;
     };
 
     "Stacky Perft"_test = []
@@ -42,15 +57,15 @@ int main()
                 "5e4- g1 4f2+ 2g3+ 5f3> c3> 2c3+11 4f7<1111 f3"
         };
 
-        auto before = steady_clock::now();
+        auto before = timeInMics();
         for (const auto& move : split(moves, ' '))
         {
             expect(perft(game.getPosition(), 3) > 0);
             game.play(move);
         }
-        auto after = steady_clock::now();
-        auto time = duration_cast<microseconds>(after - before);
+        auto after = timeInMics();
+        auto duration = after - before;
 
-        std::cout << "Perft 3 of all moves of a stacky sevens game took " << time.count() << " mics" << std::endl;
+        std::cout << "Perft 3 of all moves of a stacky sevens game took " << duration << " mics" << std::endl;
     };
 }

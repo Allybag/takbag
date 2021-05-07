@@ -5,7 +5,7 @@
 
 static constexpr int64_t micsInSecond = 1000000LL;
 
-int64_t timeInMics()
+inline int64_t timeInMics()
 {
     struct timeval currentTime;
     gettimeofday(&currentTime, nullptr);

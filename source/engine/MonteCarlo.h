@@ -3,12 +3,12 @@
 #include "tak/Position.h"
 #include "Engine.h"
 #include "log/Logger.h"
+#include "other/Time.h"
 
 #include <unordered_map>
 #include <vector>
 #include <functional>
 #include <cstddef>
-#include <chrono>
 
 struct Node
 {
@@ -36,8 +36,7 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const st
 {
     Logger logger("MonteCarlo");
 
-    using namespace std::chrono;
-    auto endTime = steady_clock::now() + std::chrono::seconds(maxSeconds);
+    auto endTime = timeInMics() + (maxSeconds * micsInSecond);
     std::unordered_map<Position, Node*> nodes{};
     auto root = new Node();
     nodes[position] = root;
@@ -46,7 +45,7 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const st
     bool givenMoves = !movesToConsider.empty();
 
     std::size_t nodeCount = 0;
-    while (steady_clock::now() < endTime)
+    while (timeInMics() < endTime)
     {
         Position nextPosition(position);
         Node* parent = nullptr;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tak/Position.h"
+#include "engine/Engine.h"
 
 template <bool checkWins = true> // To let us independently time win checking and move generation
 std::size_t perft(const Position& position, std::size_t depth)
@@ -19,3 +20,7 @@ std::size_t perft(const Position& position, std::size_t depth)
     return nodes;
 }
 
+std::string searchToDepth(Engine& engine, const Position& position, int depth)
+{
+    return moveToPtn(engine.chooseMoveNegamax(position, nullptr, depth), position.size());
+}
