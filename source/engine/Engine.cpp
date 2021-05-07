@@ -101,7 +101,6 @@ Move Engine::chooseMoveRandom(const Position& position)
 
 Move Engine::deepeningSearch(const Position& position)
 {
-    using namespace std::chrono;
     int depth = 0;
     Move move = chooseMoveNegamax(position, nullptr, 0);
     std::vector<Move> topMoves;
