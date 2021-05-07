@@ -7,6 +7,7 @@ target_link_libraries(testPosition game)
 add_executable(testMoveGenerator testMoveGenerator.cpp)
 target_link_libraries(testMoveGenerator game)
 target_link_libraries(testMoveGenerator log)
+target_link_libraries(testMoveGenerator engine)
 
 add_executable(bench bench.cpp)
 target_link_libraries(bench game)

@@ -108,13 +108,13 @@ Move Engine::deepeningSearch(const Position& position)
     {
         ++depth;
         auto potentialMoves = chooseMovesNegamax(position, &move, depth);
-        move = potentialMoves.front();
 
         // If not we've almost certainly just aborted a search
         if (timeInMics() < mStopSearchingTime)
         {
             mLogger << LogLevel::Info << "Searched to depth " << depth << Flush;
             topMoves = potentialMoves;
+            move = topMoves.front();
         }
     }
 
