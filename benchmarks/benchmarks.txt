@@ -1,0 +1,11 @@
+Commit: dd048cc8106617d8a4488db6eddf8e7966fab5eb
+checkResultStartingSixes run took an average of 15 nanos
+evaluatePosStartingSixes run took an average of 32 nanos
+generateMovesStartingSixes run took an average of 774 nanos
+copyAndPlayStartingSixes run took an average of 13 nanos
+checkResultTinueSixes run took an average of 81 nanos
+evaluatePosTinueSixes run took an average of 214 nanos
+generateMovesTinueSixes run took an average of 1863 nanos
+copyAndPlayTinueSixes run took an average of 13 nanos
+checkResultRoadSixes run took an average of 91 nanos
+evaluatePosRoadSixes run took an average of 89 nanos
