@@ -19,35 +19,35 @@ enum class MoveType
 struct Move
 {
     // Common to all moves
-    MoveType mType;
-    std::size_t mIndex;
+    Direction mDirection{Direction::None};
+    uint8_t mIndex{0};
 
     // Only for MoveType::Place moves
     Stone mStone{Stone::Blank};
 
     // Only for MoveType::Move moves
-    std::size_t mCount{0};
+    uint8_t mCount{0};
 
     // We have up to 8 numbers each at most 8, so we'll use a uint32_t to store eight quartets representing drop counts
     // 0 isn't a valid option, so we could use 8 trios where 000 represents 8, but uint24_t isn't really a thing anyway
-    // TODO: Not really sure why I'm doing it this way...
     uint32_t mDropCounts{0};
-    Direction mDirection{Direction::None};
 
-    Move(std::size_t index, Stone stone) : mType(MoveType::Place), mIndex(index), mStone(stone) { }
+    Move() = default;
+    Move(std::size_t index, Stone stone) : mDirection(Direction::None), mIndex(index), mStone(stone) { }
     Move(std::size_t index, std::size_t count, uint32_t dropCounts, Direction direction) :
-        mType(MoveType::Move), mIndex(index), mCount(count), mDropCounts(dropCounts), mDirection(direction) { }
+        mIndex(index), mCount(count), mDropCounts(dropCounts), mDirection(direction) { }
 
     template <typename LambdaT> // Lambda should take a single uint8_t
     void forEachStone(LambdaT lambda) const;
 };
 
 static_assert(std::is_trivially_copyable_v<Move>);
+static_assert(sizeof(Move) == 8); // That's nice
 
 inline bool operator==(const Move& lhs, const Move& rhs)
 {
-    return std::tie(lhs.mType, lhs.mIndex, lhs.mStone, lhs.mCount, lhs.mDropCounts, lhs.mDirection) ==
-           std::tie(rhs.mType, rhs.mIndex, rhs.mStone, rhs.mCount, rhs.mDropCounts, rhs.mDirection);
+    return std::tie(lhs.mIndex, lhs.mStone, lhs.mCount, lhs.mDropCounts, lhs.mDirection) ==
+           std::tie(rhs.mIndex, rhs.mStone, rhs.mCount, rhs.mDropCounts, rhs.mDirection);
 }
 
 inline bool operator!=(const Move& lhs, const Move& rhs)
@@ -59,7 +59,7 @@ inline bool operator!=(const Move& lhs, const Move& rhs)
 
 inline std::ostream& operator<<(std::ostream& stream, const Move& move)
 {
-    if (move.mType == MoveType::Place)
+    if (move.mDirection == Direction::None)
     {
         stream << "Place a " << move.mStone << " at index " << move.mIndex;
     }
@@ -111,7 +111,7 @@ inline std::string moveToPtn(const Move& move, std::size_t size)
     std::string ptn;
     auto [col, rank] = indexToAxis(move.mIndex, size);
 
-    if (move.mType == MoveType::Place)
+    if (move.mDirection == Direction::None)
     {
         if (isCap(move.mStone))
             ptn.push_back('C');

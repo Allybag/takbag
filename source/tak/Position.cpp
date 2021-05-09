@@ -148,7 +148,7 @@ void Position::play(const PtnTurn &ptn)
 
 void Position::play(const Move& chosenMove)
 {
-    if (chosenMove.mType == MoveType::Place)
+    if (chosenMove.mDirection == Direction::None)
         place(chosenMove);
     else
         move(chosenMove);

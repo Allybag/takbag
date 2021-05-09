@@ -109,7 +109,7 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const st
             auto move = *chooseRandomElement(moves);
 
             // To try and keep pointless shuffling to a minimum, we'll ignore moving one piece onto an empty square
-            if (move.mType == MoveType::Move && move.mCount == 1)
+            if (move.mDirection != Direction::None && move.mCount == 1)
             {
                 auto offset = position.getOffset(move.mDirection);
                 if (position[move.mIndex + offset].mCount == 0)

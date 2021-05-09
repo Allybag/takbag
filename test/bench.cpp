@@ -56,7 +56,7 @@ int main()
     auto generateMovesTinueSixes = [&]() { return pos.generateMoves(); };
     runBenchmark(generateMovesTinueSixes);
 
-    auto randomPlace = Move(7, Stone::WhiteFlat); // a1 is occupado
+    auto randomPlace = Move(1, Stone::WhiteFlat); // a1 is occupado
     auto copyAndPlayTinueSixes = [&]() { Position nextPosition(pos); nextPosition.play(randomPlace); return nextPosition; };
     runBenchmark(copyAndPlayTinueSixes);
 
@@ -64,7 +64,7 @@ int main()
     game.play(endingMove);
 
     pos = game.getPosition();
-    assert(pos.checkResult == Result::WhiteRoad);
+    assert(pos.checkResult() == Result::WhiteRoad);
 
     auto checkResultRoadSixes = [&]() { return pos.checkResult(); };
     runBenchmark(checkResultRoadSixes);
