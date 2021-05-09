@@ -53,7 +53,7 @@ public:
 
     void play(const PtnTurn& ptn);
     void play(const Move& move);
-    std::vector<Move> generateMoves() const;
+    MoveBuffer generateMoves() const;
 
     std::string print() const;
 
@@ -70,9 +70,9 @@ public:
 
 private:
 
-    std::vector<Move> generateOpeningMoves() const;
-    void addPlaceMoves(std::size_t index, std::vector<Move>& moves) const;
-    void addMoveMoves(std::size_t index, std::vector<Move>& moves) const;
+    void generateOpeningMoves(MoveBuffer& moves) const;
+    void addPlaceMoves(std::size_t index, MoveBuffer& moves) const;
+    void addMoveMoves(std::size_t index, MoveBuffer& moves) const;
 
     static std::vector<uint32_t> generateDropCounts(std::size_t handSize, std::size_t maxDistance, bool endsInSmash);
     std::vector<std::size_t> getNeighbours(std::size_t index) const;

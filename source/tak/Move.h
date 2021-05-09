@@ -44,6 +44,10 @@ struct Move
 static_assert(std::is_trivially_copyable_v<Move>);
 static_assert(sizeof(Move) == 8); // That's nice
 
+// Not using MoveBuffer.h unless good benchmarks show it to be quicker
+#include <vector>
+using MoveBuffer = std::vector<Move>;
+
 inline bool operator==(const Move& lhs, const Move& rhs)
 {
     return std::tie(lhs.mIndex, lhs.mStone, lhs.mCount, lhs.mDropCounts, lhs.mDirection) ==
@@ -54,8 +58,6 @@ inline bool operator!=(const Move& lhs, const Move& rhs)
 {
     return !(lhs == rhs);
 }
-
-
 
 inline std::ostream& operator<<(std::ostream& stream, const Move& move)
 {

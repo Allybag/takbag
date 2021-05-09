@@ -32,7 +32,7 @@ bool resultIsAWin(Player colour, Result result)
     return false; // Draws count as losses
 }
 
-Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const std::vector<Move>& movesToConsider = {})
+Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const MoveBuffer potentialMoves = {})
 {
     Logger logger("MonteCarlo");
 
@@ -42,7 +42,7 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const st
     nodes[position] = root;
     auto colour = position.getPlayer();
 
-    bool givenMoves = !movesToConsider.empty();
+    bool givenMoves = !potentialMoves.empty();
 
     std::size_t nodeCount = 0;
     while (timeInMics() < endTime)
@@ -53,11 +53,11 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const st
         // Selection
         while (nodes.contains(nextPosition))
         {
-            auto moves = std::vector<Move>{};
+            MoveBuffer moves;
 
             // We might be selecting between a pre chosen group of moves
             if (givenMoves && parent == nullptr)
-                moves = movesToConsider;
+                moves = potentialMoves;
             else
                 moves = nextPosition.generateMoves();
 
@@ -135,15 +135,16 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const st
 
     logger << LogLevel::Info << "Searched " << nodeCount << " nodes" << Flush;
 
-    Move* bestMove = nullptr;
+    const Move* bestMove = nullptr;
     Node* bestNode = nullptr;
 
-    std::vector<Move> moves;
+    MoveBuffer moves;
     // We might be selecting between a pre chosen group of moves
     if (givenMoves)
-        moves = movesToConsider;
+        moves = potentialMoves;
     else
         moves = position.generateMoves();
+
     for (auto& move : moves)
     {
         Position nextPosition(position);

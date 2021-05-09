@@ -31,7 +31,7 @@ class Engine
 public:
     std::string chooseMove(const Position& position, int timeLimitSeconds = 3);
     Move chooseMoveNegamax(const Position& position, Move* move, int depth);
-    std::vector<Move> chooseMovesNegamax(const Position& position, Move* move, int depth); // Returns all best moves
+    const MoveBuffer chooseMovesNegamax(const Position& position, Move* move, int depth); // Returns all best moves
 
     int evaluate(const Position& position);
     int negamax(const Position &position, int depth, int alpha, int beta, int colour);

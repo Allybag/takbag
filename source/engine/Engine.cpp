@@ -103,7 +103,7 @@ Move Engine::deepeningSearch(const Position& position)
 {
     int depth = 0;
     Move move = chooseMoveNegamax(position, nullptr, 0);
-    std::vector<Move> topMoves;
+    MoveBuffer topMoves;
     while (timeInMics() < mStopSearchingTime)
     {
         ++depth;
@@ -131,14 +131,14 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
     return chooseMovesNegamax(position, potentialMove, depth).front();
 }
 
-std::vector<Move> Engine::chooseMovesNegamax(const Position& position, Move* potentialMove, int depth)
+const MoveBuffer Engine::chooseMovesNegamax(const Position& position, Move* potentialMove, int depth)
 {
     auto moves = position.generateMoves();
 
     int colour = position.getPlayer() == Player::Black ? 1 : -1;
     int bestScore = -infinity;
 
-    Move* bestMove = potentialMove;
+    const Move* bestMove = potentialMove;
     // TODO: I realised the below move ordering is completely pointless
     // Literally gains nothing, as we do a distinct alpha beta search per starting move
     // So even if we start with the best move, we pass no information along to the next search
@@ -154,7 +154,7 @@ std::vector<Move> Engine::chooseMovesNegamax(const Position& position, Move* pot
     }
 #endif
 
-    std::vector<Move> topMoves;
+    MoveBuffer topMoves;
     for (auto& move : moves)
     {
         if (mStopSearchingTime != 0)

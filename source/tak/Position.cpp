@@ -6,7 +6,7 @@
 #include <cassert>
 #include <bit>
 
-static constexpr std::size_t gHighMoveCount = 256;
+static constexpr std::size_t gHighMoveCount = 1024;
 
 Position::Position(std::size_t size) :  mFlatReserves(PlayerPair{pieceCounts[size].first}),
                                         mCapReserves(PlayerPair{pieceCounts[size].second}),
@@ -171,13 +171,17 @@ int Position::getOffset(Direction direction) const
     }
 }
 
-std::vector<Move> Position::generateMoves() const
+MoveBuffer Position::generateMoves() const
 {
-    if (mOpeningSwapMoves)
-        return generateOpeningMoves();
-
-    std::vector<Move> moves;
+    MoveBuffer moves;
     moves.reserve(gHighMoveCount);
+
+    if (mOpeningSwapMoves)
+    {
+        generateOpeningMoves(moves);
+        return moves;
+    }
+
 
     for (int index = 0; index < mSize * mSize; ++index)
     {
@@ -202,24 +206,27 @@ std::vector<Move> Position::generateMoves() const
 }
 
 
-void Position::addPlaceMoves(std::size_t index, std::vector<Move> &moves) const
+void Position::addPlaceMoves(std::size_t index, MoveBuffer& moves) const
 {
     StoneBits colour = (mToPlay == Player::Black) ? StoneBits::Black : StoneBits::Stone;
 
     if (mCapReserves[mToPlay])
     {
         moves.emplace_back(index, static_cast<Stone>(Stone::WhiteCap | colour));
+        // moves.inc();
     }
 
     if (mFlatReserves[mToPlay])
     {
         moves.emplace_back(index, static_cast<Stone>(Stone::WhiteFlat | colour));
         moves.emplace_back(index, static_cast<Stone>(Stone::WhiteWall | colour));
+        // moves.inc();
+        // moves.inc();
     }
 }
 
 
-void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
+void Position::addMoveMoves(std::size_t index, MoveBuffer& moves) const
 {
     const Square& square = mBoard[index];
 
@@ -278,10 +285,8 @@ void Position::addMoveMoves(std::size_t index, std::vector<Move> &moves) const
     }
 }
 
-std::vector<Move> Position::generateOpeningMoves() const
+void Position::generateOpeningMoves(MoveBuffer& moves) const
 {
-    std::vector<Move> moves;
-
     // Super simple, we can play a flat of the opposite colour in any empty square
     for (std::size_t index = 0; index < mSize * mSize; ++index)
     {
@@ -293,8 +298,6 @@ std::vector<Move> Position::generateOpeningMoves() const
             moves.emplace_back(index, stone);
         }
     }
-
-    return moves;
 }
 
 std::vector<uint32_t> Position::generateDropCounts(std::size_t handSize, std::size_t maxDistance, bool endsInSmash)
