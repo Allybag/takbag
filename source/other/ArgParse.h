@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <cstdint>
+#include <cassert>
 
 using OptionMap = std::unordered_map<std::string, std::string>;
 
