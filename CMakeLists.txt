@@ -30,6 +30,7 @@ elseif (WIN32)
     message("This project has never been tested on Windows")
 endif()
 
+# TODO: Look into LTO/IPO, and adding some flags like -march=native -fno-rtti -Ofast and so on
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG")
 
 if (LOW_MEMORY)
