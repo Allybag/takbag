@@ -5,14 +5,33 @@
 #include "Game.h"
 #include "engine/Engine.h"
 
-void playtak()
+#include <vector>
+#include <string>
+
+void playtak(const OptionMap& options)
 {
     Logger logger("player");
     PlaytakClient client;
 
-    std::size_t gameSize = 6;
-    client.connect();
-    client.seek();
+    std::vector<std::string> loginDetails;
+    if (options.contains("user"))
+    {
+        assert(options.contains"pass");
+        loginDetails.push_back(options.at("user"));
+        loginDetails.push_back(options.at("pass"));
+    }
+    client.connect(loginDetails);
+
+    std::size_t gameSize = options.contains("size") ? std::stoi(options.at("size")) : 6;
+    std::size_t flats = options.contains("flats") ? std::stoi(options.at("flats")) : pieceCounts[gameSize].first;
+    std::size_t caps = options.contains("caps") ? std::stoi(options.at("flats")) : pieceCounts[gameSize].first;
+    std::size_t time = options.contains("time") ? std::stoi(options.at("time")) : 180;
+    std::size_t incr = options.contains("increment") ? std::stoi(options.at("increment")) : 5;
+    std::size_t komi = options.contains("komi") ? std::stoi(options.at("komi")) : 0; // Units are half-komi
+
+    GameConfig gameConfig {gameSize, time, incr, komi, flats, caps, false, false};
+    client.seek(gameConfig);
+
     Engine engine;
     Game game(gameSize);
     int colour = 0;
@@ -57,7 +76,7 @@ void playtak()
             else if (message.mType == PlaytakMessageType::GameOver)
             {
                 logger << LogLevel::Info << "Game Over!" << Flush;
-                client.seek();
+                client.seek(gameConfig);
             }
 
         }

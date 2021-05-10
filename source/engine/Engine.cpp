@@ -65,11 +65,11 @@ int Engine::evaluateResult(Result result)
     return winValue;
 }
 
-std::string Engine::chooseMove(const Position& position, int timeLimitSeconds)
+std::string Engine::chooseMove(const Position& position, double timeLimitSeconds)
 {
     auto startTime = timeInMics();
 
-    timeLimitSeconds = std::max(1, timeLimitSeconds); // Need at least a second
+    timeLimitSeconds = std::max(0.001, timeLimitSeconds); // Need at least a millisecond
     mStopSearchingTime = startTime + (timeLimitSeconds * micsInSecond);
 
     auto move = deepeningSearch(position);

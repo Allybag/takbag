@@ -18,7 +18,7 @@ void PlaytakClient::ping()
     }
 
 }
-bool PlaytakClient::connect()
+bool PlaytakClient::connect(const std::vector<std::string> loginDetails)
 {
     if (!mClient.connect(address, port))
     {
@@ -37,7 +37,12 @@ bool PlaytakClient::connect()
                 readyForLogin = true;
     }
 
-    std::string loginCommand = "Login Guest";
+    std::string loginCommand = "Login ";
+    if (loginDetails.empty())
+        loginCommand.append("Guest");
+    else
+        loginCommand.append(join(loginDetails, ' '));
+
     send(loginCommand);
 
     mPingThread = std::thread(&PlaytakClient::ping, this);

@@ -116,7 +116,7 @@ class PlaytakClient
     void ping();
 public:
     void stream();
-    bool connect();
+    bool connect(const std::vector<std::string> = {});
     bool connected();
     bool sendMove(const std::string& move);
     std::vector<PlaytakMessage> receiveMessages();

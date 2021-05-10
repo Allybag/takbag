@@ -7,11 +7,12 @@
 #include <string>
 #include <iostream>
 
-void playCommandLine(std::size_t size)
+void playCommandLine(const OptionMap& options)
 {
     Engine engine;
 
-    Game game = Game(size);
+    std::size_t gameSize = options.contains("size") ? std::stoi(options.at("size")) : 6;
+    Game game = Game(gameSize);
     std::cout << game.print() << std::endl;
 
     std::string engineMove = engine.chooseMove(game.getPosition());

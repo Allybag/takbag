@@ -23,7 +23,7 @@ Game parseTeiPosition(std::vector<std::string> words, std::size_t size)
     return game;
 }
 
-void tei()
+void tei(const OptionMap& options)
 {
     // We probably want to deal with the "tei" string before here
     std::string input;

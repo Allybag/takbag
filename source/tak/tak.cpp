@@ -1,13 +1,25 @@
 #include <iostream>
 
+#include "other/ArgParse.h"
 #include "tei.h"
 #include "cmdLine.h"
 #include "playtak.h"
 #include "log/Logger.h"
 
-int main()
+int main(int argc, const char* argv[])
 {
-    playtak();
+    auto options = parseArgs(argc, argv);
+
+    if (options.contains("tei"))
+        tei(options);
+    else if (options.contains("playtak"))
+        playtak(options);
+    else
+        playCommandLine(options);
+
+    for (const auto [key, value] : options)
+        std::cout << "Option: " << key << " , Value: " << value << std::endl;
+
     return 0;
 }
 
