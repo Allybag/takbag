@@ -24,7 +24,7 @@ void playtak(const OptionMap& options)
 
     std::size_t gameSize = options.contains("size") ? std::stoi(options.at("size")) : 6;
     std::size_t flats = options.contains("flats") ? std::stoi(options.at("flats")) : pieceCounts[gameSize].first;
-    std::size_t caps = options.contains("caps") ? std::stoi(options.at("flats")) : pieceCounts[gameSize].first;
+    std::size_t caps = options.contains("caps") ? std::stoi(options.at("flats")) : pieceCounts[gameSize].second;
     std::size_t time = options.contains("time") ? std::stoi(options.at("time")) : 180;
     std::size_t incr = options.contains("increment") ? std::stoi(options.at("increment")) : 5;
     std::size_t komi = options.contains("komi") ? std::stoi(options.at("komi")) : 0; // Units are half-komi
