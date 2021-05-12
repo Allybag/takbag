@@ -72,7 +72,7 @@ std::string Engine::chooseMove(const Position& position, double timeLimitSeconds
     timeLimitSeconds = std::max(0.001, timeLimitSeconds); // Need at least a millisecond
     mStopSearchingTime = startTime + (timeLimitSeconds * micsInSecond);
 
-    auto move = deepeningSearch(position);
+    auto move = goodDeepeningSearch(position);
 
     auto stopTime = timeInMics();
     auto duration = stopTime - startTime;
@@ -121,6 +121,46 @@ Move Engine::deepeningSearch(const Position& position)
     // We use a 2 second Monte Carlo search as a tie breaker
     if (topMoves.size() > 1)
         move = monteCarloTreeSearch(position, 2, topMoves);
+
+    return move;
+
+}
+
+Move Engine::goodDeepeningSearch(const Position& position)
+{
+    int depth = 0;
+    Move move = Move();
+    int colour = position.getPlayer() == Player::White ? 1 : -1;
+
+    auto searchStart = timeInMics();
+    auto lastSearchDuration = 0;
+    while (true)
+    {
+        ++depth;
+        auto searchResult = goodNegamax(position, move, depth, -infinity, infinity, colour);
+        auto searchStop = timeInMics();
+
+        move = searchResult.mMove;
+        mLogger << LogLevel::Info << "Best move " << moveToPtn(move, position.size())
+                << " with score " << searchResult.mScore  << " at depth " << depth << Flush;
+
+        auto searchDuration = searchStop - searchStart;
+        auto searchIncreaseFactor = lastSearchDuration ? searchDuration / lastSearchDuration : 1;
+        lastSearchDuration = searchDuration;
+        searchStart = searchStop;
+        mLogger << LogLevel::Info << "Search took " << searchDuration << " mics" << Flush;
+        mLogger << LogLevel::Info << "Estimated next search duration: " << searchDuration * searchIncreaseFactor << Flush;
+
+        if (searchStop + searchDuration * searchIncreaseFactor > mStopSearchingTime)
+            break;
+
+        // If we've already found a loss, then might as well stop searching
+        if (std::abs(searchResult.mScore) >= winValue)
+        {
+            mStopSearchingTime = timeInMics();
+            mLogger << LogLevel::Info << "Stopping search after finding end of game at depth " << depth << Flush;
+        }
+    }
 
     return move;
 
@@ -238,4 +278,60 @@ int Engine::negamax(const Position& position, int depth, int alpha, int beta, in
     }
 
     return score;
+}
+
+SearchResult Engine::goodNegamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour)
+{
+    auto result = position.checkResult();
+    if (result != Result::None)
+    {
+        ++mStats.mNodeCount;
+
+        // We subtract depth here to favour quick wins and long losses
+        int score = evaluateResult(result);
+        return SearchResult(colour * score * (depth + 1));
+    }
+
+    if (depth == 0)
+    {
+        ++mStats.mNodeCount;
+
+        int score = evaluatePos(position);
+        return SearchResult(colour * score);
+    }
+
+
+    Move bestMove = Move();
+    int bestScore = -infinity;
+    auto moves = position.generateMoves();
+
+    if (givenMove.mDirection != Direction::None || givenMove.mStone != Stone::Blank) // Check it's a proper move
+    {
+        for (auto it = moves.begin(); it != moves.end(); ++it)
+            if (givenMove == *it)
+            {
+                mLogger << LogLevel::Debug << "Swapping " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
+                std::iter_swap(it, moves.begin());
+                break;
+            }
+    }
+    for (auto &move : moves)
+    {
+        Position nextPosition(position);
+        nextPosition.play(move);
+
+        auto score = goodNegamax(nextPosition, Move(), depth - 1, beta * -1, alpha * -1, colour * -1);
+        score.mScore *= -1;
+        if (score.mScore > bestScore)
+        {
+            bestScore = score.mScore;
+            bestMove = move;
+        }
+
+        alpha = std::max(alpha, score.mScore);
+        if (alpha >= beta)
+            break; // Alpha Beta Cutoff Kapow!
+    }
+
+    return SearchResult(bestMove, bestScore);
 }
