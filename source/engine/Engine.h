@@ -28,6 +28,7 @@ class Engine
     Logger mLogger{"Engine"};
 
     EngineStats mStats;
+    std::vector<Move> mTopMoves;
     int64_t mStopSearchingTime{0};
     int mMaxDepth;
 

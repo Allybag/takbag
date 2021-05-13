@@ -23,6 +23,7 @@ void playtak(const OptionMap& options)
     client.connect(loginDetails);
 
     std::size_t gameSize = options.contains("size") ? std::stoi(options.at("size")) : 6;
+    std::size_t seekNum = options.contains("seek") ? std::stoi(options.at("seek")) : 0;
     std::size_t flats = options.contains("flats") ? std::stoi(options.at("flats")) : pieceCounts[gameSize].first;
     std::size_t caps = options.contains("caps") ? std::stoi(options.at("flats")) : pieceCounts[gameSize].second;
     std::size_t time = options.contains("time") ? std::stoi(options.at("time")) : 180;
@@ -30,7 +31,11 @@ void playtak(const OptionMap& options)
     std::size_t komi = options.contains("komi") ? std::stoi(options.at("komi")) : 0; // Units are half-komi
 
     GameConfig gameConfig {gameSize, time, incr, komi, flats, caps, false, false};
-    client.seek(gameConfig);
+
+    if (seekNum != 0)
+        client.acceptSeek(seekNum);
+    else
+        client.seek(gameConfig);
 
     Engine engine;
     Game game(gameSize);

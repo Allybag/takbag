@@ -135,8 +135,12 @@ Move Engine::goodDeepeningSearch(const Position& position)
 
     auto searchStart = timeInMics();
     auto lastSearchDuration = 0;
+    mTopMoves.clear();
     while (true)
     {
+        ++depth;
+        mTopMoves.emplace_back();
+
         auto searchResult = goodNegamax(position, move, depth, -infinity, infinity, colour);
         auto searchStop = timeInMics();
 
@@ -166,7 +170,6 @@ Move Engine::goodDeepeningSearch(const Position& position)
         {
             break;
         }
-        ++depth;
     }
 
     return move;
@@ -311,16 +314,27 @@ SearchResult Engine::goodNegamax(const Position &position, Move givenMove, int d
     Move bestMove = Move();
     int bestScore = -infinity;
     auto moves = position.generateMoves();
+    auto topMoveIndex = mTopMoves.size() - depth;
+    auto topMove = mTopMoves[topMoveIndex];
 
-    if (isSet(givenMove))
+    if (isSet(givenMove) || isSet(topMove))
     {
         for (auto it = moves.begin(); it != moves.end(); ++it)
+        {
+            if (topMove == *it)
+            {
+                mLogger << LogLevel::Debug << "Swapping top move " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
+                std::iter_swap(it, moves.begin() + 1);
+                break;
+            }
+
             if (givenMove == *it)
             {
-                mLogger << LogLevel::Debug << "Swapping " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
+                mLogger << LogLevel::Debug << "Swapping given move " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
                 std::iter_swap(it, moves.begin());
                 break;
             }
+        }
     }
 
     for (auto &move : moves)
@@ -334,6 +348,7 @@ SearchResult Engine::goodNegamax(const Position &position, Move givenMove, int d
         {
             bestScore = score.mScore;
             bestMove = move;
+            mTopMoves[topMoveIndex] = move;
         }
 
         alpha = std::max(alpha, score.mScore);
