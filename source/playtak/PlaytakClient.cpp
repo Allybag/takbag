@@ -120,7 +120,7 @@ PlaytakMessage PlaytakClient::parseMessage(const std::string& message)
             auto serverMove = join(tokens, ' ', 1, 0);
             return PlaytakMessage(PlaytakMessageType::GameUpdate, serverToPtn(serverMove));
         }
-        else if (operation == "Over" || operation == "Abandoned") // Technically different, but we treat them the same
+        else if (operation == "Over" || operation.starts_with("Abandoned")) // Technically different, but we treat them the same
         {
             mActiveGameId = 0;
             return PlaytakMessage(PlaytakMessageType::GameOver);
