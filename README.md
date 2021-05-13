@@ -21,6 +21,7 @@ All files in external are copied from external repositories and a frozen copy is
 external/boost/LICENSE_1_0.txt (https://www.boost.org/users/license.html)  
 external/boost/ut.hpp (https://github.com/boost-ext/ut)  
 external/ctre.hpp (https://github.com/hanickadot/compile-time-regular-expressions)  
+external/robin_hood.h (https://github.com/martinus/robin-hood-hashing)
 
 # Goals
 A simple evaluation based on road potential  
