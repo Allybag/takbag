@@ -65,12 +65,13 @@ int Engine::evaluateResult(Result result)
     return winValue;
 }
 
-std::string Engine::chooseMove(const Position& position, double timeLimitSeconds)
+std::string Engine::chooseMove(const Position& position, double timeLimitSeconds, int maxDepth)
 {
     auto startTime = timeInMics();
 
     timeLimitSeconds = std::max(0.001, timeLimitSeconds); // Need at least a millisecond
     mStopSearchingTime = startTime + (timeLimitSeconds * micsInSecond);
+    mMaxDepth = maxDepth;
 
     auto move = goodDeepeningSearch(position);
 
@@ -136,7 +137,6 @@ Move Engine::goodDeepeningSearch(const Position& position)
     auto lastSearchDuration = 0;
     while (true)
     {
-        ++depth;
         auto searchResult = goodNegamax(position, move, depth, -infinity, infinity, colour);
         auto searchStop = timeInMics();
 
@@ -159,7 +159,14 @@ Move Engine::goodDeepeningSearch(const Position& position)
         {
             mStopSearchingTime = timeInMics();
             mLogger << LogLevel::Info << "Stopping search after finding end of game at depth " << depth << Flush;
+            break;
         }
+
+        if (depth >= mMaxDepth)
+        {
+            break;
+        }
+        ++depth;
     }
 
     return move;
@@ -305,7 +312,7 @@ SearchResult Engine::goodNegamax(const Position &position, Move givenMove, int d
     int bestScore = -infinity;
     auto moves = position.generateMoves();
 
-    if (givenMove.mDirection != Direction::None || givenMove.mStone != Stone::Blank) // Check it's a proper move
+    if (isSet(givenMove))
     {
         for (auto it = moves.begin(); it != moves.end(); ++it)
             if (givenMove == *it)
@@ -315,6 +322,7 @@ SearchResult Engine::goodNegamax(const Position &position, Move givenMove, int d
                 break;
             }
     }
+
     for (auto &move : moves)
     {
         Position nextPosition(position);

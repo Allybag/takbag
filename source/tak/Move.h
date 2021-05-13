@@ -59,6 +59,11 @@ inline bool operator!=(const Move& lhs, const Move& rhs)
     return !(lhs == rhs);
 }
 
+inline bool isSet(const Move& move)
+{
+    return (move.mDirection != Direction::None || move.mStone != Stone::Blank);
+}
+
 inline std::ostream& operator<<(std::ostream& stream, const Move& move)
 {
     if (move.mDirection == Direction::None)

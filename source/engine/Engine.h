@@ -29,6 +29,7 @@ class Engine
 
     EngineStats mStats;
     int64_t mStopSearchingTime{0};
+    int mMaxDepth;
 
     Move chooseMoveFirst(const Position& position);
     Move chooseMoveRandom(const Position& position);
@@ -38,7 +39,7 @@ class Engine
     int evaluatePos(const Position& position);
     int evaluateResult(Result result);
 public:
-    std::string chooseMove(const Position& position, double timeLimitSeconds = 3);
+    std::string chooseMove(const Position& position, double timeLimitSeconds = 3, int maxDepth = 15);
     Move chooseMoveNegamax(const Position& position, Move* move, int depth);
     const MoveBuffer chooseMovesNegamax(const Position& position, Move* move, int depth); // Returns all best moves
 

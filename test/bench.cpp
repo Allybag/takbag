@@ -94,12 +94,41 @@ int main()
         Position pos = game.getPosition();
 
         auto before = timeInMics();
-        auto engineMove = searchToDepth(engine, pos, 5);
+        auto engineMove = engine.chooseMove(pos, 30, 5);
         auto after = timeInMics();
         auto duration = after - before;
 
         game.play(engineMove);
         std::cout << "Searching to depth 5 from open of a 6s game took " << duration << " mics" << std::endl;
+    };
+
+    "Depth 5 6s Tinue Search Bench"_test = []
+    {
+        Game game(6);
+        Engine engine;
+
+        std::string moves = {
+         "a1 b2 c2 b3 d2 e2 c3 Cd3 e3 d1 b4 d4 c4 d5 d6 e2< e2 c6 d6- c5 e5 d6 c2> "
+         "d3- d3 2d2+ e2< 3d3- e2 d3 c4+ 6d2+114 c2 2d4-11 c3> 6d5-15 d5 d6- e5< d4+ "
+         "2c5> 6d3+15 d4- 6d5- 4d3-22 6d4< Cd3 5d5<221 a2 a1+ a1 2a2> b1 Sc1 b1+ c1+ "
+         "4b2+112 2c5< b4+ a5> b4+ Sc5 5b5+ c5< 5b6>122 3b5-12 d5 2c2> d3-* 4b3>13 e4 "
+         "6c4>15 e1 6e4-"};
+
+        for (const auto& move : split(moves, ' '))
+        {
+            game.play(move);
+        }
+
+        Position pos = game.getPosition();
+
+        auto before = timeInMics();
+        auto engineMove = engine.chooseMove(pos, 30, 5);
+        assert(engineMove = "1d2+1");
+        auto after = timeInMics();
+        auto duration = after - before;
+
+        game.play(engineMove);
+        std::cout << "Finding win at depth 5 took " << duration << " mics" << std::endl;
     };
 
     "Stacky Perft"_test = []
