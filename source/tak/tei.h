@@ -25,6 +25,7 @@ Game parseTeiPosition(std::vector<std::string> words, std::size_t size)
 
 void tei(const OptionMap& options)
 {
+    Logger logger("tei");
     // We probably want to deal with the "tei" string before here
     std::string input;
     std::cin >> input;
@@ -43,6 +44,7 @@ void tei(const OptionMap& options)
 
     while (getline(std::cin, input))
     {
+        logger << LogLevel::Info << "Received " << input << Flush;
         auto words = split(input, ' ');
         if (words.empty())
             continue;
@@ -63,9 +65,12 @@ void tei(const OptionMap& options)
         }
         else if (command == "go")
         {
+            auto colour = game.getPosition().getPlayer();
+            auto millisRemaining = colour == Player::White ? std::stoi(words[2]) : std::stoi(words[4]);
+            double thinkingTime = (millisRemaining / 1000.0) / 10.0;
             std::cout << "info score cp 1 time 1 pv a1" << std::endl; // TODO: This is obviously nonsense
             Engine engine;
-            std::cout << "bestmove " << engine.chooseMove(game.getPosition()) << std::endl;
+            std::cout << "bestmove " << engine.chooseMove(game.getPosition(), thinkingTime) << std::endl;
             continue;
         }
         else
