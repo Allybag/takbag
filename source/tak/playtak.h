@@ -16,7 +16,7 @@ void playtak(const OptionMap& options)
     std::vector<std::string> loginDetails;
     if (options.contains("user"))
     {
-        assert(options.contains"pass");
+        assert(options.contains("pass"));
         loginDetails.push_back(options.at("user"));
         loginDetails.push_back(options.at("pass"));
     }

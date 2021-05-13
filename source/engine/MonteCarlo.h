@@ -4,6 +4,7 @@
 #include "Engine.h"
 #include "log/Logger.h"
 #include "other/Time.h"
+#include "tak/RobinHoodHashes.h"
 
 #include <unordered_map>
 #include <vector>
@@ -37,7 +38,7 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const Mo
     Logger logger("MonteCarlo");
 
     auto endTime = timeInMics() + (maxSeconds * micsInSecond);
-    std::unordered_map<Position, Node*> nodes{};
+    robin_hood::unordered_map<Position, Node*, Hash<Position>> nodes;
     auto root = new Node();
     nodes[position] = root;
     auto colour = position.getPlayer();
