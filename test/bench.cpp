@@ -27,6 +27,9 @@ int main()
     auto evaluatePosStartingSixes = [&]() { return engine.evaluate(pos); };
     runBenchmark(evaluatePosStartingSixes);
 
+    auto hashStartingSixes = [&]() { return Hash<Position>{}(pos); };
+    runBenchmark(hashStartingSixes);
+
     auto generateMovesStartingSixes = [&]() { return pos.generateMoves(); };
     runBenchmark(generateMovesStartingSixes);
 
@@ -53,6 +56,9 @@ int main()
     auto evaluatePosTinueSixes = [&]() { return engine.evaluate(pos); };
     runBenchmark(evaluatePosTinueSixes);
 
+    auto hashTinueSixes = [&]() { return Hash<Position>{}(pos); };
+    runBenchmark(hashTinueSixes);
+
     auto generateMovesTinueSixes = [&]() { return pos.generateMoves(); };
     runBenchmark(generateMovesTinueSixes);
 
@@ -71,6 +77,9 @@ int main()
 
     auto evaluatePosRoadSixes = [&]() { return engine.evaluate(pos); };
     runBenchmark(evaluatePosRoadSixes);
+
+    auto hashRoadSixes = [&]() { return Hash<Position>{}(pos); };
+    runBenchmark(hashRoadSixes);
 
     // Doesn't make sense to generate moves or play a move when the game is over
 
