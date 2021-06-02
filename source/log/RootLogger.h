@@ -17,6 +17,7 @@ public:
 
     LogLevel getGlobalLogLevel() { return mGlobalLogLevel; }
     void setGlobalLogLevel(LogLevel logLevel) { mGlobalLogLevel = logLevel; }
+    void setLogToStdOut(bool value) { mLogToStdOut = value; }
 };
 
 extern RootLogger rootLogger;

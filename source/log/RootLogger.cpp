@@ -13,8 +13,12 @@ void RootLogger::log(LogLevel logLevel, const std::string& message, const std::s
     auto now = std::localtime(&epochTime.tv_sec);
 
     std::stringstream logLine;
-    logLine << std::setfill('0') << std::setw(2);
+
+    // Date and time
     using std::setw;
+    logLine << std::setfill('0');
+    logLine << now->tm_year - 100 << "." << setw(2) << now->tm_mon + 1 << "." << setw(2) << now->tm_mday;
+    logLine << " ";
     logLine << setw(2) << now->tm_hour << ":" << setw(2) << now->tm_min << ":" << setw(2) << now->tm_sec;
     logLine << "." << setw(6) << epochTime.tv_usec << " ";
 

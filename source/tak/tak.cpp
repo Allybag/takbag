@@ -9,16 +9,21 @@
 int main(int argc, const char* argv[])
 {
     auto options = parseArgs(argc, argv);
+    if (options.contains("logToStdOut"))
+    {
+        if (options.at("logToStdOut") == "false")
+            rootLogger.setLogToStdOut(false);
+    }
 
     if (options.contains("tei"))
         tei(options);
     else if (options.contains("playtak"))
         playtak(options);
     else
-        playCommandLine(options);
+        tei(options);
 
-    for (const auto [key, value] : options)
-        std::cout << "Option: " << key << " , Value: " << value << std::endl;
+    // for (const auto [key, value] : options)
+        // std::cout << "Option: " << key << " , Value: " << value << std::endl;
 
     return 0;
 }
