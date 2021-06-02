@@ -1,9 +1,10 @@
 #include "Engine.h"
-#include "tak/Position.h"
 #include "MonteCarlo.h"
+#include "tak/Position.h"
+#include "other/Time.h"
 
 #include <algorithm>
-#include "other/Time.h"
+#include <optional>
 
 static constexpr int winValue = 1000;
 static constexpr int infinity = 100001; // Not really infinity, but pretty high
@@ -136,6 +137,11 @@ Move Engine::goodDeepeningSearch(const Position& position)
     auto searchStart = timeInMics();
     auto lastSearchDuration = 0;
     mTopMoves.clear();
+#if 0
+    // TODO: Are either of these necessary or useful?
+    mTranspositionTable.clear();
+    mTranspositionTable.reserve(1024 * 1024 * 64);
+#endif
     while (true)
     {
         ++depth;
@@ -181,7 +187,7 @@ Move Engine::chooseMoveNegamax(const Position& position, Move* potentialMove, in
     return chooseMovesNegamax(position, potentialMove, depth).front();
 }
 
-const MoveBuffer Engine::chooseMovesNegamax(const Position& position, Move* potentialMove, int depth)
+MoveBuffer Engine::chooseMovesNegamax(const Position& position, Move* potentialMove, int depth)
 {
     auto moves = position.generateMoves();
 
@@ -290,8 +296,36 @@ int Engine::negamax(const Position& position, int depth, int alpha, int beta, in
     return score;
 }
 
+std::optional<TranspositionTableRecord> lookup(const TranspositionTable& table, const Position& position, std::size_t depth)
+{
+    auto record = table.find(position);
+    if (record != table.end() && record->second.mDepth >= depth)
+    {
+        return record->second;
+    }
+
+    return std::nullopt;
+}
+
+void store(TranspositionTable& table, const Position& position, std::size_t depth, int score)
+{
+    auto record = table.find(position);
+    if (record == table.end() || record->second.mDepth < depth)
+        table[position] = TranspositionTableRecord{score, depth};
+
+}
+
 SearchResult Engine::goodNegamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour)
 {
+#if 0
+    if (depth > 0)
+    {
+        auto record = lookup(mTranspositionTable, position, depth);
+        if (record)
+            return SearchResult(colour * record->mScore);
+    }
+#endif
+
     auto result = position.checkResult();
     if (result != Result::None)
     {
@@ -344,6 +378,7 @@ SearchResult Engine::goodNegamax(const Position &position, Move givenMove, int d
 
         auto score = goodNegamax(nextPosition, Move(), depth - 1, beta * -1, alpha * -1, colour * -1);
         score.mScore *= -1;
+
         if (score.mScore > bestScore)
         {
             bestScore = score.mScore;
@@ -356,5 +391,8 @@ SearchResult Engine::goodNegamax(const Position &position, Move givenMove, int d
             break; // Alpha Beta Cutoff Kapow!
     }
 
+#if 0
+    store(mTranspositionTable, position, depth, bestScore);
+#endif
     return SearchResult(bestMove, bestScore);
 }

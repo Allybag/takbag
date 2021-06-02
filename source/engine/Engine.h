@@ -4,6 +4,8 @@
 #include "tak/Move.h"
 #include "tak/Result.h"
 #include "tak/Position.h"
+#include "tak/RobinHoodHashes.h"
+#include "../../external/robin_hood.h"
 
 #include <string>
 #include <vector>
@@ -23,10 +25,19 @@ struct SearchResult
     explicit SearchResult(int score) : SearchResult(Move(), score) { }
 };
 
+struct TranspositionTableRecord
+{
+    int mScore;
+    std::size_t mDepth;
+};
+
+using TranspositionTable = robin_hood::unordered_map<Position, TranspositionTableRecord, Hash<Position>>;
+
 class Engine
 {
     Logger mLogger{"Engine"};
 
+    TranspositionTable mTranspositionTable;
     EngineStats mStats;
     std::vector<Move> mTopMoves;
     int64_t mStopSearchingTime{0};
@@ -42,7 +53,7 @@ class Engine
 public:
     std::string chooseMove(const Position& position, double timeLimitSeconds = 3, int maxDepth = 15);
     Move chooseMoveNegamax(const Position& position, Move* move, int depth);
-    const MoveBuffer chooseMovesNegamax(const Position& position, Move* move, int depth); // Returns all best moves
+    MoveBuffer chooseMovesNegamax(const Position& position, Move* move, int depth); // Returns all best moves
 
     int evaluate(const Position& position);
     int negamax(const Position &position, int depth, int alpha, int beta, int colour);
