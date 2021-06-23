@@ -132,7 +132,7 @@ int main()
 
         auto before = timeInMics();
         auto engineMove = engine.chooseMove(pos, 30, 5);
-        assert(engineMove = "1d2+1");
+        assert(engineMove == "1d2+1");
         auto after = timeInMics();
         auto duration = after - before;
 
@@ -142,7 +142,7 @@ int main()
 
     "Stacky Perft"_test = []
     {
-        Game game(5);
+        Game game(7);
         std::string moves = {
                 "a1 g7 d4 e5 e4 f4 d5 d3 Ce3 c3 c4 Cc5 b4 f3 e2 b3 d6 c5> c5 Cb5 c6 "
                 "b5- e6 f5 f6 g5 b5 a3 e3< b6 a5 b6> Cb6 2c6- 2d3< 2b4> b4 b3+ e4+ "
