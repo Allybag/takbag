@@ -140,6 +140,7 @@ PlaytakMessage PlaytakClient::parseMessage(const std::string& message)
             return PlaytakMessage(PlaytakMessageType::RemoveGame); // TODO: Game details
         else
             assert(false);
+        return PlaytakMessage(PlaytakMessageType::Ack);
     }
     else
         return PlaytakMessage(PlaytakMessageType::Ack); // Atm we don't care about most messages

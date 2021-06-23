@@ -35,8 +35,8 @@ int main()
         for (const auto& move : split(movesTillTak, ' '))
             game.play(move);
 
-        // At depth 0, we can't do too much better than taking wins when we have them
-        for (int depth = 0; depth <= 3; ++depth)
+        // At depth 1, we can't do too much better than taking wins when we have them
+        for (int depth = 1; depth <= 4; ++depth)
         {
             Game missedThreatGame(game);
             missedThreatGame.play("d2"); // A random move that doesn't block the win
@@ -51,11 +51,11 @@ int main()
             expect(winningBlackMove == onlyWinningBlackMove);
         }
 
-        // At depth 1 we should block the enemy when they make a tak threat
-        for (int depth = 1; depth <= 3; ++depth)
+        // At depth 2 we should block the enemy when they make a tak threat
+        for (int depth = 2; depth <= 4; ++depth)
         {
             Game takGame(game);
-            // At depth 1 we won't just let the opponent win immediately
+            // At depth 2 we won't just let the opponent win immediately
             auto blackEngineMove = searchToDepth(engine, takGame.getPosition(), depth);
             checkEngineBlocksWin(blackEngineMove, takGame); // The engine should choose either Sa4 or just a4
 
@@ -108,7 +108,7 @@ int main()
         for (const auto& move : split(movesTillSuicidable, ' '))
             game.play(move);
 
-        for (int depth = 1; depth <= 3; ++depth)
+        for (int depth = 2; depth <= 4; ++depth)
         {
             auto engineMove = searchToDepth(engine, game.getPosition(), depth);
             checkEngineBlocksWin(engineMove, game); // The engine should choose something like a4- or 2b3+
@@ -121,7 +121,7 @@ int main()
         Engine engine;
         Game game = readGame("games/GaveWin.ptn");
 
-        for (int depth = 1; depth <= 3; ++depth)
+        for (int depth = 2; depth <= 4; ++depth)
         {
             auto engineMove = searchToDepth(engine, game.getPosition(), depth);
             checkEngineBlocksWin(engineMove, game); // The engine should choose something like a4- or 2b3+
@@ -140,13 +140,6 @@ int main()
 
         game.play("e5");
         game.play("d6");
-        game.checkResult();
-
-        for (int depth = 1; depth <= 3; ++depth)
-        {
-            auto engineMove = searchToDepth(engine, game.getPosition(), depth);
-            std::cout << engineMove << std::endl;
-            checkEngineBlocksWin(engineMove, game);
-        }
+        assert(game.checkResult() != Result::None);
     };
 }

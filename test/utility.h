@@ -22,5 +22,5 @@ std::size_t perft(const Position& position, std::size_t depth)
 
 std::string searchToDepth(Engine& engine, const Position& position, int depth)
 {
-    return moveToPtn(engine.chooseMoveNegamax(position, nullptr, depth), position.size());
+    return engine.chooseMove(position, 1, depth);
 }
