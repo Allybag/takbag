@@ -11,8 +11,11 @@ int main(int argc, const char* argv[])
     auto options = parseArgs(argc, argv);
     if (options.contains("logToStdOut"))
     {
+        // TODO: We want a nicer way to do this
         if (options.at("logToStdOut") == "false")
             rootLogger.setLogToStdOut(false);
+        else if (options.at("logToStdOut") == "true")
+            rootLogger.setLogToStdOut(true);
     }
 
     if (options.contains("tei"))

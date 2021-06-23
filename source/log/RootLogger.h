@@ -8,7 +8,7 @@
 
 class RootLogger
 {
-    bool mLogToStdOut{ true };
+    bool mLogToStdOut{ false };
     LogLevel mGlobalLogLevel{ LogLevel::Info };
     std::ofstream mLogFile{ "tak.log" };
 
