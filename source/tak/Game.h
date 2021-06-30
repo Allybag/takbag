@@ -22,7 +22,7 @@ class Game
     void fillPtn(PtnTurn& ptn);
 public:
     explicit Game(std::size_t size) : mPosition(size), mMoveList{}, mPly(1) { }
-    explicit Game(Position& position) : mPosition(position), mMoveList{}, mPly(1) { }
+    explicit Game(Position& position, std::size_t ply = 1) : mPosition(position), mMoveList{}, mPly(ply) { }
     explicit Game(const PtnGame& ptnGame);
     void play(const std::string& ptnString);
     std::string print() const;

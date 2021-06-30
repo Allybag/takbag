@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Position.h"
+#include "Game.h"
 #include "other/StringOps.h"
 
 // Tak Positional System (spec: https://www.reddit.com/r/Tak/wiki/tak_positional_system)
@@ -12,7 +12,7 @@
 // [TPS "x3,12,2S/x,22S,22C,11,21/121,212,12,1121C,1212S/21S,1,21,211S,12S/x,21S,2,x2 1 26"]
 // OpenTag TPS "BoardRepresentation PlayerToMove TurnNum" CloseTag
 
-Position positionFromTps(const std::string& tpsData)
+Game gameFromTps(const std::string& tpsData)
 {
     // We can split on ' ', then on '/' and finally on ','
     auto tokens = split(tpsData, ' ');
@@ -43,13 +43,22 @@ Position positionFromTps(const std::string& tpsData)
         }
     }
 
+    std::size_t ply = std::stoi(tokens[2]) * 2 - 1;
+
     if (tokens[1] == "2") // Black to play
     {
         position.togglePlayer();
+        ++ply;
     }
     else
         assert(tokens[1] == "1");
 
-    return position;
+    if (ply == 2)
+        // TODO: This won't work in a no swap game
+        position.setOpeningSwapMoves(1);
+    else if (ply > 2)
+        position.setOpeningSwapMoves(0);
+
+    return Game(position, ply);
 }
 
