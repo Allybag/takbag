@@ -6,6 +6,7 @@
 #include "tak/Position.h"
 #include "tak/RobinHoodHashes.h"
 #include "../../external/robin_hood.h"
+#include "TranspositionTable.h"
 
 #include <string>
 #include <vector>
@@ -25,14 +26,7 @@ struct SearchResult
     explicit SearchResult(int score) : SearchResult(Move(), score) { }
 };
 
-struct TranspositionTableRecord
-{
-    int mScore;
-    std::size_t mDepth;
-};
-
-using TranspositionTable = robin_hood::unordered_map<Position, TranspositionTableRecord, Hash<Position>>;
-
+template <bool UseTranspositionTable=false>
 class Engine
 {
     Logger mLogger{"Engine"};
@@ -70,4 +64,3 @@ auto chooseRandomElement(const Container& container) -> typename Container::cons
     std::advance(element, elementNum);
     return element;
 }
-

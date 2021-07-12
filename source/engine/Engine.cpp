@@ -9,17 +9,8 @@
 static constexpr int winValue = 1000;
 static constexpr int infinity = 100001; // Not really infinity, but pretty high
 
-// Returns a score from white's point of view
-int Engine::evaluate(const Position& position)
-{
-    auto result = position.checkResult();
-    if (result != Result::None)
-        return evaluateResult(result);
-
-    return evaluatePos(position);
-}
-
-int Engine::evaluatePos(const Position& position)
+template <>
+int Engine<>::evaluatePos(const Position& position)
 {
     int score = 0;
 
@@ -54,7 +45,8 @@ int Engine::evaluatePos(const Position& position)
     return score;
 }
 
-int Engine::evaluateResult(Result result)
+template <>
+int Engine<>::evaluateResult(Result result)
 {
     assert(result != Result::None);
     if (result == Result::Draw)
@@ -66,26 +58,19 @@ int Engine::evaluateResult(Result result)
     return winValue;
 }
 
-std::string Engine::chooseMove(const Position& position, double timeLimitSeconds, int maxDepth)
+// Returns a score from white's point of view
+template <>
+int Engine<>::evaluate(const Position& position)
 {
-    auto startTime = timeInMics();
+    auto result = position.checkResult();
+    if (result != Result::None)
+        return evaluateResult(result);
 
-    timeLimitSeconds = std::max(0.001, timeLimitSeconds); // Need at least a millisecond
-    mStopSearchingTime = startTime + (timeLimitSeconds * micsInSecond);
-    mMaxDepth = maxDepth;
-
-    auto move = deepeningSearch(position);
-
-    auto stopTime = timeInMics();
-    auto duration = stopTime - startTime;
-    mLogger << LogLevel::Info << "Evaluated " << mStats.mNodeCount << " nodes in " << duration << " mics" << Flush;
-
-    mStats.reset();
-    mStopSearchingTime = 0;
-    return moveToPtn(move, position.size());
+    return evaluatePos(position);
 }
 
-Move Engine::chooseMoveFirst(const Position& position)
+template <>
+Move Engine<>::chooseMoveFirst(const Position& position)
 {
     assert(position.checkResult() == Result::None);
     auto moves = position.generateMoves();
@@ -93,7 +78,8 @@ Move Engine::chooseMoveFirst(const Position& position)
     return move;
 }
 
-Move Engine::chooseMoveRandom(const Position& position)
+template <>
+Move Engine<>::chooseMoveRandom(const Position& position)
 {
     assert(position.checkResult() == Result::None);
     auto moves = position.generateMoves();
@@ -101,96 +87,26 @@ Move Engine::chooseMoveRandom(const Position& position)
     return *randomMove;
 }
 
-Move Engine::deepeningSearch(const Position& position)
+template <bool UseTranspositionTable>
+SearchResult Engine<UseTranspositionTable>::negamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour)
 {
-    int depth = 0;
-    Move move = Move();
-    int colour = position.getPlayer() == Player::White ? 1 : -1;
-
-    auto searchStart = timeInMics();
-    auto lastSearchDuration = 0;
-    mTopMoves.clear();
-#if 0
-    // TODO: Are either of these necessary or useful?
-    mTranspositionTable.clear();
-    mTranspositionTable.reserve(1024 * 1024 * 64);
-#endif
-    while (true)
+    // Pretty sure the issue is to do with sign
+    // When we store "bestScore" that has the sign applied already,
+    if constexpr(UseTranspositionTable)
     {
-        ++depth;
-        mTopMoves.emplace_back();
-
-        auto searchResult = negamax(position, move, depth, -infinity, infinity, colour);
-        auto searchStop = timeInMics();
-
-        move = searchResult.mMove;
-        mLogger << LogLevel::Info << "Best move " << moveToPtn(move, position.size())
-                << " with score " << searchResult.mScore  << " at depth " << depth << Flush;
-
-        auto searchDuration = searchStop - searchStart;
-        auto searchIncreaseFactor = lastSearchDuration ? searchDuration / lastSearchDuration : 1;
-        lastSearchDuration = searchDuration;
-        searchStart = searchStop;
-        mLogger << LogLevel::Info << "Search took " << searchDuration << " mics" << Flush;
-        mLogger << LogLevel::Info << "Estimated next search duration: " << searchDuration * searchIncreaseFactor << Flush;
-
-        if (searchStop + searchDuration * searchIncreaseFactor > mStopSearchingTime)
-            break;
-
-        // If we've already found a loss, then might as well stop searching
-        if (std::abs(searchResult.mScore) >= winValue)
-        {
-            mStopSearchingTime = timeInMics();
-            mLogger << LogLevel::Info << "Stopping search after finding end of game at depth " << depth << Flush;
-            break;
-        }
-
-        if (depth >= mMaxDepth)
-        {
-            break;
-        }
-    }
-
-    return move;
-
-}
-
-std::optional<TranspositionTableRecord> lookup(const TranspositionTable& table, const Position& position, std::size_t depth)
-{
-    auto record = table.find(position);
-    if (record != table.end() && record->second.mDepth >= depth)
-    {
-        return record->second;
-    }
-
-    return std::nullopt;
-}
-
-void store(TranspositionTable& table, const Position& position, std::size_t depth, int score)
-{
-    auto record = table.find(position);
-    if (record == table.end() || record->second.mDepth < depth)
-        table[position] = TranspositionTableRecord{score, depth};
-
-}
-
-SearchResult Engine::negamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour)
-{
-#if 0
-    if (depth > 0)
-    {
-        auto record = lookup(mTranspositionTable, position, depth);
+        auto record = mTranspositionTable.fetch(position, depth);
         if (record)
-            return SearchResult(colour * record->mScore);
+        {
+            assert(position == record->mPosition);
+            return SearchResult(record->mMove, record->mScore);
+        }
     }
-#endif
 
     auto result = position.checkResult();
     if (result != Result::None)
     {
         ++mStats.mNodeCount;
 
-        // We subtract depth here to favour quick wins and long losses
         int score = evaluateResult(result);
         return SearchResult(colour * score * (depth + 1));
     }
@@ -250,8 +166,79 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
             break; // Alpha Beta Cutoff Kapow!
     }
 
-#if 0
-    store(mTranspositionTable, position, depth, bestScore);
-#endif
+    if constexpr(UseTranspositionTable)
+        mTranspositionTable.store(position, depth, bestScore, bestMove);
     return SearchResult(bestMove, bestScore);
 }
+
+template <>
+Move Engine<>::deepeningSearch(const Position& position)
+{
+    int depth = 0;
+    Move move = Move();
+    int colour = position.getPlayer() == Player::White ? 1 : -1;
+
+    auto searchStart = timeInMics();
+    auto lastSearchDuration = 0;
+    mTopMoves.clear();
+    while (true)
+    {
+        ++depth;
+        mTopMoves.emplace_back();
+
+        auto searchResult = negamax(position, move, depth, -infinity, infinity, colour);
+        auto searchStop = timeInMics();
+
+        move = searchResult.mMove;
+        mLogger << LogLevel::Info << "Best move " << moveToPtn(move, position.size())
+                << " with score " << searchResult.mScore  << " at depth " << depth << Flush;
+
+        auto searchDuration = searchStop - searchStart;
+        auto searchIncreaseFactor = lastSearchDuration ? searchDuration / lastSearchDuration : 1;
+        lastSearchDuration = searchDuration;
+        searchStart = searchStop;
+        mLogger << LogLevel::Info << "Search took " << searchDuration << " mics" << Flush;
+        mLogger << LogLevel::Info << "Estimated next search duration: " << searchDuration * searchIncreaseFactor << Flush;
+
+        if (searchStop + searchDuration * searchIncreaseFactor > mStopSearchingTime)
+            break;
+
+        // If we've already found a loss, then might as well stop searching
+        if (std::abs(searchResult.mScore) >= winValue)
+        {
+            mStopSearchingTime = timeInMics();
+            mLogger << LogLevel::Info << "Stopping search after finding end of game at depth " << depth << Flush;
+            break;
+        }
+
+        if (depth >= mMaxDepth)
+        {
+            break;
+        }
+    }
+
+    return move;
+
+}
+
+
+template <>
+std::string Engine<>::chooseMove(const Position& position, double timeLimitSeconds, int maxDepth)
+{
+    auto startTime = timeInMics();
+
+    timeLimitSeconds = std::max(0.001, timeLimitSeconds); // Need at least a millisecond
+    mStopSearchingTime = startTime + (timeLimitSeconds * micsInSecond);
+    mMaxDepth = maxDepth;
+
+    auto move = deepeningSearch(position);
+
+    auto stopTime = timeInMics();
+    auto duration = stopTime - startTime;
+    mLogger << LogLevel::Info << "Evaluated " << mStats.mNodeCount << " nodes in " << duration << " mics" << Flush;
+
+    mStats.reset();
+    mStopSearchingTime = 0;
+    return moveToPtn(move, position.size());
+}
+
