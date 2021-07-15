@@ -9,19 +9,6 @@
 #include "other/StringOps.h"
 #include "utility.h"
 
-void checkEngineBlocksWin(const std::string& engineMove, const Game& game)
-{ // The move the engine plays should leave us unable to road on the next turn
-    Game blockedGame = Game(game);
-    blockedGame.play(engineMove);
-
-    for (const auto& move : blockedGame.getPosition().generateMoves())
-    {
-        auto nextPosition = Position(blockedGame.getPosition());
-        nextPosition.play(move);
-        boost::ut::expect(nextPosition.checkResult() == Result::None);
-    }
-}
-
 int main()
 {
     using namespace boost::ut;
@@ -140,6 +127,6 @@ int main()
 
         game.play("e5");
         game.play("d6");
-        assert(game.checkResult() != Result::None);
+        expect(game.checkResult() != Result::None);
     };
 }

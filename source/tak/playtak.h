@@ -82,6 +82,7 @@ void playtak(const OptionMap& options)
             {
                 logger << LogLevel::Info << "Game Over!" << Flush;
                 client.seek(gameConfig);
+                engine.reset();
             }
 
         }

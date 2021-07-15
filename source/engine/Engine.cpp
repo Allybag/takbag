@@ -90,14 +90,11 @@ Move Engine<>::chooseMoveRandom(const Position& position)
 template <bool UseTranspositionTable>
 SearchResult Engine<UseTranspositionTable>::negamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour)
 {
-    // Pretty sure the issue is to do with sign
-    // When we store "bestScore" that has the sign applied already,
     if constexpr(UseTranspositionTable)
     {
         auto record = mTranspositionTable.fetch(position, depth);
         if (record)
         {
-            assert(position == record->mPosition);
             return SearchResult(record->mMove, record->mScore);
         }
     }
@@ -168,6 +165,7 @@ SearchResult Engine<UseTranspositionTable>::negamax(const Position &position, Mo
 
     if constexpr(UseTranspositionTable)
         mTranspositionTable.store(position, depth, bestScore, bestMove);
+
     return SearchResult(bestMove, bestScore);
 }
 

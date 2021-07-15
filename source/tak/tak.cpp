@@ -22,8 +22,10 @@ int main(int argc, const char* argv[])
         tei(options);
     else if (options.contains("playtak"))
         playtak(options);
+    else if (options.contains("cli"))
+        playCommandLine(options);
     else
-        tei(options);
+        tei(options); // Make this the default just so people can run with TEI without passing any arguments
 
     // for (const auto [key, value] : options)
         // std::cout << "Option: " << key << " , Value: " << value << std::endl;

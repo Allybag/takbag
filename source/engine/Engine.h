@@ -26,7 +26,7 @@ struct SearchResult
     explicit SearchResult(int score) : SearchResult(Move(), score) { }
 };
 
-template <bool UseTranspositionTable=false>
+template <bool UseTranspositionTable=true>
 class Engine
 {
     Logger mLogger{"Engine"};
@@ -45,7 +45,7 @@ class Engine
     int evaluateResult(Result result);
 public:
     std::string chooseMove(const Position& position, double timeLimitSeconds = 3, int maxDepth = 15);
-    Move chooseMoveNegamax(const Position& position, int depth);
+    void reset() { mTranspositionTable.clear(); }
 
     int evaluate(const Position& position);
     SearchResult negamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour);

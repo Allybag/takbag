@@ -10,12 +10,11 @@
 
 struct TranspositionTableRecord
 {
-    Position mPosition; // Almost certainly superfluous, get rid of this when tests are passing
     std::size_t mDepth;
     int mScore;
     Move mMove;
 
-    TranspositionTableRecord(Position position, std::size_t depth, int score, Move move) : mPosition(position), mDepth(depth), mScore(score), mMove(move) { };
+    TranspositionTableRecord(std::size_t depth, int score, Move move) : mDepth(depth), mScore(score), mMove(move) { };
 };
 
 class TranspositionTable
@@ -28,4 +27,5 @@ class TranspositionTable
 public:
     std::optional<TranspositionTableRecord> fetch(const Position& position, std::size_t depth) const;
     void store(const Position& position, std::size_t depth, int score, Move move);
+    void clear();
 };

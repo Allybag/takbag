@@ -24,7 +24,7 @@ static std::unordered_map<std::size_t, std::pair<uint8_t, uint8_t>> pieceCounts 
 
 class Position
 {
-    std::array<Square, 64> mBoard; // TODO: Template the array size rather than wasting space
+    std::array<Square, 64> mBoard; // Templating on size to reduce sizeof(Position) seems to have negligible impact
     PlayerPair<uint8_t> mFlatReserves;
     PlayerPair<uint8_t> mCapReserves;
     uint8_t mSize;
