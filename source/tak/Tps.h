@@ -12,7 +12,8 @@
 // [TPS "x3,12,2S/x,22S,22C,11,21/121,212,12,1121C,1212S/21S,1,21,211S,12S/x,21S,2,x2 1 26"]
 // OpenTag TPS "BoardRepresentation PlayerToMove TurnNum" CloseTag
 
-Game gameFromTps(const std::string& tpsData)
+// We dubiously pass in Komi, it will probably be added to TPS one day
+Game gameFromTps(const std::string& tpsData, double komi = 0)
 {
     // We can split on ' ', then on '/' and finally on ','
     auto tokens = split(tpsData, ' ');
@@ -23,7 +24,7 @@ Game gameFromTps(const std::string& tpsData)
     std::size_t size = ranks.size();
     assert(size >= 4 && size <= 8);
 
-    Position position(size);
+    Position position(size, komi);
     for (std::size_t rank = 0; rank < size; ++rank) // We do a rank first as a1 = Position::mBoard[0]
     {
         std::size_t col = 0;

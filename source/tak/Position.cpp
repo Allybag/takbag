@@ -8,10 +8,12 @@
 
 static constexpr std::size_t gHighMoveCount = 1024;
 
-Position::Position(std::size_t size) :  mFlatReserves(PlayerPair{pieceCounts[size].first}),
-                                        mCapReserves(PlayerPair{pieceCounts[size].second}),
-                                        mSize(size), mOpeningSwapMoves(2), mToPlay(Player::White)
+Position::Position(std::size_t size, double komi) : mFlatReserves(PlayerPair{pieceCounts[size].first}),
+                                                    mCapReserves(PlayerPair{pieceCounts[size].second}),
+                                                    mSize(size), mSwaps(2), mToPlay(Player::White)
 {
+    mKomi = static_cast<int8_t>(komi * 2);
+
     if (mNeighbourMapSize != mSize)
     {
         mNeighbourMap.clear();
@@ -61,6 +63,9 @@ std::string Position::print() const
         output << " and " << remainingCaps << " cap" << (remainingCaps == 1 ? "" : "s") << " remaining\n";
     }
 
+    if (mKomi != 0)
+        output << "Komi: " << getKomi() << "\n";
+
     Result result = checkResult();
     if (result != Result::None)
         output << "Result: " << result << "\n";
@@ -76,11 +81,11 @@ void Position::place(const Move& place)
     bool stoneIsBlack = place.mStone & StoneBits::Black;
     bool playerIsBlack = (mToPlay == Player::Black);
     Player colour = mToPlay;
-    if (mOpeningSwapMoves)
+    if (mSwaps)
     {
         assert(stoneIsBlack != playerIsBlack);
         assert(!(place.mStone & StoneBits::Standing)); // Only allowed to play flats for the first two ply
-        mOpeningSwapMoves--;
+        mSwaps--;
         colour = playerIsBlack ? Player::White : Player::Black;
     }
     else
@@ -107,7 +112,7 @@ void Position::move(const Move &move)
 {
     assert(move.mIndex < mSize * mSize);
     assert(move.mCount <= mSize);
-    assert(mOpeningSwapMoves == 0);
+    assert(mSwaps == 0);
 
     Square& source = mBoard[move.mIndex];
 
@@ -176,7 +181,7 @@ MoveBuffer Position::generateMoves() const
     MoveBuffer moves;
     moves.reserve(gHighMoveCount);
 
-    if (mOpeningSwapMoves)
+    if (mSwaps)
     {
         generateOpeningMoves(moves);
         return moves;
@@ -396,9 +401,10 @@ Result Position::checkFlatWin() const
     if (whiteStonesGone || blackStonesGone || boardFilled)
     {
         auto flatCounts = checkFlatCount();
-        if (flatCounts.White > flatCounts.Black)
+        double blackFlatCount = flatCounts.Black + getKomi();
+        if (flatCounts.White > blackFlatCount)
             return Result::WhiteFlat;
-        else if (flatCounts.Black > flatCounts.White)
+        else if (blackFlatCount > flatCounts.White)
             return Result::BlackFlat;
         else
             return Result::Draw;

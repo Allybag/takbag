@@ -28,7 +28,8 @@ class Position
     PlayerPair<uint8_t> mFlatReserves;
     PlayerPair<uint8_t> mCapReserves;
     uint8_t mSize;
-    uint8_t mOpeningSwapMoves;
+    uint8_t mSwaps;
+    int8_t mKomi; // In half points
     Player mToPlay;
 
     // Optimisations
@@ -39,7 +40,7 @@ class Position
     void place(const Move& place);
     void move(const Move& move);
 public:
-    explicit Position(std::size_t size);
+    Position(std::size_t size, double komi=0);
 
     Position(const Position&) noexcept = default;
     Position(Position&&) noexcept = default;
@@ -61,8 +62,9 @@ public:
 
     void setSquare(std::size_t col, std::size_t rank, const std::string& tpsSquare);
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
-    void setOpeningSwapMoves(std::size_t n) { mOpeningSwapMoves = n; }
+    void setOpeningSwapMoves(std::size_t n) { mSwaps = n; }
     Player getPlayer() const { return mToPlay; }
+    double getKomi() const { return static_cast<double>(mKomi) / 2; }
     PlayerPair<std::size_t> checkFlatCount() const;
     PlayerPair<uint8_t> getReserveCount() const { return mFlatReserves; }
 

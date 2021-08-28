@@ -4,6 +4,7 @@
 #pragma clang diagnostic pop
 
 #include "tak/Position.h"
+#include "tak/Tps.h"
 #include "tak/Game.h" // Game is basically the interface to Position
 #include "engine/Engine.h"
 #include "other/StringOps.h"
@@ -128,5 +129,33 @@ int main()
         game.play("e5");
         game.play("d6");
         expect(game.checkResult() != Result::None);
+    };
+
+    "Test Engine recognises komi"_test = []
+    {
+        Engine engine;
+
+        std::string tps = "x5/x3,11112C,21C/x3,111111,2/x3,111111,2/x3,1111,2 1 39";
+        double noKomi = 0;
+        Game noKomiGame = gameFromTps(tps, 0);
+
+        auto noKomiEngineMove = engine.chooseMove(noKomiGame.getPosition(), 1, 1); // Search to depth 1 to find the flat win
+        noKomiGame.play(noKomiEngineMove);
+        expect(noKomiGame.checkResult() == Result::WhiteFlat);
+
+        double komi = 1;
+        Game komiGame = gameFromTps(tps, 1);
+
+        auto komiEngineMove = engine.chooseMove(komiGame.getPosition(), 1, 1); // Search to depth 1 to find a stack spread
+        komiGame.play(komiEngineMove);
+        expect(komiGame.checkResult() == Result::None);
+
+        // Let black play some random move
+        komiGame.play(engine.chooseMove(komiGame.getPosition(), 1, 1));
+        expect(komiGame.checkResult() == Result::None);
+
+        // Now play the last flat and win
+        komiGame.play(engine.chooseMove(komiGame.getPosition(), 1, 1));
+        expect(komiGame.checkResult() == Result::WhiteFlat);
     };
 }

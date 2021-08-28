@@ -42,6 +42,7 @@ int Engine<>::evaluatePos(const Position& position)
             score -= colour; // Lose a point for a square on the edge
     }
 
+    score -= 12 * position.getKomi(); // A positive komi is points for black
     return score;
 }
 

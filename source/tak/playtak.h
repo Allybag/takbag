@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include <cassert>
 
 void playtak(const OptionMap& options)
 {
@@ -28,9 +29,10 @@ void playtak(const OptionMap& options)
     std::size_t caps = options.contains("caps") ? std::stoi(options.at("flats")) : pieceCounts[gameSize].second;
     std::size_t time = options.contains("time") ? std::stoi(options.at("time")) : 180;
     std::size_t incr = options.contains("increment") ? std::stoi(options.at("increment")) : 5;
-    std::size_t komi = options.contains("komi") ? std::stoi(options.at("komi")) : 0; // Units are half-komi
+    double komi = options.contains("komi") ? std::stod(options.at("komi")) : 2.5;
+    assert(komi >= 0); // Playtak.com only allows positive komi
 
-    GameConfig gameConfig {gameSize, time, incr, komi, flats, caps, false, false};
+    GameConfig gameConfig {gameSize, time, incr, static_cast<std::size_t>(komi * 2), flats, caps, false, false};
 
     if (seekNum != 0)
         client.acceptSeek(seekNum);
@@ -38,7 +40,7 @@ void playtak(const OptionMap& options)
         client.seek(gameConfig);
 
     Engine engine;
-    Game game(gameSize);
+    Game game(gameSize, komi);
     int colour = 0;
     int remainingTime = 0;
     while (client.connected())
@@ -49,7 +51,7 @@ void playtak(const OptionMap& options)
             if (message.mType == PlaytakMessageType::StartGame)
             {
                 logger << LogLevel::Info << "Starting Game" << Flush;
-                game = Game(gameSize);
+                game = Game(gameSize, komi);
                 if (message.mData == "white")
                 {
                     colour = 0;
