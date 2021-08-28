@@ -26,7 +26,8 @@ struct SearchResult
     explicit SearchResult(int score) : SearchResult(Move(), score) { }
 };
 
-template <bool UseTranspositionTable=true>
+// We want to fix estimating next ply duration before we use a transposition table
+template <bool UseTranspositionTable=false>
 class Engine
 {
     Logger mLogger{"Engine"};
