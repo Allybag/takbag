@@ -480,6 +480,44 @@ bool Position::checkConnectsOppositeEdges(uint64_t island) const
     return ((connectsLeft && connectsRight) || (connectsTop && connectsBottom));
 }
 
+Position Position::shift(Shift shiftType) const
+{
+    // Create an identical position with an empty board
+    Position shiftedPosition(mSize, getKomi());
+    shiftedPosition.mFlatReserves = mFlatReserves;
+    shiftedPosition.mCapReserves = mCapReserves;
+    shiftedPosition.mSwaps = mSwaps;
+    shiftedPosition.mToPlay = mToPlay;
+
+    for (std::size_t index = 0; index < mSize * mSize; ++index)
+    {
+        std::size_t shiftedIndex = applyShift(index, mSize, shiftType);
+        shiftedPosition.mBoard[shiftedIndex] = mBoard[index];
+    }
+
+    return shiftedPosition;
+}
+
+Shift Position::getCanonicalShift() const
+{
+    std::size_t canonicalPriority = 0;
+    Shift canonicalShift = Shift::Identical;
+
+    for (const auto shift : shifts)
+    {
+        // We don't actually care what the position looks like,
+        // just that we always pick the same one for a given position
+        std::size_t priority = std::hash<Position>()(*this);
+        if (priority > canonicalPriority)
+        {
+            canonicalShift = shift;
+            canonicalPriority = priority;
+        }
+    }
+
+    return canonicalShift;
+}
+
 void Position::setSquare(std::size_t col, std::size_t rank, const std::string& tpsSquare)
 {
     assert(tpsSquare.starts_with('2') || tpsSquare.starts_with('1'));

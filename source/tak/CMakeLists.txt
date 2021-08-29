@@ -1,7 +1,7 @@
 include_directories(../../external)
 include_directories(..)
 
-add_library(game Game.cpp Position.cpp Square.cpp)
+add_library(game Game.cpp Position.cpp Square.cpp Shift.cpp)
 target_link_libraries(game log)
 
 add_executable(tak tak.cpp)

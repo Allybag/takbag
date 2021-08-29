@@ -14,6 +14,10 @@ target_link_libraries(bench game)
 target_link_libraries(bench log)
 target_link_libraries(bench engine)
 
+add_executable(testOpeningBook testOpeningBook.cpp)
+target_link_libraries(testOpeningBook game)
+target_link_libraries(testOpeningBook engine)
+
 add_executable(testEngine testEngine.cpp)
 target_link_libraries(testEngine game)
 target_link_libraries(testEngine engine)

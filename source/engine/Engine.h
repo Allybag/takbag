@@ -39,13 +39,13 @@ class Engine
     int mMaxDepth;
 
     Move chooseMoveFirst(const Position& position);
-    Move chooseMoveRandom(const Position& position);
     Move deepeningSearch(const Position& position);
 
     int evaluatePos(const Position& position);
     int evaluateResult(Result result);
 public:
     std::string chooseMove(const Position& position, double timeLimitSeconds = 3, int maxDepth = 15);
+    Move chooseMoveRandom(const Position& position);
     void reset() { mTranspositionTable.clear(); }
 
     int evaluate(const Position& position);

@@ -4,6 +4,7 @@
 #include "Square.h"
 #include "Move.h"
 #include "Result.h"
+#include "Shift.h"
 #include "ptn/Ptn.h"
 
 #include <vector>
@@ -24,7 +25,11 @@ static std::unordered_map<std::size_t, std::pair<uint8_t, uint8_t>> pieceCounts 
 
 class Position
 {
-    std::array<Square, 64> mBoard; // Templating on size to reduce sizeof(Position) seems to have negligible impact
+    // Templating on size to reduce sizeof(Position) seems to have negligible impact
+    // Probably the more compelling reason to template on size is that every now and again
+    // I iterate through the board indices up to mBoard.size() instead of mSize * mSize
+    // which cause memory corruption issues that make me tear my hair out
+    std::array<Square, 64> mBoard;
     PlayerPair<uint8_t> mFlatReserves;
     PlayerPair<uint8_t> mCapReserves;
     uint8_t mSize;
@@ -40,7 +45,7 @@ class Position
     void place(const Move& place);
     void move(const Move& move);
 public:
-    Position(std::size_t size, double komi=0);
+    explicit Position(std::size_t size, double komi=0);
 
     Position(const Position&) noexcept = default;
     Position(Position&&) noexcept = default;
@@ -66,6 +71,8 @@ public:
     Player getPlayer() const { return mToPlay; }
     double getKomi() const { return static_cast<double>(mKomi) / 2; }
     PlayerPair<std::size_t> checkFlatCount() const;
+    Position shift(Shift shiftType) const;
+    Shift getCanonicalShift() const;
     PlayerPair<uint8_t> getReserveCount() const { return mFlatReserves; }
 
     bool operator==(const Position& other) const;
