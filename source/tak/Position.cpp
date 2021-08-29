@@ -503,14 +503,15 @@ Shift Position::getCanonicalShift() const
     std::size_t canonicalPriority = 0;
     Shift canonicalShift = Shift::Identical;
 
-    for (const auto shift : shifts)
+    for (const auto shiftType : shifts)
     {
         // We don't actually care what the position looks like,
         // just that we always pick the same one for a given position
-        std::size_t priority = std::hash<Position>()(*this);
+        Position shiftedPosition = shift(shiftType);
+        std::size_t priority = std::hash<Position>()(shiftedPosition);
         if (priority > canonicalPriority)
         {
-            canonicalShift = shift;
+            canonicalShift = shiftType;
             canonicalPriority = priority;
         }
     }
