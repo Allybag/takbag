@@ -1,9 +1,10 @@
 #include "Shift.h"
 
+#include <cassert>
 
-std::array shifts { Shift::Identical, Shift::Vertical, Shift::Horizontal,
-                    Shift::MainDiagonal, Shift::OffDiagonal,
-                    Shift::RotateClockwise, Shift::RotateCounterClockwise, Shift::RotateTwice};
+std::array<Shift, 8> shifts { Shift::Identical, Shift::Vertical, Shift::Horizontal,
+                              Shift::MainDiagonal, Shift::OffDiagonal,
+                              Shift::RotateClockwise, Shift::RotateCounterClockwise, Shift::RotateTwice};
 
 std::size_t applyShift(std::size_t oldIndex, std::size_t size, Shift shiftType)
 {
