@@ -68,6 +68,7 @@ public:
     void setSquare(std::size_t col, std::size_t rank, const std::string& tpsSquare);
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }
     void setOpeningSwapMoves(std::size_t n) { mSwaps = n; }
+    bool isInOpeningSwap() const { return mSwaps != 0; }
     Player getPlayer() const { return mToPlay; }
     double getKomi() const { return static_cast<double>(mKomi) / 2; }
     PlayerPair<std::size_t> checkFlatCount() const;
@@ -110,7 +111,7 @@ namespace std
             for (std::size_t index = 0; index < squareCount; ++index)
             {
                 auto square = pos[index];
-                boardHash ^= std::hash<Square>()(square);
+                boardHash ^= (std::hash<Square>()(square) + 0x9e3779b9) + (boardHash << 6) + (boardHash >> 2);
             }
             return boardHash ^ (playerHash << 1) ^ (sizeHash << 2);
         }
