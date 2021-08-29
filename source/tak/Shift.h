@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <array>
+#include <iostream>
 
 enum class Shift : uint8_t
 {
@@ -15,6 +16,38 @@ enum class Shift : uint8_t
     RotateTwice
 };
 
+inline std::ostream& operator<<(std::ostream& stream, Shift shift)
+{
+    switch (shift)
+    {
+        case Shift::Identical:
+            stream << "Identical";
+            break;
+        case Shift::Vertical:
+            stream << "Vertical";
+            break;
+        case Shift::Horizontal:
+            stream << "Horizontal";
+            break;
+        case Shift::MainDiagonal:
+            stream << "MainDiagonal";
+            break;
+        case Shift::OffDiagonal:
+            stream << "OffDiagonal";
+            break;
+        case Shift::RotateClockwise:
+            stream << "RotateClockwise";
+            break;
+        case Shift::RotateCounterClockwise:
+            stream << "RotateCounterClockwise";
+            break;
+        case Shift::RotateTwice:
+            stream << "RotateTwice";
+            break;
+    }
+
+    return stream;
+}
 // Bloody c++ enums
 extern std::array<Shift, 8> shifts;
 

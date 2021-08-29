@@ -28,7 +28,7 @@ struct PtnTurn
     std::string canonicalString() const;
 };
 
-inline PtnTurn::PtnTurn(const std::string &sourceString) : mSourceString(sourceString)
+inline PtnTurn::PtnTurn(const std::string& sourceString) : mSourceString(sourceString)
 {
     // Spec is here: https://ustak.org/portable-tak-notation/
 
