@@ -29,6 +29,7 @@ void playtak(const OptionMap& options)
     std::size_t caps = options.contains("caps") ? std::stoi(options.at("flats")) : pieceCounts[gameSize].second;
     std::size_t time = options.contains("time") ? std::stoi(options.at("time")) : 180;
     std::size_t incr = options.contains("increment") ? std::stoi(options.at("increment")) : 5;
+    std::string openingPath = options.contains("openingBook") ? options.at("openingBook") : "";
     double komi = options.contains("komi") ? std::stod(options.at("komi")) : 2.5;
     assert(komi >= 0); // Playtak.com only allows positive komi
 
@@ -39,7 +40,7 @@ void playtak(const OptionMap& options)
     else
         client.seek(gameConfig);
 
-    Engine engine;
+    Engine engine = openingPath.empty() ? Engine() : Engine(openingPath);
     Game game(gameSize, komi);
     int colour = 0;
     int remainingTime = 0;

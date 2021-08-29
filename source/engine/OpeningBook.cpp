@@ -13,9 +13,11 @@ std::size_t calcMoveIndex(uint8_t rowIndex, uint8_t colIndex, std::size_t boardS
 
 OpeningBook::OpeningBook(const std::string& openingBookFile)
 {
+    // TODO: Obviously we don't want to hardcode board size
     std::size_t boardSize = 6;
     std::ifstream fileStream(openingBookFile);
 
+    int openingsLoaded = 0;
     std::string line;
     while (getline(fileStream, line))
     {
@@ -58,5 +60,8 @@ OpeningBook::OpeningBook(const std::string& openingBookFile)
             game.play(move);
         }
 
+        openingsLoaded++;
     }
+
+    mLogger << LogLevel::Info << "Loaded " << openingsLoaded << " openings from file" << Flush;
 }

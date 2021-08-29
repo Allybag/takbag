@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 #include "tak/Position.h"
+#include "log/Logger.h"
 
 using OpeningTable = std::unordered_map<Position, std::unordered_set<Move>>;
 
@@ -13,6 +14,7 @@ using OpeningTable = std::unordered_map<Position, std::unordered_set<Move>>;
 
 class OpeningBook
 {
+    Logger mLogger{"Openings"};
     OpeningTable mOpeningTable;
 
 public:

@@ -220,11 +220,29 @@ Move Engine<>::deepeningSearch(const Position& position)
 
 }
 
+template<>
+bool Engine<>::openingBookContains(const Position &position)
+{
+    Shift canonicalShift = position.getCanonicalShift();
+    Position canonicalPosition = position.shift(canonicalShift);
+    return mOpeningBook.contains(canonicalPosition);
+}
 
 template <>
 std::string Engine<>::chooseMove(const Position& position, double timeLimitSeconds, int maxDepth)
 {
     auto startTime = timeInMics();
+
+    Shift canonicalShift = position.getCanonicalShift();
+    Position canonicalPosition = position.shift(canonicalShift);
+    mLogger << LogLevel::Info << "Shift: " << canonicalShift << Flush;
+    if (mOpeningBook.contains(canonicalPosition))
+    {
+        auto openingMove = *chooseRandomElement(mOpeningBook.getResponses(canonicalPosition));
+        openingMove.mIndex = applyShift(openingMove.mIndex, canonicalPosition.size(), getReverseShift(canonicalShift));
+        mLogger << LogLevel::Info << "Playing move from opening book" << Flush;
+        return moveToPtn(openingMove, canonicalPosition.size());
+    }
 
     timeLimitSeconds = std::max(0.001, timeLimitSeconds); // Need at least a millisecond
     mStopSearchingTime = startTime + (timeLimitSeconds * micsInSecond);

@@ -7,6 +7,7 @@
 #include "tak/RobinHoodHashes.h"
 #include "../../external/robin_hood.h"
 #include "TranspositionTable.h"
+#include "OpeningBook.h"
 
 #include <string>
 #include <vector>
@@ -33,6 +34,7 @@ class Engine
     Logger mLogger{"Engine"};
 
     TranspositionTable mTranspositionTable;
+    OpeningBook mOpeningBook;
     EngineStats mStats;
     std::vector<Move> mTopMoves;
     int64_t mStopSearchingTime{0};
@@ -44,10 +46,14 @@ class Engine
     int evaluatePos(const Position& position);
     int evaluateResult(Result result);
 public:
+    Engine() = default;
+    explicit Engine(std::string openingBookFile) : mOpeningBook(openingBookFile) { }
+
     std::string chooseMove(const Position& position, double timeLimitSeconds = 3, int maxDepth = 15);
     Move chooseMoveRandom(const Position& position);
     void reset() { mTranspositionTable.clear(); }
 
+    bool openingBookContains(const Position& position);
     int evaluate(const Position& position);
     SearchResult negamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour);
 };

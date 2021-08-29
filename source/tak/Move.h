@@ -144,3 +144,21 @@ inline std::string moveToPtn(const Move& move, std::size_t size)
 
     return ptn;
 }
+
+namespace std
+{
+    template <>
+    struct hash<Move>
+    {
+        std::size_t operator()(const Move& move) const
+        {
+            std::size_t directionHash = std::hash<Direction>{}(move.mDirection);
+            std::size_t indexHash = std::hash<uint8_t>{}(move.mIndex);
+            std::size_t stoneHash = std::hash<Stone>{}(move.mStone);
+            std::size_t countHash = std::hash<uint8_t>{}(move.mCount);
+            std::size_t dropsHash = std::hash<uint32_t>{}(move.mDropCounts);
+
+            return directionHash ^ (indexHash << 1) ^ (stoneHash << 2) ^ (countHash << 3) ^ (dropsHash << 4);
+        }
+    };
+}
