@@ -63,5 +63,6 @@ OpeningBook::OpeningBook(const std::string& openingBookFile)
         openingsLoaded++;
     }
 
-    mLogger << LogLevel::Info << "Loaded " << openingsLoaded << " openings from file" << Flush;
+    mLogger << LogLevel::Info << "Loaded " << openingsLoaded << " opening lines from file" << Flush;
+    mLogger << LogLevel::Info << "Book contains " << mOpeningTable.size() << " positions" << Flush;
 }

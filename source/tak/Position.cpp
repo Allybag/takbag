@@ -315,6 +315,62 @@ std::vector<uint32_t> Position::generateDropCounts(std::size_t handSize, std::si
 
 }
 
+// TODO: This shouldn't be a copy past of the checkRoadWin below
+PlayerPair<std::size_t> Position::countIslands() const
+{
+    PlayerPair<std::size_t> islandCounts{0};
+    uint64_t squareInIsland = 0; // We use this as if it were a map, but with much faster lookup
+    for (std::size_t index = 0; index < mSize * mSize; index++)
+    {
+        if (squareInIsland & (1LL << index))
+            continue;
+
+        Stone topStone = mBoard[index].mTopStone;
+        if (topStone == Stone::Blank || isWall(topStone))
+            continue;
+
+        uint8_t colour = topStone & StoneBits::Black;
+
+        // We do a breadth first search
+        uint64_t parents = 0;
+        parents |= (1LL << index);
+        uint64_t island = 0;
+        while (parents != 0)
+        {
+            uint64_t children = 0;
+            while (parents != 0)
+            {
+                auto parentIndex = std::countr_zero(parents);
+                parents -= (1LL << parentIndex);
+                island |= (1LL << parentIndex);
+                squareInIsland |= (1LL << parentIndex);
+                for (const auto neighbour : mNeighbourMap[parentIndex])
+                {
+                    if (squareInIsland & (1LL << neighbour))
+                        continue; // Already assigned to an island
+
+                    Stone neighbourStone = mBoard[neighbour].mTopStone;
+
+                    if (neighbourStone == Stone::Blank)
+                        continue; // Empty
+                    if ((neighbourStone & StoneBits::Black) != colour)
+                        continue; // Wrong colour
+                    if (isWall(neighbourStone))
+                        continue; // Wall
+
+                    children |= ( 1LL << neighbour);
+                }
+            }
+            parents = children;
+
+            Player islandOwner = colour & StoneBits::Black ? Player::Black : Player::White;
+            islandCounts[islandOwner] += 1;
+        }
+    }
+
+    return islandCounts;
+};
+
 Result Position::checkRoadWin() const {
     // Plan: We iterate through the board, creating "islands"
     // We then look at each island, and check if it connects two sides
@@ -370,7 +426,6 @@ Result Position::checkRoadWin() const {
 
         if (checkConnectsOppositeEdges(island))
         {
-
             bool roadIsBlack = topStone & StoneBits::Black;
             bool playerIsBlack = (mToPlay == Player::Black);
             result = static_cast<Result>((topStone & StoneBits::Black) | Result::WhiteRoad);

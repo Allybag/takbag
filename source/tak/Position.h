@@ -64,6 +64,7 @@ public:
     std::string print() const;
 
     Result checkResult() const;
+    PlayerPair<std::size_t> countIslands() const;
 
     void setSquare(std::size_t col, std::size_t rank, const std::string& tpsSquare);
     void togglePlayer() { mToPlay = (mToPlay == Player::White) ? Player::Black : Player::White; }

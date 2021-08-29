@@ -43,6 +43,12 @@ int Engine<>::evaluatePos(const Position& position)
     }
 
     score -= 12 * position.getKomi(); // A positive komi is points for black
+
+    // TODO: check if this is too slow to be worth it
+    auto islandCounts = position.countIslands();
+    score -= islandCounts[Player::White] * 4; // We want our pieces as connected as possible
+    score += islandCounts[Player::Black] * 4;
+
     return score;
 }
 
