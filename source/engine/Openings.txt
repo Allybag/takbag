@@ -1,0 +1,42 @@
+a6 f6 d3 c4 d4 c3
+a6 f6 d3 c3 d4 c4
+a6 f6 d4 c4 d3 c3 Cd5
+a6 f6 d4 c4 d3 c3 c5
+a6 f6 d4 c4 d3 c3 d5 c5 e5 Ce4
+a6 f6 d4 c4 d3 c3 d5 c5 c2
+a6 f6 d4 c4 d3 c3 d5 c5 d2
+a6 f6 d4 c4 d3 c3 d5 Cc5
+a6 f6 d4 c4 d3 c3 d2 Cc2
+a6 f6 d4 c4 d3 c3 d5 Ce3
+a6 f6 d4 c4 d3 c3 d2 Ce3
+a6 f6 d4 c4 d3 c3 d2 Cd5
+a6 f6 d4 c4 d3 Cc3 d2 e3
+a6 f6 d4 c4 d3 Cc3 d2 e3
+a6 f6 d4 c4 d3 Cc3
+a6 f6 d4 e5 d5 Ce4
+a6 f6 d4 e5 d5 d6
+a6 f6 d4 e5 e4 Cd5
+a6 f6 d4 c4 Cd3
+a6 f6 d4 Cd3
+a6 f6 d4 c4 c3 Cd3
+a6 f6 d4 c4 Cc3 Cd3
+
+a6 f6 e4 d4 Cd3
+a6 f6 e4 e5 d4 Cd3
+a6 f6 e4 d3 e3 e2
+
+a6 f1 d3 c4 c3 d4
+a6 f1 d3 c4 d4 c3
+
+a6 f1 e4 d4 Cd3
+a6 f1 e4 e5 d4 Cd3
+a6 f1 e4 d3 e3 e2
+
+a6 b6 b5 c5 b4 Cc4
+a6 b6 c3 d3 c4 d4 b5 Cb4
+a6 b6 c3 d3 c4 d4 b5 Cc5
+a6 b6 c4 d4 c3 d3 c5 Cb5 c2 b4
+
+a6 f6 f5 d4 f4 Ce4
+a6 f1 f2 d3 f3 Ce3
+a6 f1 d3 b6 d4 c6 Cd5

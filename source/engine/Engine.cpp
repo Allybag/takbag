@@ -42,12 +42,13 @@ int Engine<>::evaluatePos(const Position& position)
             score -= colour; // Lose a point for a square on the edge
     }
 
+    // This is just a constant offset to all scores, and so completely pointless. Still..
     score -= 12 * position.getKomi(); // A positive komi is points for black
 
     // TODO: check if this is too slow to be worth it
-    auto islandCounts = position.countIslands();
-    score -= islandCounts[Player::White] * 4; // We want our pieces as connected as possible
-    score += islandCounts[Player::Black] * 4;
+    auto islandLengths = position.countIslands();
+    score += islandLengths[Player::White] * 4; // We want our pieces as connected as possible
+    score -= islandLengths[Player::Black] * 4;
 
     return score;
 }
@@ -186,6 +187,7 @@ Move Engine<>::deepeningSearch(const Position& position)
     auto searchStart = timeInMics();
     auto lastSearchDuration = 0;
     mTopMoves.clear();
+    mTranspositionTable.clear(); // TODO: We only do this because the table breaks our move length estimates
     while (true)
     {
         ++depth;

@@ -21,7 +21,7 @@ class TranspositionTable
 {
     Logger mLogger{"Engine"};
 
-    using TableT = std::unordered_map<Position, TranspositionTableRecord, Hash<Position>>;
+    using TableT = robin_hood::unordered_flat_map<Position, TranspositionTableRecord, Hash<Position>>;
     TableT mTable;
 
 public:

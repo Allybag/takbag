@@ -334,7 +334,13 @@ PlayerPair<std::size_t> Position::countIslands() const
         // We do a breadth first search
         uint64_t parents = 0;
         parents |= (1LL << index);
+
         uint64_t island = 0;
+        int northRank = 0;
+        int eastCol = 0;
+        int southRank = mSize - 1;
+        int westCol = mSize - 1;
+
         while (parents != 0)
         {
             uint64_t children = 0;
@@ -344,6 +350,14 @@ PlayerPair<std::size_t> Position::countIslands() const
                 parents -= (1LL << parentIndex);
                 island |= (1LL << parentIndex);
                 squareInIsland |= (1LL << parentIndex);
+
+                int rank = parentIndex % mSize;
+                int col = parentIndex / mSize;
+                northRank = std::max(rank, northRank);
+                eastCol = std::max(col, eastCol);
+                southRank = std::min(southRank, rank);
+                westCol = std::min(col, westCol);
+
                 for (const auto neighbour : mNeighbourMap[parentIndex])
                 {
                     if (squareInIsland & (1LL << neighbour))
@@ -363,8 +377,11 @@ PlayerPair<std::size_t> Position::countIslands() const
             }
             parents = children;
 
+            // We find the "length" of the island by taking max(height, width) of the island
+            int islandLength = std::max(northRank - southRank, eastCol - westCol);
+
             Player islandOwner = colour & StoneBits::Black ? Player::Black : Player::White;
-            islandCounts[islandOwner] += 1;
+            islandCounts[islandOwner] += islandLength;
         }
     }
 

@@ -55,7 +55,7 @@ OpeningBook::OpeningBook(const std::string& openingBookFile)
             }
             assert(moveIsValid);
 
-            mOpeningTable[canonicalPosition].insert(canonicalResponse);
+            mOpeningTable[canonicalPosition].push_back(canonicalResponse);
 
             game.play(move);
         }
