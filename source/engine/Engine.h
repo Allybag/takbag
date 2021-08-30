@@ -28,7 +28,7 @@ struct SearchResult
 };
 
 // We want to fix estimating next ply duration before we use a transposition table
-template <bool UseTranspositionTable = true>
+template <bool UseTranspositionTable = false>
 class Engine
 {
     Logger mLogger{"Engine"};
