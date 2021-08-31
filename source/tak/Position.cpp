@@ -376,13 +376,14 @@ PlayerPair<std::size_t> Position::countIslands() const
                 }
             }
             parents = children;
-
-            // We find the "length" of the island by taking max(height, width) of the island
-            int islandLength = std::max(northRank - southRank, eastCol - westCol);
-
-            Player islandOwner = colour & StoneBits::Black ? Player::Black : Player::White;
-            islandCounts[islandOwner] += islandLength;
         }
+
+
+        // We find the "length" of the island by taking max(height, width) of the island
+        int islandLength = std::max(northRank - southRank, eastCol - westCol);
+
+        Player islandOwner = colour & StoneBits::Black ? Player::Black : Player::White;
+        islandCounts[islandOwner] += islandLength;
     }
 
     return islandCounts;
