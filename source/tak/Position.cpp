@@ -400,7 +400,6 @@ PlayerPair<std::size_t> Position::countIslands() const
 Result Position::checkRoadWin() const {
     // Plan: We iterate through the board, creating "islands"
     // We then look at each island, and check if it connects two sides
-    // TODO: Think about and optimise this
     Result result = Result::None;
     uint64_t squareInIsland = 0; // We use this as if it were a map, but with much faster lookup
 
@@ -414,41 +413,7 @@ Result Position::checkRoadWin() const {
         if (topStone == Stone::Blank || isWall(topStone))
             continue;
 
-        uint8_t colour = topStone & StoneBits::Black;
-
-        // We do a breadth first search
-        uint64_t parents = 0;
-        parents |= (1LL << index);
-        uint64_t island = 0;
-        while (parents != 0)
-        {
-            uint64_t children = 0;
-            while (parents != 0)
-            {
-                auto parentIndex = std::countr_zero(parents);
-                parents -= (1LL << parentIndex);
-                island |= (1LL << parentIndex);
-                squareInIsland |= (1LL << parentIndex);
-                for (const auto neighbour : mNeighbourMap[parentIndex])
-                {
-                    if (squareInIsland & (1LL << neighbour))
-                        continue; // Already assigned to an island
-
-                    Stone neighbourStone = mBoard[neighbour].mTopStone;
-
-                    if (neighbourStone == Stone::Blank)
-                        continue; // Empty
-                    if ((neighbourStone & StoneBits::Black) != colour)
-                        continue; // Wrong colour
-                    if (isWall(neighbourStone))
-                        continue; // Wall
-
-                    children |= ( 1LL << neighbour);
-                }
-            }
-            parents = children;
-        }
-
+        uint64_t island = findIsland(index, squareInIsland);
 
         if (checkConnectsOppositeEdges(island))
         {
@@ -464,22 +429,51 @@ Result Position::checkRoadWin() const {
     return result;
 }
 
+uint64_t Position::findIsland(size_t index, uint64_t &squareInIsland) const
+{
+    uint64_t island = 0;// We do a breadth first search
+
+    uint8_t colour = mBoard[index].mTopStone & StoneBits::Black;
+    uint64_t parents = 0;
+    parents |= (1LL << index);
+    while (parents != 0)
+    {
+        uint64_t children = 0;
+        while (parents != 0)
+        {
+            auto parentIndex = std::countr_zero(parents);
+            parents -= (1LL << parentIndex);
+            island |= (1LL << parentIndex);
+            squareInIsland |= (1LL << parentIndex);
+            for (const auto neighbour : mNeighbourMap[parentIndex])
+            {
+                if (squareInIsland & (1LL << neighbour))
+                    continue; // Already assigned to an island
+
+                Stone neighbourStone = mBoard[neighbour].mTopStone;
+
+                if (neighbourStone == Stone::Blank)
+                    continue; // Empty
+                if ((neighbourStone & StoneBits::Black) != colour)
+                    continue; // Wrong colour
+                if (isWall(neighbourStone))
+                    continue; // Wall
+
+                children |= ( 1LL << neighbour);
+            }
+        }
+        parents = children;
+    }
+
+    return island;
+}
+
 Result Position::checkFlatWin() const
 {
     bool whiteStonesGone = (mFlatReserves.White == 0 && mCapReserves.White == 0);
     bool blackStonesGone = (mFlatReserves.Black == 0 && mCapReserves.Black == 0);
 
-    bool boardFilled = true;
-    for (std::size_t index = 0; index < mSize * mSize; ++index)
-    {
-        if (mBoard[index].mTopStone == Stone::Blank)
-        {
-            boardFilled = false;
-            break;
-        }
-    }
-
-    if (whiteStonesGone || blackStonesGone || boardFilled)
+    if (whiteStonesGone || blackStonesGone || checkBoardFilled())
     {
         auto flatCounts = checkFlatCount();
         double blackFlatCount = flatCounts.Black + getKomi();
@@ -492,6 +486,19 @@ Result Position::checkFlatWin() const
     }
 
     return Result::None;
+}
+
+bool Position::checkBoardFilled() const
+{
+    for (size_t index = 0; index < mSize * mSize; ++index)
+    {
+        if (mBoard[index].mTopStone == Stone::Blank)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 

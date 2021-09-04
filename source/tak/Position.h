@@ -98,6 +98,10 @@ private:
     void initDropCountMap();
 
     uint8_t calcMaxDistance(size_t index, uint8_t maxHandSize, bool isCapStack, const Direction direction) const;
+
+    uint64_t findIsland(size_t index, uint64_t& squareInIsland) const;
+
+    bool checkBoardFilled() const;
 };
 
 namespace std
