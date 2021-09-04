@@ -8,7 +8,7 @@
 
 void RootLogger::log(LogLevel logLevel, const std::string& message, const std::string& funcName, const std::string& logName)
 {
-    struct timeval epochTime;
+    struct timeval epochTime{ };
     gettimeofday(&epochTime, nullptr);
     auto now = std::localtime(&epochTime.tv_sec);
 

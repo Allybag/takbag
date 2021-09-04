@@ -1,5 +1,4 @@
 #include "Engine.h"
-#include "MonteCarlo.h"
 #include "tak/Position.h"
 #include "other/Time.h"
 
@@ -105,7 +104,7 @@ SearchResult Engine<UseTranspositionTable>::negamax(const Position &position, Mo
         auto record = mTranspositionTable.fetch(position, depth);
         if (record)
         {
-            return SearchResult(record->mMove, record->mScore);
+            return {record->mMove, record->mScore};
         }
     }
 
@@ -176,7 +175,7 @@ SearchResult Engine<UseTranspositionTable>::negamax(const Position &position, Mo
     if constexpr(UseTranspositionTable)
         mTranspositionTable.store(position, depth, bestScore, bestMove);
 
-    return SearchResult(bestMove, bestScore);
+    return {bestMove, bestScore};
 }
 
 template <>

@@ -51,8 +51,8 @@ struct Node
     Node(Token tagKey, Token tagData) : mType(NodeType::TagNode), mFirstToken(std::move(tagKey)), mSecondToken(std::move(tagData)) { }
     Node(std::size_t turnNum, Token firstMove) : mType(NodeType::TurnNode), mTurnNum(turnNum), mFirstToken(std::move(firstMove)) { }
     Node(std::size_t turnNum, Token firstMove, Token secondMove) : mType(NodeType::TurnNode), mTurnNum(turnNum), mFirstToken(std::move(firstMove)), mSecondToken(std::move(secondMove)) { }
-    Node(Result result) : mType(NodeType::ResultNode), mResult(result) { }
-    Node(Token comment) : mType(NodeType::CommentNode), mFirstToken(std::move(comment)) { }
+    explicit Node(Result result) : mType(NodeType::ResultNode), mResult(result) { }
+    explicit Node(Token comment) : mType(NodeType::CommentNode), mFirstToken(std::move(comment)) { }
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const Node& node)

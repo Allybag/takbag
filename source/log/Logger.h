@@ -26,7 +26,7 @@ class Logger
     bool shouldLog() { return (mActiveLevel == LogLevel::Always || mActiveLevel <= mLogLevel); }
 
 public:
-    explicit Logger(std::string name) : Logger(name, rootLogger.getGlobalLogLevel()) { }
+    explicit Logger(std::string name) : Logger(std::move(name), rootLogger.getGlobalLogLevel()) { }
     Logger(std::string name, LogLevel logLevel) : mName(std::move(name)), mLogLevel(logLevel), mActiveLevel(LogLevel::Unset) { }
 
     template <typename InputT>
@@ -51,7 +51,7 @@ inline Logger& Logger::operator<<(LogLevel logLevel)
 }
 
 template <>
-inline Logger& Logger::operator<<(const WriteMessage flushMessage)
+inline Logger& Logger::operator<<(const WriteMessage& flushMessage)
 {
 	assert(mActiveLevel != LogLevel::Unset);
 
