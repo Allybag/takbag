@@ -19,6 +19,19 @@ struct EngineStats
     void reset() { mNodeCount = 0; }
 };
 
+struct EvaluationWeights
+{
+    int mFlatsOnBoardWeight;
+    int mFlatCountWeight;
+    int mCapsOnBoardWeight; // 7s or 8s do have two caps
+    int mStackControlWeight; // Probably want to make this much more fine grained
+    int mStackControlNobleBonus;
+    int mStoneOnEdgeWeight;
+    int mIslandLengthsWeight; // For more info look in Position::countIslands in Position.cpp
+};
+
+extern EvaluationWeights gDefaultEvaluationWeights;
+
 struct SearchResult
 {
     Move mMove;
@@ -32,6 +45,7 @@ template <bool UseTranspositionTable = false>
 class Engine
 {
     Logger mLogger{"Engine"};
+    EvaluationWeights mWeights{gDefaultEvaluationWeights};
 
     TranspositionTable mTranspositionTable;
     OpeningBook mOpeningBook;

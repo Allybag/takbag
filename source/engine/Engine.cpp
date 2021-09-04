@@ -9,14 +9,16 @@
 static constexpr int winValue = 1000;
 static constexpr int infinity = 100001; // Not really infinity, but pretty high
 
+EvaluationWeights gDefaultEvaluationWeights = EvaluationWeights{8, 12, 9, 1, 1, 4};
+
 template <>
 int Engine<>::evaluatePos(const Position& position)
 {
     int score = 0;
 
     auto reserveCounts = position.getReserveCount();
-    score -= reserveCounts[Player::White] * 8; // We want flats on the board
-    score += reserveCounts[Player::Black] * 8;
+    score -= reserveCounts[Player::White] * mWeights.mFlatsOnBoardWeight;
+    score += reserveCounts[Player::Black] * mWeights.mFlatsOnBoardWeight;
 
     auto size = position.size();
     for (std::size_t index = 0; index < size * size; ++index)
@@ -29,26 +31,26 @@ int Engine<>::evaluatePos(const Position& position)
         auto colour = topStone & StoneBits::Black ? -1 : 1;
 
         if (isFlat(square.mTopStone))
-            score += 12 * colour; // We want a high flat count
+            score += mWeights.mFlatCountWeight * colour; // We want a high flat count
 
         if (isCap(square.mTopStone))
-            score += 9 * colour; // We want to use our cap rather than walls if possible
+            score += mWeights.mCapsOnBoardWeight * colour; // We want to use our cap rather than walls if possible
 
-        score += square.mCount * colour; // Wanna control stacks
+        score += square.mCount * mWeights.mStackControlWeight * colour; // Wanna control stacks
         if (topStone & StoneBits::Standing)
-            score += square.mCount * colour; // Wanna control stacks especially with
+            score += square.mCount * mWeights.mStackControlNobleBonus * colour; // Wanna control stacks especially with
 
         if ((index < size) || (index >= (size * size) - size) || (index % size == 0) || (index % size == size - 1))
-            score -= colour; // Lose a point for a square on the edge
+            score -= mWeights.mStoneOnEdgeWeight * colour; // Lose a point for a square on the edge
     }
 
     // This is just a constant offset to all scores, and so completely pointless. Still..
-    score -= 12 * position.getKomi(); // A positive komi is points for black
+    score -= mWeights.mFlatCountWeight * position.getKomi(); // A positive komi is points for black
 
     // TODO: check if this is too slow to be worth it
     auto islandLengths = position.countIslands();
-    score += islandLengths[Player::White] * 4; // We want our pieces as connected as possible
-    score -= islandLengths[Player::Black] * 4;
+    score += islandLengths[Player::White] * mWeights.mIslandLengthsWeight; // We want our pieces as connected as possible
+    score -= islandLengths[Player::Black] * mWeights.mIslandLengthsWeight;
 
     return score;
 }
