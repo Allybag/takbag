@@ -9,3 +9,22 @@ generateMovesTinueSixes run took an average of 1863 nanos
 copyAndPlayTinueSixes run took an average of 13 nanos
 checkResultRoadSixes run took an average of 91 nanos
 evaluatePosRoadSixes run took an average of 89 nanos
+
+Commit: 5799a56987b964e6de2d7a4b2faae3e291ea2cd3
+checkResultStartingSixes run took an average of 14 nanos
+evaluatePosStartingSixes run took an average of 75 nanos
+hashStartingSixes run took an average of 72 nanos
+generateMovesStartingSixes run took an average of 121 nanos
+copyAndPlayStartingSixes run took an average of 14 nanos
+checkResultTinueSixes run took an average of 83 nanos
+evaluatePosTinueSixes run took an average of 424 nanos
+hashTinueSixes run took an average of 69 nanos
+generateMovesTinueSixes run took an average of 1572 nanos
+copyAndPlayTinueSixes run took an average of 14 nanos
+checkResultRoadSixes run took an average of 88 nanos
+evaluatePosRoadSixes run took an average of 88 nanos
+hashRoadSixes run took an average of 72 nanos
+Checking four opening moves of a 6s game took 300918 mics
+Searching to depth 5 from open of a 6s game took 141717 mics
+Finding win at depth 5 took 1970053 mics
+Perft 3 of all moves of a stacky sevens game took 12100048 mics
