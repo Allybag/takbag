@@ -15,26 +15,31 @@ Position::Position(std::size_t size, double komi) : mFlatReserves(PlayerPair{pie
     mKomi = static_cast<int8_t>(komi * 2);
 
     if (mNeighbourMapSize != mSize)
-    {
-        mNeighbourMap.clear();
-        for (std::size_t index = 0; index < mSize * mSize; ++index)
-        {
-            auto neighbours = getNeighbours(index);
-            mNeighbourMap.push_back(neighbours);
-        }
-        mNeighbourMapSize = mSize;
-    }
+        initNeighbourMap();
+
     if (mDropCountMap.empty())
+        initDropCountMap();
+}
+
+void Position::initDropCountMap() {
+    // 1 1 false 1 1 true ... 1 8 false 1 8 true 2 1 false
+    for (size_t handSize = 1; handSize <= 8; ++handSize)
+        for (size_t maxDistance = 1; maxDistance <= 8; ++maxDistance)
+            for (bool endsInSmash : {false, true})
+            {
+                auto dropCounts = generateDropCounts(handSize, maxDistance, endsInSmash);
+                mDropCountMap.push_back(dropCounts);
+            }
+}
+
+void Position::initNeighbourMap() {
+    mNeighbourMap.clear();
+    for (size_t index = 0; index < mSize * mSize; ++index)
     {
-        // 1 1 false 1 1 true ... 1 8 false 1 8 true 2 1 false
-        for (std::size_t handSize = 1; handSize <= 8; ++handSize)
-            for (std::size_t maxDistance = 1; maxDistance <= 8; ++maxDistance)
-                for (bool endsInSmash : {false, true})
-                {
-                    auto dropCounts = generateDropCounts(handSize, maxDistance, endsInSmash);
-                    mDropCountMap.push_back(dropCounts);
-                }
+        auto neighbours = getNeighbours(index);
+        mNeighbourMap.push_back(neighbours);
     }
+    mNeighbourMapSize = mSize;
 }
 
 std::string Position::print() const
@@ -218,15 +223,12 @@ void Position::addPlaceMoves(std::size_t index, MoveBuffer& moves) const
     if (mCapReserves[mToPlay])
     {
         moves.emplace_back(index, static_cast<Stone>(Stone::WhiteCap | colour));
-        // moves.inc();
     }
 
     if (mFlatReserves[mToPlay])
     {
         moves.emplace_back(index, static_cast<Stone>(Stone::WhiteFlat | colour));
         moves.emplace_back(index, static_cast<Stone>(Stone::WhiteWall | colour));
-        // moves.inc();
-        // moves.inc();
     }
 }
 
@@ -240,44 +242,11 @@ void Position::addMoveMoves(std::size_t index, MoveBuffer& moves) const
 
     for (const auto direction : Directions)
     {
-        const int offset = getOffset(direction);
-
-        uint8_t maxDistance = mSize;
-        bool endsInSmash = false;
-        for (int j = 1; j <= maxHandSize; ++j)
-        {
-            uint8_t nextIndex = index + j * offset;
-            if (nextIndex >= mSize * mSize) // Stops us going off the top or bottom of the board
-            {
-                maxDistance = j - 1;
-                break;
-            }
-
-            if ((direction == Direction::Right || direction == Direction::Left))
-                if ((nextIndex / mSize) != (index / mSize)) // Stops us going off the right or left of the board
-                {
-                    maxDistance = j - 1;
-                    break;
-                }
-
-            const Square nextSquare = mBoard[nextIndex];
-            if (isWall(nextSquare.mTopStone) && isCapStack)
-            {
-                maxDistance = j;
-                endsInSmash = true;
-                break;
-            }
-
-            if (nextSquare.mTopStone & StoneBits::Standing) // Either a cap stack, or a wall and we aren't a cap stack
-            {
-                maxDistance = j - 1;
-                break;
-            }
-        }
-
+        uint8_t maxDistance = calcMaxDistance(index, maxHandSize, isCapStack, direction);
         if (maxDistance == 0)
             continue;
 
+        bool endsInSmash = isCapStack && isWall(mBoard[index + maxDistance * getOffset(direction)].mTopStone);
         for (std::size_t handSize = 1; handSize <= maxHandSize; ++handSize)
         {
             const auto dropCountIndex = (handSize - 1) * 16 + (maxDistance - 1) * 2 + endsInSmash;
@@ -288,6 +257,45 @@ void Position::addMoveMoves(std::size_t index, MoveBuffer& moves) const
             }
         }
     }
+}
+
+uint8_t Position::calcMaxDistance(size_t index, uint8_t maxHandSize, bool isCapStack, const Direction direction) const
+{
+    uint8_t maxDistance = mSize;
+    const int offset = getOffset(direction);
+    for (int i = 1; i <= maxHandSize; ++i)
+    {
+        uint8_t nextIndex = index + i * offset;
+        if (nextIndex >= mSize * mSize) // Stops us going off the top or bottom of the board
+        {
+            maxDistance = i - 1;
+            break;
+        }
+
+        if ((direction == Direction::Right || direction == Direction::Left))
+        {
+            if ((nextIndex / mSize) != (index / mSize)) // Stops us going off the right or left of the board
+            {
+                maxDistance = i - 1;
+                break;
+            }
+        }
+
+        const Square nextSquare = mBoard[nextIndex];
+        if (isWall(nextSquare.mTopStone) && isCapStack)
+        {
+            maxDistance = i;
+            break;
+        }
+
+        if (nextSquare.mTopStone & StoneBits::Standing) // Either a cap stack, or a wall and we aren't a cap stack
+        {
+            maxDistance = i - 1;
+            break;
+        }
+    }
+
+    return maxDistance;
 }
 
 void Position::generateOpeningMoves(MoveBuffer& moves) const
@@ -509,6 +517,7 @@ PlayerPair<std::size_t> Position::checkFlatCount() const
     return flatCounts;
 }
 
+// Only called in initNeighbourMap
 std::vector<std::size_t> Position::getNeighbours(std::size_t index) const
 {
     std::vector<std::size_t> neighbours;

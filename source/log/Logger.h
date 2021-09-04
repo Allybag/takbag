@@ -30,11 +30,11 @@ public:
     Logger(std::string name, LogLevel logLevel) : mName(std::move(name)), mLogLevel(logLevel), mActiveLevel(LogLevel::Unset) { }
 
     template <typename InputT>
-    inline Logger& operator<<(InputT input);
+    inline Logger& operator<<(const InputT& input);
 };
 
 template <typename InputT>
-inline Logger& Logger::operator<<(InputT input)
+inline Logger& Logger::operator<<(const InputT& input)
 {
 	assert(mActiveLevel != LogLevel::Unset);
 	if (shouldLog())
@@ -43,7 +43,7 @@ inline Logger& Logger::operator<<(InputT input)
 }
 
 template <>
-inline Logger& Logger::operator<<(LogLevel logLevel)
+inline Logger& Logger::operator<<(const LogLevel& logLevel)
 {
 	assert(mActiveLevel == LogLevel::Unset);
 	mActiveLevel = logLevel;

@@ -93,6 +93,11 @@ private:
     Result checkRoadWin() const;
     Result checkFlatWin() const;
 
+    void initNeighbourMap();
+
+    void initDropCountMap();
+
+    uint8_t calcMaxDistance(size_t index, uint8_t maxHandSize, bool isCapStack, const Direction direction) const;
 };
 
 namespace std
