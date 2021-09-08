@@ -173,7 +173,7 @@ SearchResult Engine<UseTranspositionTable>::negamax(const Position &position, Mo
     }
 
     if constexpr(UseTranspositionTable)
-        mTranspositionTable.store(position, depth, bestScore, bestMove);
+        mTranspositionTable.store(position, bestMove, bestScore, depth);
 
     return {bestMove, bestScore};
 }
@@ -188,7 +188,6 @@ Move Engine<>::deepeningSearch(const Position& position)
     auto searchStart = timeInMics();
     auto lastSearchDuration = 0;
     mTopMoves.clear();
-    mTranspositionTable.clear(); // TODO: We only do this because the table breaks our move length estimates
     while (true)
     {
         ++depth;

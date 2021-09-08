@@ -2,36 +2,25 @@
 
 std::optional<TranspositionTableRecord> TranspositionTable::fetch(const Position& position, std::size_t depth) const
 {
-    auto record = mTable.find(position);
-    if (record != mTable.end() && record->second.mDepth >= depth)
+    auto hash = std::hash<Position>{}(position);
+    auto record = (*mTable)[hash % sTableSize];
+
+    // TODO: Using >= causes the engine to give up if it sees a loss further ahead in the table
+    if (record.mHash == hash && record.mDepth == depth)
     {
-        return record->second;
+        return record;
     }
 
     return std::nullopt;
 }
 
-void TranspositionTable::store(const Position& position, std::size_t depth, int score, Move move)
+void TranspositionTable::store(const Position& position, Move move, int score, uint8_t depth)
 {
-    auto record = mTable.find(position);
+    auto hash = std::hash<Position>{}(position);
+    auto& record = (*mTable)[hash % sTableSize];
 
-    if (record != mTable.end() && record->second.mDepth >= depth)
+    if (record.mHash == hash && record.mDepth >= depth)
         return;
 
-    if (record != mTable.end())
-        mTable.erase(record);
-
-    mTable.try_emplace(position, depth, score, move);
-}
-
-void TranspositionTable::clear()
-{
-    constexpr std::size_t recordSize = sizeof(TranspositionTableRecord);
-    if (mTable.size())
-    {
-        mLogger << LogLevel::Info << "Transposition Table size: " << mTable.size() * recordSize << " bytes" << Flush;
-        mLogger << LogLevel::Info << "Clearing all " << mTable.size() <<  " entries!" << Flush;
-        mTable.clear();
-    }
-
+    record = {hash, move, score, depth, ResultType::Unknown};
 }

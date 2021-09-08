@@ -41,13 +41,13 @@ struct SearchResult
 };
 
 // We want to fix estimating next ply duration before we use a transposition table
-template <bool UseTranspositionTable = false>
+template <bool UseTranspositionTable = true>
 class Engine
 {
     Logger mLogger{"Engine"};
     EvaluationWeights mWeights{gDefaultEvaluationWeights};
 
-    TranspositionTable mTranspositionTable;
+    TranspositionTable mTranspositionTable{};
     OpeningBook mOpeningBook;
     EngineStats mStats;
     std::vector<Move> mTopMoves;
@@ -65,7 +65,6 @@ public:
 
     std::string chooseMove(const Position& position, double timeLimitSeconds = 3, int maxDepth = 15);
     Move chooseMoveRandom(const Position& position);
-    void reset() { mTranspositionTable.clear(); }
 
     bool openingBookContains(const Position& position);
     int evaluate(const Position& position);

@@ -16,8 +16,6 @@ int main()
     rootLogger.setLogToStdOut(true);
 
     // If we aren't using transposition tables this fails due to template linker errors
-    // TODO: sort out!
-#if 0
     "Test Block Wins"_test = []
     {
         Engine<useTranspositionTable> engine;
@@ -47,5 +45,4 @@ int main()
         game.play(winningMove);
         expect(game.checkResult() == Result::WhiteRoad);
     };
-#endif
 }
