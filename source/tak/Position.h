@@ -38,9 +38,9 @@ class Position
     Player mToPlay;
 
     // Optimisations
-    inline static std::vector<std::vector<std::uint32_t>> mDropCountMap;
-    inline static std::vector<std::vector<std::size_t>> mNeighbourMap;
-    inline static std::size_t mNeighbourMapSize;
+    inline static std::vector<std::vector<std::uint32_t>> mDropCountMap{ };
+    inline static std::vector<std::vector<std::size_t>> mNeighbourMap{ };
+    inline static std::size_t mNeighbourMapSize { 0 };
 
     void place(const Move& place);
     void move(const Move& move);
@@ -102,6 +102,8 @@ private:
     uint64_t findIsland(size_t index, uint64_t& squareInIsland) const;
 
     bool checkBoardFilled() const;
+
+    uint8_t calcDistanceTillEdge(size_t index, const Direction &direction) const;
 };
 
 namespace std

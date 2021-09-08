@@ -21,6 +21,12 @@ inline AlwaysInline void DoNotOptimizeAway(const T& value)
 template <typename LambdaT>
 void benchmark(const std::string& name, LambdaT benchFunction, std::size_t runCount = 10'000'000)
 {
+    // Warm up, 1% of the iterations
+    for (std::size_t i = 0; i < runCount / 100; ++i)
+    {
+        DoNotOptimizeAway(benchFunction());
+    }
+
     auto before = timeInMics();
     for (std::size_t i = 0; i < runCount; ++i)
     {

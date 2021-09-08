@@ -261,41 +261,55 @@ void Position::addMoveMoves(std::size_t index, MoveBuffer& moves) const
 
 uint8_t Position::calcMaxDistance(size_t index, uint8_t maxHandSize, bool isCapStack, const Direction direction) const
 {
-    uint8_t maxDistance = mSize;
     const int offset = getOffset(direction);
-    for (int i = 1; i <= maxHandSize; ++i)
+    uint8_t distanceTillEdge = calcDistanceTillEdge(index, direction);
+
+    auto furthestPossibleDistance = std::min(distanceTillEdge, maxHandSize);
+    for (int i = 1; i <= furthestPossibleDistance; ++i)
     {
         uint8_t nextIndex = index + i * offset;
-        if (nextIndex >= mSize * mSize) // Stops us going off the top or bottom of the board
-        {
-            maxDistance = i - 1;
-            break;
-        }
-
-        if ((direction == Direction::Right || direction == Direction::Left))
-        {
-            if ((nextIndex / mSize) != (index / mSize)) // Stops us going off the right or left of the board
-            {
-                maxDistance = i - 1;
-                break;
-            }
-        }
-
         const Square nextSquare = mBoard[nextIndex];
         if (isWall(nextSquare.mTopStone) && isCapStack)
         {
-            maxDistance = i;
-            break;
+            return i;
         }
 
         if (nextSquare.mTopStone & StoneBits::Standing) // Either a cap stack, or a wall and we aren't a cap stack
         {
-            maxDistance = i - 1;
-            break;
+            return i - 1;
         }
     }
 
-    return maxDistance;
+    return furthestPossibleDistance;
+}
+
+uint8_t Position::calcDistanceTillEdge(size_t index, const Direction &direction) const {
+    switch (direction) {
+        case Direction::Up:
+        {
+            auto row = index / mSize;
+            return (mSize - 1) - row;
+        }
+        case Direction::Down:
+        {
+            auto row = index / mSize;
+            return row;
+        }
+        case Direction::Left:
+        {
+            auto col = index % mSize;
+            return col;
+        }
+        case Direction::Right:
+        {
+            auto col = index % mSize;
+            return (mSize - 1) - col;
+        }
+
+        case Direction::None:
+            assert(false);
+            return 0UL;
+    }
 }
 
 void Position::generateOpeningMoves(MoveBuffer& moves) const
