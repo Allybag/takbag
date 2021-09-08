@@ -125,7 +125,9 @@ namespace std
                 auto square = pos[index];
                 boardHash ^= (std::hash<Square>()(square) + 0x9e3779b9) + (boardHash << 6) + (boardHash >> 2);
             }
-            return boardHash ^ (playerHash << 1) ^ (sizeHash << 2);
+
+            std::size_t komiHash = std::hash<double>{}(pos.getKomi());
+            return boardHash ^ (playerHash << 1) ^ (sizeHash << 2) ^ (komiHash << 3);
         }
     };
 }
