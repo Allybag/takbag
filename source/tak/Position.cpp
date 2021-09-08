@@ -682,3 +682,6 @@ bool Position::operator!=(const Position& other) const
 {
     return !(*this == other);
 }
+
+#include "other/SizeChecker.h"
+SizeChecker<Position, 520> sizeChecker; // A bit big...
