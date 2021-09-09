@@ -20,7 +20,7 @@ std::size_t perft(const Position& position, std::size_t depth)
     return nodes;
 }
 
-std::string searchToDepth(Engine<>& engine, const Position& position, int depth)
+std::string searchToDepth(Engine& engine, const Position& position, int depth)
 {
     return engine.chooseMove(position, 1e9, depth);
 }

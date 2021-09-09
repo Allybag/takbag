@@ -12,13 +12,10 @@
 int main()
 {
     using namespace boost::ut;
-    const bool useTranspositionTable = true;
-    rootLogger.setLogToStdOut(true);
 
-    // If we aren't using transposition tables this fails due to template linker errors
     "Test Block Wins"_test = []
     {
-        Engine<useTranspositionTable> engine;
+        Engine engine;
         Game game(5);
         const int searchDepth = 5;
 

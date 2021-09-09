@@ -10,8 +10,7 @@ static constexpr int infinity = 100001; // Not really infinity, but pretty high
 
 EvaluationWeights gDefaultEvaluationWeights = EvaluationWeights{8, 12, 9, 1, 1, 1, 4};
 
-template <>
-int Engine<>::evaluatePos(const Position& position)
+int Engine::evaluatePos(const Position& position)
 {
     int score = 0;
 
@@ -54,8 +53,7 @@ int Engine<>::evaluatePos(const Position& position)
     return score;
 }
 
-template <>
-int Engine<>::evaluateResult(Result result)
+int Engine::evaluateResult(Result result)
 {
     assert(result != Result::None);
     if (result == Result::Draw)
@@ -68,8 +66,7 @@ int Engine<>::evaluateResult(Result result)
 }
 
 // Returns a score from white's point of view
-template <>
-int Engine<>::evaluate(const Position& position)
+int Engine::evaluate(const Position& position)
 {
     auto result = position.checkResult();
     if (result != Result::None)
@@ -78,8 +75,7 @@ int Engine<>::evaluate(const Position& position)
     return evaluatePos(position);
 }
 
-template <>
-Move Engine<>::chooseMoveFirst(const Position& position)
+Move Engine::chooseMoveFirst(const Position& position)
 {
     assert(position.checkResult() == Result::None);
     auto moves = position.generateMoves();
@@ -87,8 +83,7 @@ Move Engine<>::chooseMoveFirst(const Position& position)
     return move;
 }
 
-template <>
-Move Engine<>::chooseMoveRandom(const Position& position)
+Move Engine::chooseMoveRandom(const Position& position)
 {
     assert(position.checkResult() == Result::None);
     auto moves = position.generateMoves();
@@ -96,8 +91,7 @@ Move Engine<>::chooseMoveRandom(const Position& position)
     return *randomMove;
 }
 
-template <bool UseTranspositionTable>
-SearchResult Engine<UseTranspositionTable>::negamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour)
+SearchResult Engine::negamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour)
 {
     if constexpr(UseTranspositionTable)
     {
@@ -178,8 +172,7 @@ SearchResult Engine<UseTranspositionTable>::negamax(const Position &position, Mo
     return {bestMove, bestScore};
 }
 
-template <>
-Move Engine<>::deepeningSearch(const Position& position)
+Move Engine::deepeningSearch(const Position& position)
 {
     int depth = 0;
     Move move = Move();
@@ -228,16 +221,14 @@ Move Engine<>::deepeningSearch(const Position& position)
 
 }
 
-template<>
-bool Engine<>::openingBookContains(const Position &position)
+bool Engine::openingBookContains(const Position &position)
 {
     Shift canonicalShift = position.getCanonicalShift();
     Position canonicalPosition = position.shift(canonicalShift);
     return mOpeningBook.contains(canonicalPosition);
 }
 
-template <>
-std::string Engine<>::chooseMove(const Position& position, double timeLimitSeconds, int maxDepth)
+std::string Engine::chooseMove(const Position& position, double timeLimitSeconds, int maxDepth)
 {
     auto startTime = timeInMics();
 

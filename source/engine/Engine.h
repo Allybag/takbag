@@ -41,11 +41,11 @@ struct SearchResult
 };
 
 // We want to fix estimating next ply duration before we use a transposition table
-template <bool UseTranspositionTable = true>
 class Engine
 {
     Logger mLogger{"Engine"};
     EvaluationWeights mWeights{gDefaultEvaluationWeights};
+    static constexpr bool UseTranspositionTable = false;
 
     TranspositionTable mTranspositionTable{};
     OpeningBook mOpeningBook;
