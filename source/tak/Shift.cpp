@@ -23,8 +23,6 @@ std::size_t applyShift(std::size_t oldIndex, std::size_t size, Shift shiftType)
         case Shift::RotateClockwise:        return recompose(colIndex, flip(rowIndex));
         case Shift::RotateCounterClockwise: return recompose(flip(colIndex), rowIndex);
         case Shift::RotateTwice:            return recompose(flip(colIndex), flip(rowIndex));
-        default:
-            assert(false);
     }
 
     assert(false);

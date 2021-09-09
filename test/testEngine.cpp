@@ -137,14 +137,14 @@ int main()
 
         std::string tps = "x5/x3,11112C,21C/x3,111111,2/x3,111111,2/x3,1111,2 1 39";
         double noKomi = 0;
-        Game noKomiGame = gameFromTps(tps, 0);
+        Game noKomiGame = gameFromTps(tps, noKomi);
 
         auto noKomiEngineMove = engine.chooseMove(noKomiGame.getPosition(), 1, 1); // Search to depth 1 to find the flat win
         noKomiGame.play(noKomiEngineMove);
         expect(noKomiGame.checkResult() == Result::WhiteFlat);
 
         double komi = 1;
-        Game komiGame = gameFromTps(tps, 1);
+        Game komiGame = gameFromTps(tps, komi);
 
         auto komiEngineMove = engine.chooseMove(komiGame.getPosition(), 1, 1); // Search to depth 1 to find a stack spread
         komiGame.play(komiEngineMove);

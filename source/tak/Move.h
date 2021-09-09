@@ -35,7 +35,7 @@ struct Move
     Move() = default;
     Move(std::size_t index, Stone stone) : mDirection(Direction::None), mIndex(index), mStone(stone) { }
     Move(std::size_t index, std::size_t count, uint32_t dropCounts, Direction direction) :
-        mIndex(index), mCount(count), mDropCounts(dropCounts), mDirection(direction) { }
+        mDirection(direction), mIndex(index), mCount(count), mDropCounts(dropCounts) { }
 
     template <typename LambdaT> // Lambda should take a single uint8_t
     void forEachStone(LambdaT lambda) const;

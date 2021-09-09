@@ -81,7 +81,26 @@ inline bool isRelevant(PlaytakMessageType type)
         case PlaytakMessageType::GameOver:
         case PlaytakMessageType::GameTime:
             return true;
-        default:
+
+        case PlaytakMessageType::ConnectionSuccess:
+        case PlaytakMessageType::ReadyForLogin:
+        case PlaytakMessageType::LoginSuccess:
+        case PlaytakMessageType::AddGame:
+        case PlaytakMessageType::RemoveGame:
+        case PlaytakMessageType::AddSeek:
+        case PlaytakMessageType::RemoveSeek:
+        case PlaytakMessageType::Observe:
+        case PlaytakMessageType::GlobalChat:
+        case PlaytakMessageType::ChatJoin:
+        case PlaytakMessageType::ChatLeave:
+        case PlaytakMessageType::RoomChat:
+        case PlaytakMessageType::PrivateChat:
+        case PlaytakMessageType::PrivateChatSent:
+        case PlaytakMessageType::Announcement:
+        case PlaytakMessageType::Error:
+        case PlaytakMessageType::OnlineCount:
+        case PlaytakMessageType::Nak:
+        case PlaytakMessageType::Ack:
             return false;
     }
 }

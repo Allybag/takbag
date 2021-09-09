@@ -17,71 +17,74 @@ int main()
 {
     using namespace boost::ut;
 
-    Game game(6);
-    Engine engine;
-    auto pos = game.getPosition();
+    "Standard Benchmarks"_test = []
+    {
+        Game game(6);
+        Engine engine;
+        auto pos = game.getPosition();
 
-    auto checkResultStartingSixes = [&]() { return pos.checkResult(); };
-    runBenchmark(checkResultStartingSixes);
+        auto checkResultStartingSixes = [&]() { return pos.checkResult(); };
+        runBenchmark(checkResultStartingSixes);
 
-    auto evaluatePosStartingSixes = [&]() { return engine.evaluate(pos); };
-    runBenchmark(evaluatePosStartingSixes);
+        auto evaluatePosStartingSixes = [&]() { return engine.evaluate(pos); };
+        runBenchmark(evaluatePosStartingSixes);
 
-    auto hashStartingSixes = [&]() { return Hash<Position>{}(pos); };
-    runBenchmark(hashStartingSixes);
+        auto hashStartingSixes = [&]() { return Hash<Position>{}(pos); };
+        runBenchmark(hashStartingSixes);
 
-    auto generateMovesStartingSixes = [&]() { return pos.generateMoves(); };
-    runBenchmark(generateMovesStartingSixes);
+        auto generateMovesStartingSixes = [&]() { return pos.generateMoves(); };
+        runBenchmark(generateMovesStartingSixes);
 
-    auto startingMove = Move(0, Stone::BlackFlat);
-    auto copyAndPlayStartingSixes = [&]() { Position nextPosition(pos); nextPosition.play(startingMove); return nextPosition; };
-    runBenchmark(copyAndPlayStartingSixes);
+        auto startingMove = Move(0, Stone::BlackFlat);
+        auto copyAndPlayStartingSixes = [&]() { Position nextPosition(pos); nextPosition.play(startingMove); return nextPosition; };
+        runBenchmark(copyAndPlayStartingSixes);
 
-    std::string movesTillRoad = "a6 f6 d4 c4 d3 c3 d2 c5 c2 d5 e4 b5 e5 Ce3 f5 e3+ f4 f3 e3 b6 "
-                                 "Cb4 b2 b3 c4> b4+ c4 2b5> c6 3c5- c5 4c4> c4 c1 d5> d6 Sd5 f2 "
-                                 "f3+ b1 e2 a1 2e4- e4 3e3< e3 4d3- f3 d3 5d4< d5- f1 e2> e1 d1 "
-                                 "e2 2d4> d5 a2 d4 c3- c3 2f2< b3- a2> b1+ c5> b3 c5 d6- 2e5< d4+ "
-                                 "c5> Se5 5d5+ e5< 5d6>32 f5+ 3e6> Se6 4f6- e6> 2c2< b3- a2 5b2< "
-                                 "5d2<311 c5 6a2>132 c3- 3b2> 6c4-15 a3 3d5-12 d2+* 3f6-12 3d3>12 "
-                                 "6c2+ b2> d2< 3e2<12 d2< d6 6c2<15 a3- 6c2<51 e6";
+        std::string movesTillRoad = "a6 f6 d4 c4 d3 c3 d2 c5 c2 d5 e4 b5 e5 Ce3 f5 e3+ f4 f3 e3 b6 "
+                                     "Cb4 b2 b3 c4> b4+ c4 2b5> c6 3c5- c5 4c4> c4 c1 d5> d6 Sd5 f2 "
+                                     "f3+ b1 e2 a1 2e4- e4 3e3< e3 4d3- f3 d3 5d4< d5- f1 e2> e1 d1 "
+                                     "e2 2d4> d5 a2 d4 c3- c3 2f2< b3- a2> b1+ c5> b3 c5 d6- 2e5< d4+ "
+                                     "c5> Se5 5d5+ e5< 5d6>32 f5+ 3e6> Se6 4f6- e6> 2c2< b3- a2 5b2< "
+                                     "5d2<311 c5 6a2>132 c3- 3b2> 6c4-15 a3 3d5-12 d2+* 3f6-12 3d3>12 "
+                                     "6c2+ b2> d2< 3e2<12 d2< d6 6c2<15 a3- 6c2<51 e6";
 
-    for (const auto& move : split(movesTillRoad, ' '))
-        game.play(move);
+        for (const auto& move : split(movesTillRoad, ' '))
+            game.play(move);
 
-    pos = game.getPosition();
+        pos = game.getPosition();
 
-    auto checkResultTinueSixes = [&]() { return pos.checkResult(); };
-    runBenchmark(checkResultTinueSixes);
+        auto checkResultTinueSixes = [&]() { return pos.checkResult(); };
+        runBenchmark(checkResultTinueSixes);
 
-    auto evaluatePosTinueSixes = [&]() { return engine.evaluate(pos); };
-    runBenchmark(evaluatePosTinueSixes);
+        auto evaluatePosTinueSixes = [&]() { return engine.evaluate(pos); };
+        runBenchmark(evaluatePosTinueSixes);
 
-    auto hashTinueSixes = [&]() { return Hash<Position>{}(pos); };
-    runBenchmark(hashTinueSixes);
+        auto hashTinueSixes = [&]() { return Hash<Position>{}(pos); };
+        runBenchmark(hashTinueSixes);
 
-    auto generateMovesTinueSixes = [&]() { return pos.generateMoves(); };
-    runBenchmark(generateMovesTinueSixes);
+        auto generateMovesTinueSixes = [&]() { return pos.generateMoves(); };
+        runBenchmark(generateMovesTinueSixes);
 
-    auto randomPlace = Move(1, Stone::WhiteFlat); // a1 is occupado
-    auto copyAndPlayTinueSixes = [&]() { Position nextPosition(pos); nextPosition.play(randomPlace); return nextPosition; };
-    runBenchmark(copyAndPlayTinueSixes);
+        auto randomPlace = Move(1, Stone::WhiteFlat); // a1 is occupado
+        auto copyAndPlayTinueSixes = [&]() { Position nextPosition(pos); nextPosition.play(randomPlace); return nextPosition; };
+        runBenchmark(copyAndPlayTinueSixes);
 
-    auto endingMove = "6b2+1113";
-    game.play(endingMove);
+        auto endingMove = "6b2+1113";
+        game.play(endingMove);
 
-    pos = game.getPosition();
-    assert(pos.checkResult() == Result::WhiteRoad);
+        pos = game.getPosition();
+        assert(pos.checkResult() == Result::WhiteRoad);
 
-    auto checkResultRoadSixes = [&]() { return pos.checkResult(); };
-    runBenchmark(checkResultRoadSixes);
+        auto checkResultRoadSixes = [&]() { return pos.checkResult(); };
+        runBenchmark(checkResultRoadSixes);
 
-    auto evaluatePosRoadSixes = [&]() { return engine.evaluate(pos); };
-    runBenchmark(evaluatePosRoadSixes);
+        auto evaluatePosRoadSixes = [&]() { return engine.evaluate(pos); };
+        runBenchmark(evaluatePosRoadSixes);
 
-    auto hashRoadSixes = [&]() { return Hash<Position>{}(pos); };
-    runBenchmark(hashRoadSixes);
+        auto hashRoadSixes = [&]() { return Hash<Position>{}(pos); };
+        runBenchmark(hashRoadSixes);
 
-    // Doesn't make sense to generate moves or play a move when the game is over
+        // Doesn't make sense to generate moves or play a move when the game is over
+    };
 
     "Perft 6s Opening Bench"_test = []
     {

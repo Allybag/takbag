@@ -8,7 +8,7 @@
 static constexpr int winValue = 1000;
 static constexpr int infinity = 100001; // Not really infinity, but pretty high
 
-EvaluationWeights gDefaultEvaluationWeights = EvaluationWeights{8, 12, 9, 1, 1, 4};
+EvaluationWeights gDefaultEvaluationWeights = EvaluationWeights{8, 12, 9, 1, 1, 1, 4};
 
 template <>
 int Engine<>::evaluatePos(const Position& position)
@@ -44,7 +44,7 @@ int Engine<>::evaluatePos(const Position& position)
     }
 
     // This is just a constant offset to all scores, and so completely pointless. Still..
-    score -= mWeights.mFlatCountWeight * position.getKomi(); // A positive komi is points for black
+    score -= static_cast<int>(mWeights.mFlatCountWeight * position.getKomi()); // A positive komi is points for black
 
     // TODO: check if this is too slow to be worth it
     auto islandLengths = position.countIslands();
@@ -253,7 +253,7 @@ std::string Engine<>::chooseMove(const Position& position, double timeLimitSecon
     }
 
     timeLimitSeconds = std::max(0.001, timeLimitSeconds); // Need at least a millisecond
-    mStopSearchingTime = startTime + (timeLimitSeconds * micsInSecond);
+    mStopSearchingTime = startTime + static_cast<int64_t>(timeLimitSeconds * micsInSecond);
     mMaxDepth = maxDepth;
 
     auto move = deepeningSearch(position);

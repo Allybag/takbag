@@ -16,7 +16,7 @@ inline AlwaysInline void DoNotOptimizeAway(const T& value)
     asm volatile("" : : "r,m"(value) : "memory");
 }
 
-#define runBenchmark(func) benchmark(#func, func);
+#define runBenchmark(func) benchmark(#func, func)
 
 template <typename LambdaT>
 void benchmark(const std::string& name, LambdaT benchFunction, std::size_t runCount = 10'000'000)

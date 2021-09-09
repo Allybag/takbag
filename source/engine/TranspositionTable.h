@@ -19,8 +19,8 @@ enum ResultType : uint8_t
 struct TranspositionTableRecord
 {
     TranspositionTableRecord() : mHash(0), mMove(Move()), mScore(0), mDepth(0), mType(ResultType::Unknown) { }
-    TranspositionTableRecord(uint64_t mHash, const Move &mMove, int mScore, uint8_t mDepth, ResultType mType) :
-                             mHash( mHash), mMove(mMove), mScore(mScore), mDepth(mDepth), mType(mType) {}
+    TranspositionTableRecord(uint64_t hash, const Move& move, int score, uint8_t depth, ResultType type) :
+                             mHash(hash), mMove(move), mScore(score), mDepth(depth), mType(type) {}
 
     uint64_t mHash;
     Move mMove;
