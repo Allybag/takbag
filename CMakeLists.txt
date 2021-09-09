@@ -4,7 +4,7 @@ project(takbag)
 # Use C++20, with all warnings
 set(CMAKE_CXX_STANDARD 20)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang$")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything") # Enable everything all warnings, except for
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat -Wno-c++98-compat-pedantic") # Who cares about C++98?
@@ -19,6 +19,8 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     message("This project has never been tested using the Intel Compiler")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message("This project has never been tested using Microsoft Visual Studio")
+else ()
+    message("Unknown compiler ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
 if (APPLE)
@@ -28,6 +30,8 @@ elseif (UNIX AND NOT APPLE) # Linux
     set (LOW_MEMORY TRUE)
 elseif (WIN32)
     message("This project has never been tested on Windows")
+else()
+    message("Unknown system, anything could happen!")
 endif()
 
 # TODO: Look into LTO/IPO, and adding some flags like -march=native -fno-rtti -Ofast and so on
