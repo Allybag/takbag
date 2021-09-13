@@ -10,8 +10,7 @@ using OpeningTable = std::unordered_map<Position, MoveBuffer>;
 
 // We read a file containing openings
 // We populate our hash table with all the next moves for a given position
-
-
+// There is no real need for this to be efficient
 class OpeningBook
 {
     Logger mLogger{"Openings"};
@@ -19,7 +18,7 @@ class OpeningBook
 
 public:
     explicit OpeningBook(const std::string& openingBookFile);
-    bool contains(const Position& position) { return mOpeningTable.contains(position); }
-    MoveBuffer getResponses(const Position& position) { return mOpeningTable[position]; }
+    bool contains(const Position& position) const { return mOpeningTable.contains(position); }
+    MoveBuffer getResponses(const Position& position) const { return mOpeningTable.at(position); }
     OpeningBook() = default;
 };

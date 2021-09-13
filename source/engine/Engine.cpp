@@ -10,8 +10,10 @@ static constexpr int infinity = 100001; // Not really infinity, but pretty high
 
 EvaluationWeights gDefaultEvaluationWeights = EvaluationWeights{8, 12, 9, 1, 1, 1, 4};
 
-int Engine::evaluatePos(const Position& position)
+int evaluate(const Position& position)
 {
+    // TODO: Pretty dubious but this part is still up in the air
+    EvaluationWeights mWeights = gDefaultEvaluationWeights;
     int score = 0;
 
     auto reserveCounts = position.getReserveCount();
@@ -53,6 +55,8 @@ int Engine::evaluatePos(const Position& position)
     return score;
 }
 
+EvaluationFunction gDefaultEvaluator = &evaluate;
+
 int Engine::evaluateResult(Result result)
 {
     assert(result != Result::None);
@@ -72,7 +76,7 @@ int Engine::evaluate(const Position& position)
     if (result != Result::None)
         return evaluateResult(result);
 
-    return evaluatePos(position);
+    return mEvaluator(position);
 }
 
 Move Engine::chooseMoveFirst(const Position& position)
@@ -93,11 +97,14 @@ Move Engine::chooseMoveRandom(const Position& position)
 
 SearchResult Engine::negamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour)
 {
-    if constexpr(UseTranspositionTable)
+    ++mStats.mSeenNodes;
+
+    if (mUseTranspositionTable)
     {
         auto record = mTranspositionTable.fetch(position, depth);
         if (record)
         {
+            ++mStats.mTableHits;
             return {record->mMove, record->mScore};
         }
     }
@@ -105,17 +112,21 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
     auto result = position.checkResult();
     if (result != Result::None)
     {
-        ++mStats.mNodeCount;
+        ++mStats.mTerminalNodes;
 
         int score = evaluateResult(result);
+        if (mUseTranspositionTable)
+            mTranspositionTable.store(position, Move(), colour * score, depth);
         return SearchResult(colour * score * (depth + 1));
     }
 
     if (depth == 0)
     {
-        ++mStats.mNodeCount;
+        ++mStats.mEvaluatedNodes;
 
-        int score = evaluatePos(position);
+        int score = mEvaluator(position);
+        if (mUseTranspositionTable)
+            mTranspositionTable.store(position, Move(), colour * score, depth);
         return SearchResult(colour * score);
     }
 
@@ -126,25 +137,29 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
     auto topMoveIndex = mTopMoves.size() - depth;
     auto topMove = mTopMoves[topMoveIndex];
 
-    if (isSet(givenMove) || isSet(topMove))
+    if (mUseMoveOrdering)
     {
-        for (auto it = moves.begin(); it != moves.end(); ++it)
+        if (isSet(givenMove) || isSet(topMove))
         {
-            if (topMove == *it)
+            for (auto it = moves.begin(); it != moves.end(); ++it)
             {
-                mLogger << LogLevel::Debug << "Swapping top move " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
-                std::iter_swap(it, moves.begin() + 1);
-                break;
-            }
+                if (topMove == *it)
+                {
+                    mLogger << LogLevel::Debug << "Swapping top move " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
+                    std::iter_swap(it, moves.begin() + 1);
+                    break;
+                }
 
-            if (givenMove == *it)
-            {
-                mLogger << LogLevel::Debug << "Swapping given move " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
-                std::iter_swap(it, moves.begin());
-                break;
+                if (givenMove == *it)
+                {
+                    mLogger << LogLevel::Debug << "Swapping given move " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
+                    std::iter_swap(it, moves.begin());
+                    break;
+                }
             }
         }
     }
+
 
     for (auto &move : moves)
     {
@@ -152,6 +167,10 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
         nextPosition.play(move);
 
         auto score = negamax(nextPosition, Move(), depth - 1, beta * -1, alpha * -1, colour * -1);
+
+        std::string moveStr = moveToPtn(move, position.size());
+        mLogger << LogLevel::Debug << "Score: " << score.mScore << " after calling negamax: move: " << moveStr
+                << ", depth: " << depth << ", alpha: " << alpha << ", beta: " << beta << ", colour: " << colour << Flush;
         score.mScore *= -1;
 
         if (score.mScore > bestScore)
@@ -162,11 +181,17 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
         }
 
         alpha = std::max(alpha, score.mScore);
-        if (alpha >= beta)
-            break; // Alpha Beta Cutoff Kapow!
+        if (mUseAlphaBeta)
+        {
+            if (alpha >= beta)
+            {
+                 mLogger << LogLevel::Debug << "Alpha beta Cutoff Kapow!" << Flush;
+                break;
+            }
+        }
     }
 
-    if constexpr(UseTranspositionTable)
+    if (mUseTranspositionTable)
         mTranspositionTable.store(position, bestMove, bestScore, depth);
 
     return {bestMove, bestScore};
@@ -230,6 +255,7 @@ bool Engine::openingBookContains(const Position &position)
 
 std::string Engine::chooseMove(const Position& position, double timeLimitSeconds, int maxDepth)
 {
+    mStats.reset();
     auto startTime = timeInMics();
 
     Shift canonicalShift = position.getCanonicalShift();
@@ -251,9 +277,11 @@ std::string Engine::chooseMove(const Position& position, double timeLimitSeconds
 
     auto stopTime = timeInMics();
     auto duration = stopTime - startTime;
-    mLogger << LogLevel::Info << "Evaluated " << mStats.mNodeCount << " nodes in " << duration << " mics" << Flush;
+    mLogger << LogLevel::Info << "After " << duration << " mics: " << mStats << Flush;
 
-    mStats.reset();
+    auto tableEntries = mTranspositionTable.count();
+    mLogger << LogLevel::Info << "Table entries: " << tableEntries << Flush;
+
     mStopSearchingTime = 0;
     return moveToPtn(move, position.size());
 }

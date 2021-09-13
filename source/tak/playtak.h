@@ -40,7 +40,10 @@ void playtak(const OptionMap& options)
     else
         client.seek(gameConfig);
 
-    Engine engine = openingPath.empty() ? Engine() : Engine(openingPath);
+    EngineOptions engineOptions;
+    engineOptions.mOpeningBookPath = openingPath;
+    Engine engine(engineOptions);
+
     Game game(gameSize, komi);
     int colour = 0;
     int remainingTime = 0;

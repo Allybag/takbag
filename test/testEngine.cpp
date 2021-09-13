@@ -10,9 +10,51 @@
 #include "other/StringOps.h"
 #include "utility.h"
 
+int lastSquareEvaluate(const Position& pos)
+{
+    auto lastIndex = pos.size() * pos.size() - 1;
+    auto lastSquare = pos[lastIndex];
+
+    if (lastSquare.mCount == 0)
+        return 0;
+    else if (lastSquare.mTopStone & StoneBits::Black)
+        return -1;
+    else
+        return 1;
+}
+
 int main()
 {
     using namespace boost::ut;
+
+    "Test Basic Search"_test = []
+    {
+        // Set up a super vanilla, slow and simple engine config
+        EngineOptions options = EngineOptions();
+        options.mUseAlphaBeta = false;
+        options.mUseMoveOrdering = false;
+        options.mUseTranspositionTable = false;
+        options.mEvaluator = &lastSquareEvaluate;
+
+        Engine engine(options);
+        Game game(3);
+
+        expect(engine.evaluate(game.getPosition()) == 0);
+
+        // Play the opening swap moves, neither player should place the enemy in the only square that matters
+        expect(engine.chooseMove(game.getPosition(), 1, 1) != "c3");
+        game.play("a1");
+        expect(engine.evaluate(game.getPosition()) == 0);
+
+        expect(engine.chooseMove(game.getPosition(), 1, 1) != "c3");
+        game.play("a2");
+        expect(engine.evaluate(game.getPosition()) == 0);
+
+        // Let the engine play a move and score a point
+        game.play(engine.chooseMove(game.getPosition(), 1e6, 1));
+        expect(engine.evaluate(game.getPosition()) == 1);
+        expect(engine.getStats().mSeenNodes == 1 + 3 + 7 * 2); // Root move, 3 move moves, 7 flat/wall place moves
+    };
 
     "Test Negamax Search"_test = []
     {

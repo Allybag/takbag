@@ -34,7 +34,10 @@ int main()
     "Opening book"_test = []
     {
         Engine noOpeningEngine;
-        Engine engine("test/Openings.txt");
+
+        EngineOptions openingOptions;
+        openingOptions.mOpeningBookPath = "test/Openings.txt";
+        Engine engine(openingOptions);
 
         Game game(6);
         // f1 is not in the file, but an equivalent by symmetry position (a1) is
@@ -45,6 +48,5 @@ int main()
 
         game.play("c3");
         expect(!engine.openingBookContains(game.getPosition()));
-
     };
 }

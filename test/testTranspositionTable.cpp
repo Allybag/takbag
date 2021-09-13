@@ -15,11 +15,14 @@ int main()
 
     "Test Block Wins"_test = []
     {
-        Engine engine;
-        Game game(5);
+        EngineOptions options;
+        options.mUseTranspositionTable = true;
+
+        Engine engine(options);
+        Game game(4);
         const int searchDepth = 5;
 
-        std::string movesTillTinueStart = "b1 c1 c2 b2 c3 b3 d3 a3 d2 a2 d1 a1 b5 e1 c4";
+        std::string movesTillTinueStart = "b1 c1 c2 b2 d2 d4 d1 a1 b4 a2";
 
         for (const auto& move : split(movesTillTinueStart, ' '))
         {
@@ -29,7 +32,7 @@ int main()
         }
         std::cout << game.print() << std::endl;
 
-        const int moveCountTillTinue = 4;
+        const int moveCountTillTinue = 3;
         for (int i = 0; i < moveCountTillTinue + 1; ++i)
         {
             auto engineMove = engine.chooseMove(game.getPosition(), 1e9, moveCountTillTinue + 2 - i);

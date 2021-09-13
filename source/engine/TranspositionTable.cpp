@@ -24,3 +24,15 @@ void TranspositionTable::store(const Position& position, Move move, int score, u
 
     record = {hash, move, score, depth, ResultType::Unknown};
 }
+
+std::size_t TranspositionTable::count() const
+{
+    std::size_t entryCount = 0;
+    for (const auto& entry : *mTable)
+    {
+        if (entry.mHash != 0)
+            entryCount++;
+    }
+
+    return entryCount;
+}
