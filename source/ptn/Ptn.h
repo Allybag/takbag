@@ -1,7 +1,7 @@
 #pragma once
 
-#include "tak/Stone.h"
 #include "tak/Move.h"
+#include "tak/Stone.h"
 #include <string>
 
 struct PtnTurn
@@ -33,7 +33,8 @@ inline PtnTurn::PtnTurn(const std::string& sourceString) : mSourceString(sourceS
     // Spec is here: https://ustak.org/portable-tak-notation/
 
     // Simplest rule to check if place: ends in a number, and is 3 or fewer chars
-    mType = (std::isdigit(sourceString[sourceString.size() - 1]) && sourceString.size() <= 3) ? MoveType::Place : MoveType::Move;
+    mType = (std::isdigit(sourceString[sourceString.size() - 1]) && sourceString.size() <= 3) ? MoveType::Place
+                                                                                              : MoveType::Move;
 
     if (mType == MoveType::Place)
     {
@@ -49,17 +50,17 @@ inline PtnTurn::PtnTurn(const std::string& sourceString) : mSourceString(sourceS
         {
             switch (std::tolower(sourceString[0]))
             {
-                case 'c':
-                    stoneBits = stoneBits | StoneBits::Standing | StoneBits::Road;
-                    break;
-                case 'f':
-                    stoneBits = stoneBits | StoneBits::Road;
-                    break;
-                case 's':
-                    stoneBits = stoneBits | StoneBits::Standing;
-                    break;
-                default:
-                    assert(false);
+            case 'c':
+                stoneBits = stoneBits | StoneBits::Standing | StoneBits::Road;
+                break;
+            case 'f':
+                stoneBits = stoneBits | StoneBits::Road;
+                break;
+            case 's':
+                stoneBits = stoneBits | StoneBits::Standing;
+                break;
+            default:
+                assert(false);
             }
         }
         else

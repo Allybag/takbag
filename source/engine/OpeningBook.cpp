@@ -3,8 +3,8 @@
 #include "other/StringOps.h"
 #include "tak/Game.h"
 
-#include <fstream>
 #include <cassert>
+#include <fstream>
 
 std::size_t calcMoveIndex(uint8_t rowIndex, uint8_t colIndex, std::size_t boardSize)
 {
@@ -44,7 +44,8 @@ OpeningBook::OpeningBook(const std::string& openingBookFile)
             if (game.getPosition().isInOpeningSwap())
                 colour = (colour == Player::White ? Player::Black : Player::White);
 
-            auto stone = static_cast<Stone>(ptnTurn.mTopStone | (colour == Player::Black ? StoneBits::Black : StoneBits::Stone));
+            auto stone =
+                static_cast<Stone>(ptnTurn.mTopStone | (colour == Player::Black ? StoneBits::Black : StoneBits::Stone));
             Move canonicalResponse = Move(canonicalMoveIndex, stone);
 
             bool moveIsValid = false;

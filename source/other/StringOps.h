@@ -1,10 +1,11 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 
-inline std::string join(const std::vector<std::string>& tokens, char delimiter, std::size_t startIndex = 0, std::size_t endIndex = 0)
+inline std::string join(const std::vector<std::string>& tokens, char delimiter, std::size_t startIndex = 0,
+                        std::size_t endIndex = 0)
 {
     if (endIndex == 0)
         endIndex = tokens.size() - 1;
@@ -30,4 +31,3 @@ inline std::vector<std::string> split(const std::string& s, char delimiter)
     }
     return tokens;
 }
-

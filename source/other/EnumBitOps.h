@@ -21,16 +21,17 @@ inline constexpr auto operator&(LeftEnum lhs, RightEnum rhs) -> typename std::un
 
 // These are necessary for chaining operators, so that Bits::X | Bits::Y | Bits::Z = underType(X | Y) | Bits::Z works
 template <typename Enum>
-inline constexpr auto operator|(typename std::underlying_type<Enum>::type lhs, Enum rhs) -> typename std::underlying_type<Enum>::type
+inline constexpr auto operator|(typename std::underlying_type<Enum>::type lhs, Enum rhs) ->
+    typename std::underlying_type<Enum>::type
 {
     using underType = typename std::underlying_type<Enum>::type;
     return static_cast<underType>(lhs) | static_cast<underType>(rhs);
 }
 
 template <typename Enum>
-inline constexpr auto operator&(typename std::underlying_type<Enum>::type lhs, Enum rhs) -> typename std::underlying_type<Enum>::type
+inline constexpr auto operator&(typename std::underlying_type<Enum>::type lhs, Enum rhs) ->
+    typename std::underlying_type<Enum>::type
 {
     using underType = typename std::underlying_type<Enum>::type;
     return static_cast<underType>(lhs) & static_cast<underType>(rhs);
 }
-

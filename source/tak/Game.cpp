@@ -2,8 +2,8 @@
 
 #ifndef LOW_MEMORY_COMPILE
 #include "ptn/Generator.h"
-#include "ptn/Parser.h"
 #include "ptn/Lexer.h"
+#include "ptn/Parser.h"
 
 #include <fstream>
 #endif
@@ -20,7 +20,7 @@ void Game::play(const std::string& ptnString)
     ++mPly;
 }
 
-void Game::fillPtn(PtnTurn &ptn)
+void Game::fillPtn(PtnTurn& ptn)
 {
     // Only have to set two fields: mTopStone and mIsWallSmash
     StoneBits colour = StoneBits::Stone;
@@ -58,11 +58,13 @@ std::string Game::print() const
             std::cout << move.mSourceString << " ";
         std::cout << std::endl;
     }
-    
+
     return mPosition.print();
 }
 
-Game::Game(const PtnGame& ptnGame) : mPosition(ptnGame.mSize), mFirstPlayer(ptnGame.mFirstPlayer), mSecondPlayer(ptnGame.mSecondPlayer), mDate(ptnGame.mDate), mPtnResult(ptnGame.mPtnResult), mPly(1)
+Game::Game(const PtnGame& ptnGame)
+    : mPosition(ptnGame.mSize), mFirstPlayer(ptnGame.mFirstPlayer), mSecondPlayer(ptnGame.mSecondPlayer),
+      mDate(ptnGame.mDate), mPtnResult(ptnGame.mPtnResult), mPly(1)
 {
     for (const auto& ptnTurn : ptnGame.mTurnNodes)
     {
@@ -121,4 +123,3 @@ Game readGame(const std::string& ptnFilePath)
     return games.front();
 }
 #endif
-

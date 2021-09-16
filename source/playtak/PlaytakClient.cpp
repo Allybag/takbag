@@ -16,7 +16,6 @@ void PlaytakClient::ping()
         if (connected())
             send("PING");
     }
-
 }
 bool PlaytakClient::connect(const std::vector<std::string> loginDetails)
 {
@@ -51,7 +50,7 @@ bool PlaytakClient::connect(const std::vector<std::string> loginDetails)
     return true;
 }
 
-bool PlaytakClient::send(const std::string &data)
+bool PlaytakClient::send(const std::string& data)
 {
     // We lock because the logger is single threaded
     std::lock_guard lock(mSendLock);
@@ -84,7 +83,6 @@ void PlaytakClient::seek(const GameConfig& gameConfig, Colour colour, const std:
         seekRequest << opponent;
 
     send(seekRequest.str());
-
 }
 
 PlaytakMessage PlaytakClient::parseMessage(const std::string& message)
@@ -120,7 +118,8 @@ PlaytakMessage PlaytakClient::parseMessage(const std::string& message)
             auto serverMove = join(tokens, ' ', 1, 0);
             return PlaytakMessage(PlaytakMessageType::GameUpdate, serverToPtn(serverMove));
         }
-        else if (operation == "Over" || operation.starts_with("Abandoned")) // Technically different, but we treat them the same
+        else if (operation == "Over" ||
+                 operation.starts_with("Abandoned")) // Technically different, but we treat them the same
         {
             mActiveGameId = 0;
             return PlaytakMessage(PlaytakMessageType::GameOver);
@@ -187,4 +186,3 @@ void PlaytakClient::acceptSeek(std::size_t gameNum)
     data.append(std::to_string(gameNum));
     send(data);
 }
-

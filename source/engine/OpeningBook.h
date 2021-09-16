@@ -3,8 +3,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "tak/Position.h"
 #include "log/Logger.h"
+#include "tak/Position.h"
 
 using OpeningTable = std::unordered_map<Position, MoveBuffer>;
 
@@ -18,7 +18,13 @@ class OpeningBook
 
 public:
     explicit OpeningBook(const std::string& openingBookFile);
-    bool contains(const Position& position) const { return mOpeningTable.contains(position); }
-    MoveBuffer getResponses(const Position& position) const { return mOpeningTable.at(position); }
+    bool contains(const Position& position) const
+    {
+        return mOpeningTable.contains(position);
+    }
+    MoveBuffer getResponses(const Position& position) const
+    {
+        return mOpeningTable.at(position);
+    }
     OpeningBook() = default;
 };

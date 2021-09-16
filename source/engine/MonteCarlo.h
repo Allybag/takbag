@@ -1,15 +1,15 @@
 #pragma once
 
-#include "tak/Position.h"
 #include "Engine.h"
 #include "log/Logger.h"
 #include "other/Time.h"
+#include "tak/Position.h"
 #include "tak/RobinHoodHashes.h"
 
+#include <cstddef>
+#include <functional>
 #include <unordered_map>
 #include <vector>
-#include <functional>
-#include <cstddef>
 
 struct Node
 {
@@ -20,8 +20,12 @@ struct Node
 
     // Node(Position rootPosition) : mParent(nullptr), mPosition(rootPosition), mPlayCount(0), mWinCount(0) { }
     // Node(Node* parent, Position position) : mParent(parent), mPosition(position), mPlayCount(0), mWinCount(0) { }
-    Node() : mParent(nullptr), mPlayCount(0), mWinCount(0) { }
-    Node(Node* parent) : mParent(parent), mPlayCount(0), mWinCount(0) { }
+    Node() : mParent(nullptr), mPlayCount(0), mWinCount(0)
+    {
+    }
+    Node(Node* parent) : mParent(parent), mPlayCount(0), mWinCount(0)
+    {
+    }
 };
 
 bool resultIsAWin(Player colour, Result result)
@@ -159,13 +163,15 @@ Move monteCarloTreeSearch(const Position& position, int maxSeconds = 1, const Mo
 
         auto* node = nodes.at(nextPosition);
 
-        double bestNodeRatio = bestNode ? static_cast<double>(bestNode->mWinCount) / static_cast<double>(bestNode->mPlayCount) : 0.0;
+        double bestNodeRatio =
+            bestNode ? static_cast<double>(bestNode->mWinCount) / static_cast<double>(bestNode->mPlayCount) : 0.0;
         double nodeRatio = static_cast<double>(node->mWinCount) / static_cast<double>(node->mPlayCount);
 
         if (nodeRatio >= bestNodeRatio) // If this is the first move we've seen, pick it
         {
             std::string ptnMove = moveToPtn(move, position.size());
-            logger << LogLevel::Info << ptnMove << " is new best move, wins " << node->mWinCount << " out of " << node->mPlayCount << Flush;
+            logger << LogLevel::Info << ptnMove << " is new best move, wins " << node->mWinCount << " out of "
+                   << node->mPlayCount << Flush;
 
             bestMove = &move;
             bestNode = node;

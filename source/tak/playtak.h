@@ -1,13 +1,13 @@
 #pragma once
 
-#include "log/Logger.h"
-#include "playtak/PlaytakClient.h"
 #include "Game.h"
 #include "engine/Engine.h"
+#include "log/Logger.h"
+#include "playtak/PlaytakClient.h"
 
-#include <vector>
-#include <string>
 #include <cassert>
+#include <string>
+#include <vector>
 
 void playtak(const OptionMap& options)
 {
@@ -33,7 +33,7 @@ void playtak(const OptionMap& options)
     double komi = options.contains("komi") ? std::stod(options.at("komi")) : 2.5;
     assert(komi >= 0); // Playtak.com only allows positive komi
 
-    GameConfig gameConfig {gameSize, time, incr, static_cast<std::size_t>(komi * 2), flats, caps, false, false};
+    GameConfig gameConfig{gameSize, time, incr, static_cast<std::size_t>(komi * 2), flats, caps, false, false};
 
     if (seekNum != 0)
         client.acceptSeek(seekNum);
@@ -89,8 +89,6 @@ void playtak(const OptionMap& options)
                 logger << LogLevel::Info << "Game Over!" << Flush;
                 client.seek(gameConfig);
             }
-
         }
-
     }
 }

@@ -7,27 +7,27 @@ std::vector<PtnGame> Generator::generate(const std::vector<Node>& nodes, bool fl
     {
         switch (node.mType)
         {
-            case NodeType::TagNode:
-                if (mGameInProgress)
-                {
-                    games.push_back(generateGame());
-                }
-                mNodes.push_back(node);
-                break;
-            case NodeType::TurnNode:
-                if (!mGameInProgress)
-                {
-                    assert(node.mTurnNum == 1);
-                    mGameInProgress = true;
-                }
-                mNodes.push_back(node);
-                break;
-            case NodeType::ResultNode:
-                mNodes.push_back(node);
+        case NodeType::TagNode:
+            if (mGameInProgress)
+            {
                 games.push_back(generateGame());
-                break;
-            case NodeType::CommentNode:
-                break;
+            }
+            mNodes.push_back(node);
+            break;
+        case NodeType::TurnNode:
+            if (!mGameInProgress)
+            {
+                assert(node.mTurnNum == 1);
+                mGameInProgress = true;
+            }
+            mNodes.push_back(node);
+            break;
+        case NodeType::ResultNode:
+            mNodes.push_back(node);
+            games.push_back(generateGame());
+            break;
+        case NodeType::CommentNode:
+            break;
         }
     }
 

@@ -4,8 +4,9 @@
 #include "engine/Engine.h"
 
 #include <cstddef>
-#include <string>
 #include <iostream>
+#include <other/ArgParse.h>
+#include <string>
 
 void playCommandLine(const OptionMap& options)
 {

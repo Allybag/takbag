@@ -8,7 +8,7 @@
 class Generator
 {
     std::vector<Node> mNodes;
-    bool mGameInProgress {false};
+    bool mGameInProgress{false};
 
     PtnGame generateGame();
 

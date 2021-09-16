@@ -12,32 +12,70 @@ struct MoveBuffer
     std::size_t mSize;
     Move mMoves[gHighMoveCount];
 
-    MoveBuffer() : mSize(0) { std::memset(mMoves, 0, sizeof(Move) * gHighMoveCount); }
+    MoveBuffer() : mSize(0)
+    {
+        std::memset(mMoves, 0, sizeof(Move) * gHighMoveCount);
+    }
 
-    MoveBuffer(const MoveBuffer& other) { std::memcpy(this, &other, sizeof(MoveBuffer)); }
-    MoveBuffer(MoveBuffer&& other) noexcept { std::memcpy(this, &other, sizeof(MoveBuffer)); }
-    MoveBuffer& operator=(const MoveBuffer& other) noexcept { std::memcpy(this, &other, sizeof(MoveBuffer)); return *this; }
-    MoveBuffer& operator=(MoveBuffer&& other ) { std::memcpy(this, &other, sizeof(MoveBuffer)); return *this; }
+    MoveBuffer(const MoveBuffer& other)
+    {
+        std::memcpy(this, &other, sizeof(MoveBuffer));
+    }
+    MoveBuffer(MoveBuffer&& other) noexcept
+    {
+        std::memcpy(this, &other, sizeof(MoveBuffer));
+    }
+    MoveBuffer& operator=(const MoveBuffer& other) noexcept
+    {
+        std::memcpy(this, &other, sizeof(MoveBuffer));
+        return *this;
+    }
+    MoveBuffer& operator=(MoveBuffer&& other)
+    {
+        std::memcpy(this, &other, sizeof(MoveBuffer));
+        return *this;
+    }
     ~MoveBuffer() = default;
 
     // Give us iterability
-    const Move* begin() const { return &mMoves[0]; }
-    const Move* end() const  { return &mMoves[mSize]; }
+    const Move* begin() const
+    {
+        return &mMoves[0];
+    }
+    const Move* end() const
+    {
+        return &mMoves[mSize];
+    }
     using iterator = Move*;
     using const_iterator = const Move*;
-    void reserve(std::size_t) { } // Matching vector's interface
+    void reserve(std::size_t)
+    {
+    } // Matching vector's interface
 
-    std::size_t size() const { return mSize; }
-    bool empty() const { return mSize == 0; }
+    std::size_t size() const
+    {
+        return mSize;
+    }
+    bool empty() const
+    {
+        return mSize == 0;
+    }
 
-    void clear() { mSize = 0; }
+    void clear()
+    {
+        mSize = 0;
+    }
 
-    Move front() const {
+    Move front() const
+    {
         assert(mSize > 0);
         return mMoves[0];
     }
 
-    void inc() { ++mSize; }
+    void inc()
+    {
+        ++mSize;
+    }
 
     void push_back(Move move)
     {

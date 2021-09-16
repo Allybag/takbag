@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cassert>
 #include <cstdint>
 #include <string>
-#include <cassert>
 
 enum class LogLevel : uint8_t
 {
@@ -19,23 +19,22 @@ inline std::string logLevelToStr(LogLevel logLevel)
 {
     switch (logLevel)
     {
-        case LogLevel::Always:
-            return "ALWAYS";
-        case LogLevel::Warn:
-            return "WARN";
-        case LogLevel::Error:
-            return "ERROR";
-        case LogLevel::Info:
-            return "INFO";
-        case LogLevel::Debug:
-            return "DEBUG";
-        case LogLevel::Trace:
-            return "TRACE";
-        case LogLevel::Unset:
-            return "UNSET";
+    case LogLevel::Always:
+        return "ALWAYS";
+    case LogLevel::Warn:
+        return "WARN";
+    case LogLevel::Error:
+        return "ERROR";
+    case LogLevel::Info:
+        return "INFO";
+    case LogLevel::Debug:
+        return "DEBUG";
+    case LogLevel::Trace:
+        return "TRACE";
+    case LogLevel::Unset:
+        return "UNSET";
     }
 
     assert(false);
     return "";
 }
-

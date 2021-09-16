@@ -39,7 +39,6 @@ class Parser
     void parseComment(const std::vector<Token>& tokens);
     void parsePly(const std::vector<Token>& tokens);
 
-
     // std::vector<PtnGame> mGames;
     std::vector<Token> mRemainingTokens;
     std::vector<Node> mParsedNodes;
@@ -48,5 +47,8 @@ class Parser
 public:
     std::vector<Node> parse(const std::vector<Token>& tokens);
     std::vector<Node> flush();
-    const std::vector<Node>& getNodes() { return mParsedNodes; }
+    const std::vector<Node>& getNodes()
+    {
+        return mParsedNodes;
+    }
 };

@@ -3,13 +3,15 @@
 #include "RootLogger.h"
 
 #include <cstdint>
-#include <utility>
 #include <sstream>
+#include <utility>
 
 struct WriteMessage
 {
     std::string mFuncName;
-    explicit WriteMessage(std::string funcName) : mFuncName(std::move(funcName)) { }
+    explicit WriteMessage(std::string funcName) : mFuncName(std::move(funcName))
+    {
+    }
 };
 
 #define Flush WriteMessage(__func__)
@@ -23,44 +25,48 @@ class Logger
     LogLevel mActiveLevel;
     std::stringstream mActiveStream;
 
-    bool shouldLog() { return (mActiveLevel == LogLevel::Always || mActiveLevel <= mLogLevel); }
+    bool shouldLog()
+    {
+        return (mActiveLevel == LogLevel::Always || mActiveLevel <= mLogLevel);
+    }
 
 public:
-    explicit Logger(std::string name) : Logger(std::move(name), rootLogger.getGlobalLogLevel()) { }
-    Logger(std::string name, LogLevel logLevel) : mName(std::move(name)), mLogLevel(logLevel), mActiveLevel(LogLevel::Unset) { }
+    explicit Logger(std::string name) : Logger(std::move(name), rootLogger.getGlobalLogLevel())
+    {
+    }
+    Logger(std::string name, LogLevel logLevel)
+        : mName(std::move(name)), mLogLevel(logLevel), mActiveLevel(LogLevel::Unset)
+    {
+    }
 
-    template <typename InputT>
-    inline Logger& operator<<(const InputT& input);
+    template <typename InputT> inline Logger& operator<<(const InputT& input);
 };
 
-template <typename InputT>
-inline Logger& Logger::operator<<(const InputT& input)
+template <typename InputT> inline Logger& Logger::operator<<(const InputT& input)
 {
-	assert(mActiveLevel != LogLevel::Unset);
-	if (shouldLog())
-		mActiveStream << input;
-	return *this;
+    assert(mActiveLevel != LogLevel::Unset);
+    if (shouldLog())
+        mActiveStream << input;
+    return *this;
 }
 
-template <>
-inline Logger& Logger::operator<<(const LogLevel& logLevel)
+template <> inline Logger& Logger::operator<<(const LogLevel& logLevel)
 {
-	assert(mActiveLevel == LogLevel::Unset);
-	mActiveLevel = logLevel;
-	return *this;
+    assert(mActiveLevel == LogLevel::Unset);
+    mActiveLevel = logLevel;
+    return *this;
 }
 
-template <>
-inline Logger& Logger::operator<<(const WriteMessage& flushMessage)
+template <> inline Logger& Logger::operator<<(const WriteMessage& flushMessage)
 {
-	assert(mActiveLevel != LogLevel::Unset);
+    assert(mActiveLevel != LogLevel::Unset);
 
-	// rootLogger is declared in RootLogger.h and defined in RootLogger.cpp
-	if (shouldLog())
-		rootLogger.log(mActiveLevel, mActiveStream.str(), flushMessage.mFuncName, mName);
+    // rootLogger is declared in RootLogger.h and defined in RootLogger.cpp
+    if (shouldLog())
+        rootLogger.log(mActiveLevel, mActiveStream.str(), flushMessage.mFuncName, mName);
 
-	std::stringstream emptyStream;
-	std::swap(mActiveStream, emptyStream);
-	mActiveLevel = LogLevel::Unset;
-	return *this;
+    std::stringstream emptyStream;
+    std::swap(mActiveStream, emptyStream);
+    mActiveLevel = LogLevel::Unset;
+    return *this;
 }

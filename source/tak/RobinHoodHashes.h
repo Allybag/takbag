@@ -1,15 +1,13 @@
 #pragma once
 
-#include "Square.h"
 #include "../../external/robin_hood.h"
+#include "Square.h"
 
-template <typename T>
-struct Hash
+template <typename T> struct Hash
 {
 };
 
-template<>
-struct Hash<Square>
+template <> struct Hash<Square>
 {
     std::size_t operator()(const Square& square) const noexcept
     {
@@ -20,8 +18,7 @@ struct Hash<Square>
     }
 };
 
-template <>
-struct Hash<Position>
+template <> struct Hash<Position>
 {
     std::size_t operator()(const Position& pos) const
     {

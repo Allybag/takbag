@@ -1,6 +1,6 @@
 #include "Engine.h"
-#include "tak/Position.h"
 #include "other/Time.h"
+#include "tak/Position.h"
 
 #include <algorithm>
 #include <optional>
@@ -49,7 +49,8 @@ int evaluate(const Position& position)
 
     // TODO: check if this is too slow to be worth it
     auto islandLengths = position.countIslands();
-    score += islandLengths[Player::White] * mWeights.mIslandLengthsWeight; // We want our pieces as connected as possible
+    score +=
+        islandLengths[Player::White] * mWeights.mIslandLengthsWeight; // We want our pieces as connected as possible
     score -= islandLengths[Player::Black] * mWeights.mIslandLengthsWeight;
 
     return score;
@@ -95,7 +96,7 @@ Move Engine::chooseMoveRandom(const Position& position)
     return *randomMove;
 }
 
-SearchResult Engine::negamax(const Position &position, Move givenMove, int depth, int alpha, int beta, int colour)
+SearchResult Engine::negamax(const Position& position, Move givenMove, int depth, int alpha, int beta, int colour)
 {
     ++mStats.mSeenNodes;
 
@@ -130,7 +131,6 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
         return SearchResult(colour * score);
     }
 
-
     Move bestMove = Move();
     int bestScore = -infinity;
     auto moves = position.generateMoves();
@@ -145,14 +145,16 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
             {
                 if (topMove == *it)
                 {
-                    mLogger << LogLevel::Debug << "Swapping top move " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
+                    mLogger << LogLevel::Debug << "Swapping top move " << moveToPtn(givenMove, position.size())
+                            << " to front" << Flush;
                     std::iter_swap(it, moves.begin() + 1);
                     break;
                 }
 
                 if (givenMove == *it)
                 {
-                    mLogger << LogLevel::Debug << "Swapping given move " << moveToPtn(givenMove, position.size()) << " to front" << Flush;
+                    mLogger << LogLevel::Debug << "Swapping given move " << moveToPtn(givenMove, position.size())
+                            << " to front" << Flush;
                     std::iter_swap(it, moves.begin());
                     break;
                 }
@@ -160,8 +162,7 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
         }
     }
 
-
-    for (auto &move : moves)
+    for (auto& move : moves)
     {
         Position nextPosition(position);
         nextPosition.play(move);
@@ -170,7 +171,8 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
 
         std::string moveStr = moveToPtn(move, position.size());
         mLogger << LogLevel::Debug << "Score: " << score.mScore << " after calling negamax: move: " << moveStr
-                << ", depth: " << depth << ", alpha: " << alpha << ", beta: " << beta << ", colour: " << colour << Flush;
+                << ", depth: " << depth << ", alpha: " << alpha << ", beta: " << beta << ", colour: " << colour
+                << Flush;
         score.mScore *= -1;
 
         if (score.mScore > bestScore)
@@ -185,7 +187,7 @@ SearchResult Engine::negamax(const Position &position, Move givenMove, int depth
         {
             if (alpha >= beta)
             {
-                 mLogger << LogLevel::Debug << "Alpha beta Cutoff Kapow!" << Flush;
+                mLogger << LogLevel::Debug << "Alpha beta Cutoff Kapow!" << Flush;
                 break;
             }
         }
@@ -215,15 +217,16 @@ Move Engine::deepeningSearch(const Position& position)
         auto searchStop = timeInMics();
 
         move = searchResult.mMove;
-        mLogger << LogLevel::Info << "Best move " << moveToPtn(move, position.size())
-                << " with score " << searchResult.mScore  << " at depth " << depth << Flush;
+        mLogger << LogLevel::Info << "Best move " << moveToPtn(move, position.size()) << " with score "
+                << searchResult.mScore << " at depth " << depth << Flush;
 
         auto searchDuration = searchStop - searchStart;
         auto searchIncreaseFactor = lastSearchDuration ? searchDuration / lastSearchDuration : 1;
         lastSearchDuration = searchDuration;
         searchStart = searchStop;
         mLogger << LogLevel::Info << "Search took " << searchDuration << " mics" << Flush;
-        mLogger << LogLevel::Info << "Estimated next search duration: " << searchDuration * searchIncreaseFactor << Flush;
+        mLogger << LogLevel::Info << "Estimated next search duration: " << searchDuration * searchIncreaseFactor
+                << Flush;
 
         if (searchStop + searchDuration * searchIncreaseFactor > mStopSearchingTime)
             break;
@@ -243,10 +246,9 @@ Move Engine::deepeningSearch(const Position& position)
     }
 
     return move;
-
 }
 
-bool Engine::openingBookContains(const Position &position)
+bool Engine::openingBookContains(const Position& position)
 {
     Shift canonicalShift = position.getCanonicalShift();
     Position canonicalPosition = position.shift(canonicalShift);
@@ -285,4 +287,3 @@ std::string Engine::chooseMove(const Position& position, double timeLimitSeconds
     mStopSearchingTime = 0;
     return moveToPtn(move, position.size());
 }
-

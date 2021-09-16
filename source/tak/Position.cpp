@@ -2,15 +2,15 @@
 
 #include "DropCountGenerator.h"
 
-#include <sstream>
-#include <cassert>
 #include <bit>
+#include <cassert>
+#include <sstream>
 
 static constexpr std::size_t gHighMoveCount = 1024;
 
-Position::Position(std::size_t size, double komi) : mFlatReserves(PlayerPair{pieceCounts[size].first}),
-                                                    mCapReserves(PlayerPair{pieceCounts[size].second}),
-                                                    mSize(size), mSwaps(2), mToPlay(Player::White)
+Position::Position(std::size_t size, double komi)
+    : mFlatReserves(PlayerPair{pieceCounts[size].first}), mCapReserves(PlayerPair{pieceCounts[size].second}),
+      mSize(size), mSwaps(2), mToPlay(Player::White)
 {
     mKomi = static_cast<int8_t>(komi * 2);
 
@@ -21,7 +21,8 @@ Position::Position(std::size_t size, double komi) : mFlatReserves(PlayerPair{pie
         initDropCountMap();
 }
 
-void Position::initDropCountMap() {
+void Position::initDropCountMap()
+{
     // 1 1 false 1 1 true ... 1 8 false 1 8 true 2 1 false
     for (size_t handSize = 1; handSize <= 8; ++handSize)
         for (size_t maxDistance = 1; maxDistance <= 8; ++maxDistance)
@@ -32,7 +33,8 @@ void Position::initDropCountMap() {
             }
 }
 
-void Position::initNeighbourMap() {
+void Position::initNeighbourMap()
+{
     mNeighbourMap.clear();
     for (size_t index = 0; index < mSize * mSize; ++index)
     {
@@ -64,7 +66,7 @@ std::string Position::print() const
     {
         std::size_t remainingFlats = mFlatReserves[side];
         std::size_t remainingCaps = mCapReserves[side];
-        output << side << " has " << remainingFlats << " flat" <<  (remainingFlats == 1 ? "" : "s");
+        output << side << " has " << remainingFlats << " flat" << (remainingFlats == 1 ? "" : "s");
         output << " and " << remainingCaps << " cap" << (remainingCaps == 1 ? "" : "s") << " remaining\n";
     }
 
@@ -113,7 +115,7 @@ void Position::place(const Move& place)
     togglePlayer();
 }
 
-void Position::move(const Move &move)
+void Position::move(const Move& move)
 {
     assert(move.mIndex < mSize * mSize);
     assert(move.mCount <= mSize);
@@ -133,8 +135,7 @@ void Position::move(const Move &move)
     Square hand = Square(source, move.mCount); // Removes mCount flats from source
 
     uint8_t nextIndex = move.mIndex;
-    auto dropStone = [&](uint8_t dropCount)
-    {
+    auto dropStone = [&](uint8_t dropCount) {
         nextIndex += offset;
 
         assert(nextIndex < mSize * mSize);
@@ -149,10 +150,11 @@ void Position::move(const Move &move)
     togglePlayer();
 }
 
-void Position::play(const PtnTurn &ptn)
+void Position::play(const PtnTurn& ptn)
 {
     std::size_t index = axisToIndex(ptn.mCol, ptn.mRank, mSize);
-    auto chosenMove = (ptn.mType == MoveType::Place) ? Move(index, ptn.mTopStone) : Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection);
+    auto chosenMove = (ptn.mType == MoveType::Place) ? Move(index, ptn.mTopStone)
+                                                     : Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection);
     play(chosenMove);
 }
 
@@ -166,18 +168,19 @@ void Position::play(const Move& chosenMove)
 
 int Position::getOffset(Direction direction) const
 {
-    switch (direction) {
-        case Direction::Up:
-            return mSize;
-        case Direction::Down:
-            return -1 * mSize;
-        case Direction::Left:
-            return -1;
-        case Direction::Right:
-            return 1;
-        case Direction::None:
-            assert(false);
-            return 0;
+    switch (direction)
+    {
+    case Direction::Up:
+        return mSize;
+    case Direction::Down:
+        return -1 * mSize;
+    case Direction::Left:
+        return -1;
+    case Direction::Right:
+        return 1;
+    case Direction::None:
+        assert(false);
+        return 0;
     }
 }
 
@@ -191,7 +194,6 @@ MoveBuffer Position::generateMoves() const
         generateOpeningMoves(moves);
         return moves;
     }
-
 
     for (int index = 0; index < mSize * mSize; ++index)
     {
@@ -215,7 +217,6 @@ MoveBuffer Position::generateMoves() const
     return moves;
 }
 
-
 void Position::addPlaceMoves(std::size_t index, MoveBuffer& moves) const
 {
     StoneBits colour = (mToPlay == Player::Black) ? StoneBits::Black : StoneBits::Stone;
@@ -231,7 +232,6 @@ void Position::addPlaceMoves(std::size_t index, MoveBuffer& moves) const
         moves.emplace_back(index, static_cast<Stone>(Stone::WhiteWall | colour));
     }
 }
-
 
 void Position::addMoveMoves(std::size_t index, MoveBuffer& moves) const
 {
@@ -283,32 +283,30 @@ uint8_t Position::calcMaxDistance(size_t index, uint8_t maxHandSize, bool isCapS
     return furthestPossibleDistance;
 }
 
-uint8_t Position::calcDistanceTillEdge(size_t index, const Direction &direction) const {
-    switch (direction) {
-        case Direction::Up:
-        {
-            auto row = index / mSize;
-            return (mSize - 1) - row;
-        }
-        case Direction::Down:
-        {
-            auto row = index / mSize;
-            return row;
-        }
-        case Direction::Left:
-        {
-            auto col = index % mSize;
-            return col;
-        }
-        case Direction::Right:
-        {
-            auto col = index % mSize;
-            return (mSize - 1) - col;
-        }
+uint8_t Position::calcDistanceTillEdge(size_t index, const Direction& direction) const
+{
+    switch (direction)
+    {
+    case Direction::Up: {
+        auto row = index / mSize;
+        return (mSize - 1) - row;
+    }
+    case Direction::Down: {
+        auto row = index / mSize;
+        return row;
+    }
+    case Direction::Left: {
+        auto col = index % mSize;
+        return col;
+    }
+    case Direction::Right: {
+        auto col = index % mSize;
+        return (mSize - 1) - col;
+    }
 
-        case Direction::None:
-            assert(false);
-            return 0UL;
+    case Direction::None:
+        assert(false);
+        return 0UL;
     }
 }
 
@@ -334,7 +332,6 @@ std::vector<uint32_t> Position::generateDropCounts(std::size_t handSize, std::si
     DropCountGenerator generator(handSize, maxDistance, endsInSmash);
     generator.generateDropCounts(0, 0, 0, dropCountVec);
     return dropCountVec;
-
 }
 
 // TODO: This shouldn't be a copy past of the checkRoadWin below
@@ -394,12 +391,11 @@ PlayerPair<std::size_t> Position::countIslands() const
                     if (isWall(neighbourStone))
                         continue; // Wall
 
-                    children |= ( 1LL << neighbour);
+                    children |= (1LL << neighbour);
                 }
             }
             parents = children;
         }
-
 
         // We find the "length" of the island by taking max(height, width) of the island
         int islandLength = std::max(northRank - southRank, eastCol - westCol);
@@ -411,7 +407,8 @@ PlayerPair<std::size_t> Position::countIslands() const
     return islandCounts;
 };
 
-Result Position::checkRoadWin() const {
+Result Position::checkRoadWin() const
+{
     // Plan: We iterate through the board, creating "islands"
     // We then look at each island, and check if it connects two sides
     Result result = Result::None;
@@ -443,9 +440,9 @@ Result Position::checkRoadWin() const {
     return result;
 }
 
-uint64_t Position::findIsland(size_t index, uint64_t &squareInIsland) const
+uint64_t Position::findIsland(size_t index, uint64_t& squareInIsland) const
 {
-    uint64_t island = 0;// We do a breadth first search
+    uint64_t island = 0; // We do a breadth first search
 
     uint8_t colour = mBoard[index].mTopStone & StoneBits::Black;
     uint64_t parents = 0;
@@ -473,7 +470,7 @@ uint64_t Position::findIsland(size_t index, uint64_t &squareInIsland) const
                 if (isWall(neighbourStone))
                     continue; // Wall
 
-                children |= ( 1LL << neighbour);
+                children |= (1LL << neighbour);
             }
         }
         parents = children;
@@ -514,7 +511,6 @@ bool Position::checkBoardFilled() const
 
     return true;
 }
-
 
 Result Position::checkResult() const
 {

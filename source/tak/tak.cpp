@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "other/ArgParse.h"
-#include "tei.h"
 #include "cmdLine.h"
-#include "playtak.h"
 #include "log/Logger.h"
+#include "other/ArgParse.h"
+#include "playtak.h"
+#include "tei.h"
 
 int main(int argc, const char* argv[])
 {
@@ -28,9 +28,7 @@ int main(int argc, const char* argv[])
         tei(options); // Make this the default just so people can run with TEI without passing any arguments
 
     // for (const auto [key, value] : options)
-        // std::cout << "Option: " << key << " , Value: " << value << std::endl;
+    // std::cout << "Option: " << key << " , Value: " << value << std::endl;
 
     return 0;
 }
-
-

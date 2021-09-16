@@ -5,20 +5,24 @@
 #include "ctre.hpp"
 #pragma clang diagnostic pop
 
-static constexpr auto cPattern = ctll::fixed_string{"\\s*(\\[)" // TagOpen
-                                                    "|(\\])" // TagClose
-                                                    "|\\s*([1-9]\\d*)\\.\\s" // PlyNum
-                                                    "|\\s*([CSF]?[a-h][1-8]['!?]*)[\\s\x00]" // PlaceMove
-                                                    "|\\s*([1-8]?[a-h][1-8][+-<>][1-8]*[CSF]?\\*?['!?]*)[\\s\x00]" // MoveMove
-                                                    // "|\\s*([RF10](?:/2-1/2)|(?:-[RF10]))" // Result
-                                                    "|\\s*((?:(?:1/2-1/2)|(?:[RF10]-[RF10])))" // Result
-                                                    "|\"(.*)\"" //TagData
-                                                    "|(\\w+)\\s" // TagKey
-                                                    "|\\s*\\{(.*?)\\}"}; // Comment
+static constexpr auto cPattern =
+    ctll::fixed_string{"\\s*(\\[)"                                                    // TagOpen
+                       "|(\\])"                                                       // TagClose
+                       "|\\s*([1-9]\\d*)\\.\\s"                                       // PlyNum
+                       "|\\s*([CSF]?[a-h][1-8]['!?]*)[\\s\x00]"                       // PlaceMove
+                       "|\\s*([1-8]?[a-h][1-8][+-<>][1-8]*[CSF]?\\*?['!?]*)[\\s\x00]" // MoveMove
+                       // "|\\s*([RF10](?:/2-1/2)|(?:-[RF10]))" // Result
+                       "|\\s*((?:(?:1/2-1/2)|(?:[RF10]-[RF10])))" // Result
+                       "|\"(.*)\""                                // TagData
+                       "|(\\w+)\\s"                               // TagKey
+                       "|\\s*\\{(.*?)\\}"};                       // Comment
 
 std::optional<Token> Lexer::match(std::string_view v) noexcept
 {
-    if (auto [match, tagOpen, tagClose, plyNum, placeMove, moveMove, gameResult, tagData, tagKey, comment] = ctre::match<cPattern>(v); match) {
+    if (auto [match, tagOpen, tagClose, plyNum, placeMove, moveMove, gameResult, tagData, tagKey, comment] =
+            ctre::match<cPattern>(v);
+        match)
+    {
         if (tagOpen)
             return Token{TokenType::TagOpen, std::string(tagOpen)};
         else if (tagClose)
@@ -70,4 +74,3 @@ std::vector<Token> Lexer::tokenise(const std::string& stringBuffer)
 
     return items;
 }
-

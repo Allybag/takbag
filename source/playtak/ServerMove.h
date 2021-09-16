@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include "other/StringOps.h"
+#include <string>
 #include <vector>
 
 std::string ptnToServer(const std::string& ptn)
@@ -29,20 +29,20 @@ std::string ptnToServer(const std::string& ptn)
 
         switch (direction)
         {
-            case '+':
-                file += dropCounts.size();
-                break;
-            case '-':
-                file -= dropCounts.size();
-                break;
-            case '>':
-                rank += dropCounts.size();
-                break;
-            case '<':
-                rank -= dropCounts.size();
-                break;
-            default:
-                assert(false);
+        case '+':
+            file += dropCounts.size();
+            break;
+        case '-':
+            file -= dropCounts.size();
+            break;
+        case '>':
+            rank += dropCounts.size();
+            break;
+        case '<':
+            rank -= dropCounts.size();
+            break;
+        default:
+            assert(false);
         }
 
         std::string destinationSquare;
@@ -141,7 +141,6 @@ std::string serverToPtn(const std::string& serverMove)
         auto square = tokens[1];
         ptn.push_back(std::tolower(square[0]));
         ptn.push_back(square[1]);
-
     }
     return ptn;
 }

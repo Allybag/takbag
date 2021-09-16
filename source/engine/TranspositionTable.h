@@ -5,8 +5,8 @@
 #include "tak/Position.h"
 #include "tak/RobinHoodHashes.h"
 
-#include <unordered_map>
 #include <optional>
+#include <unordered_map>
 
 enum ResultType : uint8_t
 {
@@ -18,9 +18,13 @@ enum ResultType : uint8_t
 
 struct TranspositionTableRecord
 {
-    TranspositionTableRecord() : mHash(0), mMove(Move()), mScore(0), mDepth(0), mType(ResultType::Unknown) { }
-    TranspositionTableRecord(uint64_t hash, const Move& move, int score, uint8_t depth, ResultType type) :
-                             mHash(hash), mMove(move), mScore(score), mDepth(depth), mType(type) {}
+    TranspositionTableRecord() : mHash(0), mMove(Move()), mScore(0), mDepth(0), mType(ResultType::Unknown)
+    {
+    }
+    TranspositionTableRecord(uint64_t hash, const Move& move, int score, uint8_t depth, ResultType type)
+        : mHash(hash), mMove(move), mScore(score), mDepth(depth), mType(type)
+    {
+    }
 
     uint64_t mHash;
     Move mMove;
@@ -28,7 +32,6 @@ struct TranspositionTableRecord
     uint8_t mDepth;
     ResultType mType;
 };
-
 
 class TranspositionTable
 {
@@ -41,12 +44,12 @@ class TranspositionTable
 public:
     TranspositionTable()
     {
-        mTable = new TableT {};
+        mTable = new TableT{};
     }
 
     ~TranspositionTable()
     {
-        delete(mTable);
+        delete mTable;
     }
 
 public:

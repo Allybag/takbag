@@ -2,11 +2,11 @@
 
 #include "other/StringOps.h"
 
-#include <vector>
+#include <cassert>
+#include <cstdint>
 #include <string>
 #include <unordered_map>
-#include <cstdint>
-#include <cassert>
+#include <vector>
 
 using OptionMap = std::unordered_map<std::string, std::string>;
 

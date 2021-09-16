@@ -1,12 +1,11 @@
 #pragma once
 
-#include "tak/Result.h"
 #include "Node.h"
+#include "tak/Result.h"
 
-#include <vector>
-#include <string>
 #include <cstddef>
-
+#include <string>
+#include <vector>
 
 struct PtnGame
 {
@@ -28,29 +27,28 @@ inline void PtnGame::addNode(const Node& node)
 {
     switch (node.mType)
     {
-        case NodeType::TagNode:
-            if (node.mFirstToken.mValue == "Size") // Ignoring all other tags atm
-                mSize = std::stoi(node.mSecondToken.mValue);
-            else if (node.mFirstToken.mValue == "Player1")
-                mFirstPlayer = node.mSecondToken.mValue;
-            else if (node.mFirstToken.mValue == "Player2")
-                mSecondPlayer = node.mSecondToken.mValue;
-            else if (node.mFirstToken.mValue == "Date")
-                mDate = node.mSecondToken.mValue;
-            else if (node.mFirstToken.mValue == "Result")
-                mPtnResult = node.mResult;
-            break;
-        case NodeType::TurnNode:
-            assert(node.mTurnNum == mTurnNum + 1);
-            mTurnNum = node.mTurnNum;
-            mTurnNodes.push_back(node);
-            break;
-        case NodeType::ResultNode:
-            assert(mPtnResult == Result::None || mPtnResult == node.mResult);
+    case NodeType::TagNode:
+        if (node.mFirstToken.mValue == "Size") // Ignoring all other tags atm
+            mSize = std::stoi(node.mSecondToken.mValue);
+        else if (node.mFirstToken.mValue == "Player1")
+            mFirstPlayer = node.mSecondToken.mValue;
+        else if (node.mFirstToken.mValue == "Player2")
+            mSecondPlayer = node.mSecondToken.mValue;
+        else if (node.mFirstToken.mValue == "Date")
+            mDate = node.mSecondToken.mValue;
+        else if (node.mFirstToken.mValue == "Result")
             mPtnResult = node.mResult;
-            break;
-        case NodeType::CommentNode:
-            break;
+        break;
+    case NodeType::TurnNode:
+        assert(node.mTurnNum == mTurnNum + 1);
+        mTurnNum = node.mTurnNum;
+        mTurnNodes.push_back(node);
+        break;
+    case NodeType::ResultNode:
+        assert(mPtnResult == Result::None || mPtnResult == node.mResult);
+        mPtnResult = node.mResult;
+        break;
+    case NodeType::CommentNode:
+        break;
     }
 }
-

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cassert>
 #include <cstdint>
 #include <iostream>
-#include <cassert>
 
 enum class Direction : uint8_t
 {
@@ -19,21 +19,21 @@ inline std::ostream& operator<<(std::ostream& stream, const Direction& dir)
 {
     switch (dir)
     {
-        case Direction::Up:
-            stream << "Up";
-            break;
-        case Direction::Down:
-            stream << "Down";
-            break;
-        case Direction::Left:
-            stream << "Left";
-            break;
-        case Direction::Right:
-            stream << "Right";
-            break;
-        case Direction::None:
-            assert(false);
-            break;
+    case Direction::Up:
+        stream << "Up";
+        break;
+    case Direction::Down:
+        stream << "Down";
+        break;
+    case Direction::Left:
+        stream << "Left";
+        break;
+    case Direction::Right:
+        stream << "Right";
+        break;
+    case Direction::None:
+        assert(false);
+        break;
     }
     return stream;
 }

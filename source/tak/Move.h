@@ -1,19 +1,18 @@
 #pragma once
 
-#include "Stone.h"
 #include "Direction.h"
+#include "Stone.h"
 
+#include <cstdint>
 #include <iostream>
 #include <string>
-#include <utility>
 #include <tuple>
-#include <cstdint>
-
+#include <utility>
 
 enum class MoveType
 {
     Place, // (stone)(square)
-    Move // (count)(square)(direction)(drop counts)(stone)
+    Move   // (count)(square)(direction)(drop counts)(stone)
 };
 
 struct Move
@@ -33,9 +32,13 @@ struct Move
     uint32_t mDropCounts{0};
 
     Move() = default;
-    Move(std::size_t index, Stone stone) : mDirection(Direction::None), mIndex(index), mStone(stone) { }
-    Move(std::size_t index, std::size_t count, uint32_t dropCounts, Direction direction) :
-        mDirection(direction), mIndex(index), mCount(count), mDropCounts(dropCounts) { }
+    Move(std::size_t index, Stone stone) : mDirection(Direction::None), mIndex(index), mStone(stone)
+    {
+    }
+    Move(std::size_t index, std::size_t count, uint32_t dropCounts, Direction direction)
+        : mDirection(direction), mIndex(index), mCount(count), mDropCounts(dropCounts)
+    {
+    }
 
     template <typename LambdaT> // Lambda should take a single uint8_t
     void forEachStone(LambdaT lambda) const;
@@ -75,10 +78,7 @@ inline std::ostream& operator<<(std::ostream& stream, const Move& move)
         stream << "Move " << move.mCount << " stones from index " << move.mIndex << " " << move.mDirection;
         stream << " dropping ";
 
-        auto printStone = [&stream](uint8_t dropCount)
-        {
-            stream << static_cast<int>(dropCount) << " ";
-        };
+        auto printStone = [&stream](uint8_t dropCount) { stream << static_cast<int>(dropCount) << " "; };
 
         move.forEachStone(printStone);
         stream << "stones";
@@ -86,8 +86,7 @@ inline std::ostream& operator<<(std::ostream& stream, const Move& move)
     return stream;
 }
 
-template <typename LambdaT>
-inline void Move::forEachStone(LambdaT lambda) const
+template <typename LambdaT> inline void Move::forEachStone(LambdaT lambda) const
 {
     uint32_t dropCountMask = 0xf; // Last four bits set
     uint8_t stonesLeftToDrop = mCount;
@@ -135,10 +134,7 @@ inline std::string moveToPtn(const Move& move, std::size_t size)
         ptn.push_back('1' + rank);
         ptn.push_back(static_cast<char>(move.mDirection));
 
-        auto addCountToPtn = [&ptn](uint8_t count)
-        {
-            ptn.push_back('0' + count);
-        };
+        auto addCountToPtn = [&ptn](uint8_t count) { ptn.push_back('0' + count); };
         move.forEachStone(addCountToPtn);
     }
 
@@ -147,18 +143,17 @@ inline std::string moveToPtn(const Move& move, std::size_t size)
 
 namespace std
 {
-    template <>
-    struct hash<Move>
+template <> struct hash<Move>
+{
+    std::size_t operator()(const Move& move) const
     {
-        std::size_t operator()(const Move& move) const
-        {
-            std::size_t directionHash = std::hash<Direction>{}(move.mDirection);
-            std::size_t indexHash = std::hash<uint8_t>{}(move.mIndex);
-            std::size_t stoneHash = std::hash<Stone>{}(move.mStone);
-            std::size_t countHash = std::hash<uint8_t>{}(move.mCount);
-            std::size_t dropsHash = std::hash<uint32_t>{}(move.mDropCounts);
+        std::size_t directionHash = std::hash<Direction>{}(move.mDirection);
+        std::size_t indexHash = std::hash<uint8_t>{}(move.mIndex);
+        std::size_t stoneHash = std::hash<Stone>{}(move.mStone);
+        std::size_t countHash = std::hash<uint8_t>{}(move.mCount);
+        std::size_t dropsHash = std::hash<uint32_t>{}(move.mDropCounts);
 
-            return directionHash ^ (indexHash << 1) ^ (stoneHash << 2) ^ (countHash << 3) ^ (dropsHash << 4);
-        }
-    };
-}
+        return directionHash ^ (indexHash << 1) ^ (stoneHash << 2) ^ (countHash << 3) ^ (dropsHash << 4);
+    }
+};
+} // namespace std

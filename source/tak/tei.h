@@ -4,11 +4,11 @@
 #include "engine/Engine.h"
 #include "other/StringOps.h"
 
-#include <cstddef>
-#include <vector>
-#include <string>
 #include <cassert>
+#include <cstddef>
 #include <iostream>
+#include <string>
+#include <vector>
 
 Game parseTeiPosition(std::vector<std::string> words, std::size_t size)
 {

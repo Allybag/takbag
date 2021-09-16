@@ -1,12 +1,12 @@
 #pragma once
 
-#include "tcp/TcpClient.h"
 #include "log/Logger.h"
+#include "tcp/TcpClient.h"
 
-#include <vector>
 #include <cstdint>
-#include <thread>
 #include <mutex>
+#include <thread>
+#include <vector>
 
 enum class Colour
 {
@@ -47,61 +47,60 @@ struct PlaytakGame
 enum class PlaytakMessageType : uint8_t
 {
     ConnectionSuccess, // Welcome!
-    ReadyForLogin, // Login or Register
-    LoginSuccess, // Welcome Username!
-    AddGame, // GameList Add
-    RemoveGame, // GameList Remove
-    StartGame, // Game Start
-    GameUpdate, // Game#
-    GameOver, // Game# Over
-    GameTime, // Game# Time
-    AddSeek, // Seek Add
-    RemoveSeek, // Seek remove
-    Observe, // Observer
-    GlobalChat, // Shout
-    ChatJoin, // Joined
-    ChatLeave, // Left
-    RoomChat, // ShoutRoom
-    PrivateChat, // Tell
-    PrivateChatSent, // Told
-    Announcement, // Message
-    Error, // Error
-    OnlineCount, // Online
-    Nak, // NOK
-    Ack, // OK
-
+    ReadyForLogin,     // Login or Register
+    LoginSuccess,      // Welcome Username!
+    AddGame,           // GameList Add
+    RemoveGame,        // GameList Remove
+    StartGame,         // Game Start
+    GameUpdate,        // Game#
+    GameOver,          // Game# Over
+    GameTime,          // Game# Time
+    AddSeek,           // Seek Add
+    RemoveSeek,        // Seek remove
+    Observe,           // Observer
+    GlobalChat,        // Shout
+    ChatJoin,          // Joined
+    ChatLeave,         // Left
+    RoomChat,          // ShoutRoom
+    PrivateChat,       // Tell
+    PrivateChatSent,   // Told
+    Announcement,      // Message
+    Error,             // Error
+    OnlineCount,       // Online
+    Nak,               // NOK
+    Ack,               // OK
 };
 
 inline bool isRelevant(PlaytakMessageType type)
 {
     switch (type)
     {
-        case PlaytakMessageType::StartGame:
-        case PlaytakMessageType::GameUpdate:
-        case PlaytakMessageType::GameOver:
-        case PlaytakMessageType::GameTime:
-            return true;
+    case PlaytakMessageType::StartGame:
+    case PlaytakMessageType::GameUpdate:
+    case PlaytakMessageType::GameOver:
+    case PlaytakMessageType::GameTime:
+        return true;
 
-        case PlaytakMessageType::ConnectionSuccess:
-        case PlaytakMessageType::ReadyForLogin:
-        case PlaytakMessageType::LoginSuccess:
-        case PlaytakMessageType::AddGame:
-        case PlaytakMessageType::RemoveGame:
-        case PlaytakMessageType::AddSeek:
-        case PlaytakMessageType::RemoveSeek:
-        case PlaytakMessageType::Observe:
-        case PlaytakMessageType::GlobalChat:
-        case PlaytakMessageType::ChatJoin:
-        case PlaytakMessageType::ChatLeave:
-        case PlaytakMessageType::RoomChat:
-        case PlaytakMessageType::PrivateChat:
-        case PlaytakMessageType::PrivateChatSent:
-        case PlaytakMessageType::Announcement:
-        case PlaytakMessageType::Error:
-        case PlaytakMessageType::OnlineCount:
-        case PlaytakMessageType::Nak:
-        case PlaytakMessageType::Ack:
-            return false;
+    case PlaytakMessageType::ConnectionSuccess:
+    case PlaytakMessageType::ReadyForLogin:
+    case PlaytakMessageType::LoginSuccess:
+    case PlaytakMessageType::AddGame:
+    case PlaytakMessageType::RemoveGame:
+    case PlaytakMessageType::AddSeek:
+    case PlaytakMessageType::RemoveSeek:
+    case PlaytakMessageType::Observe:
+    case PlaytakMessageType::GlobalChat:
+    case PlaytakMessageType::ChatJoin:
+    case PlaytakMessageType::ChatLeave:
+    case PlaytakMessageType::RoomChat:
+    case PlaytakMessageType::PrivateChat:
+    case PlaytakMessageType::PrivateChatSent:
+    case PlaytakMessageType::Announcement:
+    case PlaytakMessageType::Error:
+    case PlaytakMessageType::OnlineCount:
+    case PlaytakMessageType::Nak:
+    case PlaytakMessageType::Ack:
+        return false;
     }
 }
 
@@ -110,8 +109,12 @@ struct PlaytakMessage
     PlaytakMessageType mType;
     std::string mData;
 
-    explicit PlaytakMessage(PlaytakMessageType type) : PlaytakMessage(type, "") { }
-    PlaytakMessage(PlaytakMessageType type, std::string data) : mType(type), mData(std::move(data)) { }
+    explicit PlaytakMessage(PlaytakMessageType type) : PlaytakMessage(type, "")
+    {
+    }
+    PlaytakMessage(PlaytakMessageType type, std::string data) : mType(type), mData(std::move(data))
+    {
+    }
 };
 
 class PlaytakClient
@@ -133,6 +136,7 @@ class PlaytakClient
     bool mStopping;
     bool send(const std::string& data);
     void ping();
+
 public:
     void stream();
     bool connect(const std::vector<std::string> = {});
@@ -140,7 +144,8 @@ public:
     bool sendMove(const std::string& move);
     std::vector<PlaytakMessage> receiveMessages();
 
-    void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any, const std::string opponent = "");
+    void seek(const GameConfig& gameConfig = defaultConfig, Colour colour = Colour::Any,
+              const std::string opponent = "");
     void acceptSeek(std::size_t gameNum);
 
     PlaytakMessage parseMessage(const std::string& message);

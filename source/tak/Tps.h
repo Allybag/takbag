@@ -62,4 +62,3 @@ Game gameFromTps(const std::string& tpsData, double komi = 0)
 
     return Game(position, ply);
 }
-

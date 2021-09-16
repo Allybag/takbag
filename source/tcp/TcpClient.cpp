@@ -1,10 +1,10 @@
 #include "TcpClient.h"
 
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <netdb.h> // addrinfo
-#include <unistd.h>
 #include <cstring> // memset for some reason
+#include <netdb.h> // addrinfo
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 TcpClient::TcpClient() : mSocket(-1)
 {
@@ -60,7 +60,8 @@ bool TcpClient::connect(const std::string& site, int port)
     return true;
 }
 
-bool TcpClient::send(const std::string& data) {
+bool TcpClient::send(const std::string& data)
+{
     auto sent = ::send(mSocket, data.c_str(), data.length(), 0);
     if (sent == data.length())
         return true;
@@ -103,4 +104,3 @@ bool TcpClient::hasData()
 
     return select(mSocket + 1, &rfds, nullptr, nullptr, &tv);
 }
-

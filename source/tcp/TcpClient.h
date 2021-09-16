@@ -14,6 +14,7 @@ class TcpClient
     Logger mLogger{"TCP"};
 
     bool hasData();
+
 public:
     TcpClient();
     ~TcpClient();
@@ -22,5 +23,8 @@ public:
     bool send(const std::string& data);
     std::string receive();
 
-    bool connected() { return mSocket != -1;}
+    bool connected()
+    {
+        return mSocket != -1;
+    }
 };

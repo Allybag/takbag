@@ -16,26 +16,26 @@ std::string Square::print() const
     std::stringstream output;
     switch (mTopStone)
     {
-        case Stone::Blank:
-            return " ";
-        case Stone::WhiteFlat:
-            output << "F";
-            break;
-        case Stone::BlackFlat:
-            output << "f";
-            break;
-        case Stone::WhiteWall:
-            output << "S";
-            break;
-        case Stone::BlackWall:
-            output << "s";
-            break;
-        case Stone::WhiteCap:
-            output << "C";
-            break;
-        case Stone::BlackCap:
-            output << "c";
-            break;
+    case Stone::Blank:
+        return " ";
+    case Stone::WhiteFlat:
+        output << "F";
+        break;
+    case Stone::BlackFlat:
+        output << "f";
+        break;
+    case Stone::WhiteWall:
+        output << "S";
+        break;
+    case Stone::BlackWall:
+        output << "s";
+        break;
+    case Stone::WhiteCap:
+        output << "C";
+        break;
+    case Stone::BlackCap:
+        output << "c";
+        break;
     }
 
     // TODO: Test this bit twiddling
@@ -66,7 +66,7 @@ void Square::add(Square& source, uint8_t count)
     }
 
     // TODO: Test all this!
-    uint32_t movingMask = (1LL << count ) - 1;
+    uint32_t movingMask = (1LL << count) - 1;
 
     uint32_t movingStones = (source.mStack & movingMask); // Just the stones we need to move
     movingStones = movingStones << mCount;
@@ -135,12 +135,12 @@ void Square::checkValid() const
     assert(topStoneIsBlack == topOfStackIsBlack);
 }
 
-bool Square::operator==(const Square &other) const
+bool Square::operator==(const Square& other) const
 {
     return mTopStone == other.mTopStone && mCount == other.mCount && mStack == other.mStack;
 }
 
-bool Square::operator!=(const Square &other) const
+bool Square::operator!=(const Square& other) const
 {
     return !(*this == other);
 }
