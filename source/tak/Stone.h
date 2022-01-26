@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <concepts>
 #include <iostream>
 
 #include "../other/EnumBitOps.h"
@@ -13,6 +14,34 @@ enum class StoneBits : uint8_t
     Standing = 1 << 3, // Top only pieces, walls or caps
 };
 
+enum class StoneType : uint8_t
+{
+    Blank = 0,
+    Flat = StoneBits::Stone | StoneBits::Road,
+    Wall = StoneBits::Stone | StoneBits::Standing,
+    Cap  = StoneBits::Stone | StoneBits::Road | StoneBits::Standing
+};
+
+inline std::ostream& operator<<(std::ostream& stream, StoneType stoneType)
+{
+    switch (stoneType)
+    {
+    case StoneType::Blank:
+        stream << "No Stone";
+        break;
+    case StoneType::Flat:
+        stream << "Flat";
+        break;
+    case StoneType::Wall:
+        stream << "Wall";
+        break;
+    case StoneType::Cap:
+        stream << "Cap";
+        break;
+    }
+
+    return stream;
+}
 enum class Stone : uint8_t
 {
     Blank = 0,
@@ -53,17 +82,20 @@ inline std::ostream& operator<<(std::ostream& stream, Stone stone)
     return stream;
 }
 
-inline bool isFlat(Stone stone)
+// Not a great way to define a concept
+template <typename StoneT> concept StoneKind = std::same_as<Stone, StoneT> || std::same_as<StoneType, StoneT>;
+
+inline bool isFlat(StoneKind auto stone)
 {
     return (stone & StoneBits::Road) && !(stone & StoneBits::Standing);
 }
 
-inline bool isWall(Stone stone)
+inline bool isWall(StoneKind auto stone)
 {
     return (stone & StoneBits::Standing) && !(stone & StoneBits::Road);
 }
 
-inline bool isCap(Stone stone)
+inline bool isCap(StoneKind auto stone)
 {
     return (stone & StoneBits::Standing) && (stone & StoneBits::Road);
 }

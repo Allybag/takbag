@@ -22,29 +22,20 @@ void Game::play(const std::string& ptnString)
 
 void Game::fillPtn(PtnTurn& ptn)
 {
-    // Only have to set two fields: mTopStone and mIsWallSmash
-    StoneBits colour = StoneBits::Stone;
-    if (mPly > 2)
-        colour = (mPly % 2 == 0) ? StoneBits::Black : StoneBits::Stone;
-    else
-        colour = (mPly % 2 != 0) ? StoneBits::Black : StoneBits::Stone;
-
     if (ptn.mType == MoveType::Place)
     {
-        ptn.mTopStone = static_cast<Stone>(ptn.mTopStone | colour);
         ptn.mIsWallSmash = false; // Should be unnecessary
     }
     else // ptn.mType == MoveType::Move
     {
         std::size_t index = axisToIndex(ptn.mCol, ptn.mRank, mPosition.size());
-        ptn.mTopStone = mPosition[index].mTopStone;
 
         std::size_t finalIndex = index + mPosition.getOffset(ptn.mDirection) * ptn.mDistance;
         Stone finalStone = mPosition[finalIndex].mTopStone;
 
         if (isWall(finalStone))
         {
-            assert(isCap(ptn.mTopStone));
+            assert(isCap(mPosition[index].mTopStone));
             ptn.mIsWallSmash = true;
         }
     }

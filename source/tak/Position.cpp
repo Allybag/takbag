@@ -85,23 +85,21 @@ void Position::place(const Move& place)
     assert(place.mIndex < mSize * mSize);
     assert(mBoard[place.mIndex].mTopStone == Stone::Blank);
 
-    bool stoneIsBlack = place.mStone & StoneBits::Black;
     bool playerIsBlack = (mToPlay == Player::Black);
     Player colour = mToPlay;
     if (mSwaps)
     {
-        assert(stoneIsBlack != playerIsBlack);
-        assert(!(place.mStone & StoneBits::Standing)); // Only allowed to play flats for the first two ply
+        assert(!(place.mStoneType & StoneBits::Standing)); // Only allowed to play flats for the first two ply
         mSwaps--;
         colour = playerIsBlack ? Player::White : Player::Black;
     }
-    else
-        assert(stoneIsBlack == playerIsBlack);
 
-    Square singleStone = Square(place.mStone, 1, stoneIsBlack ? 1 : 0);
+    bool stoneIsBlack = colour == Player::Black;
+    Stone stone = stoneIsBlack ? static_cast<Stone>(place.mStoneType | StoneBits::Black) : static_cast<Stone>(place.mStoneType);
+    Square singleStone = Square(stone, 1, stoneIsBlack ? 1 : 0);
     mBoard[place.mIndex].add(singleStone, 1);
 
-    if (isCap(place.mStone))
+    if (isCap(place.mStoneType))
     {
         assert(mCapReserves[mToPlay]);
         mCapReserves[colour] -= 1;
@@ -153,7 +151,7 @@ void Position::move(const Move& move)
 void Position::play(const PtnTurn& ptn)
 {
     std::size_t index = axisToIndex(ptn.mCol, ptn.mRank, mSize);
-    auto chosenMove = (ptn.mType == MoveType::Place) ? Move(index, ptn.mTopStone)
+    auto chosenMove = (ptn.mType == MoveType::Place) ? Move(index, ptn.mPlacedStoneType)
                                                      : Move(index, ptn.mCount, ptn.mDropCounts, ptn.mDirection);
     play(chosenMove);
 }
@@ -219,17 +217,15 @@ MoveBuffer Position::generateMoves() const
 
 void Position::addPlaceMoves(std::size_t index, MoveBuffer& moves) const
 {
-    StoneBits colour = (mToPlay == Player::Black) ? StoneBits::Black : StoneBits::Stone;
-
     if (mCapReserves[mToPlay])
     {
-        moves.emplace_back(index, static_cast<Stone>(Stone::WhiteCap | colour));
+        moves.emplace_back(index, StoneType::Cap);
     }
 
     if (mFlatReserves[mToPlay])
     {
-        moves.emplace_back(index, static_cast<Stone>(Stone::WhiteFlat | colour));
-        moves.emplace_back(index, static_cast<Stone>(Stone::WhiteWall | colour));
+        moves.emplace_back(index, StoneType::Flat);
+        moves.emplace_back(index, StoneType::Wall);
     }
 }
 
@@ -318,9 +314,8 @@ void Position::generateOpeningMoves(MoveBuffer& moves) const
         const Square& square = mBoard[index];
         if (square.mTopStone == Stone::Blank)
         {
-            Stone stone = (mToPlay == Player::White) ? Stone::BlackFlat : Stone::WhiteFlat;
             assert(square.mCount == 0 && square.mStack == 0);
-            moves.emplace_back(index, stone);
+            moves.emplace_back(index, StoneType::Flat);
         }
     }
 }

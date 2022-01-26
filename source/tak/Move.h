@@ -22,7 +22,7 @@ struct Move
     uint8_t mIndex{0};
 
     // Only for MoveType::Place moves
-    Stone mStone{Stone::Blank};
+    StoneType mStoneType{StoneType::Blank};
 
     // Only for MoveType::Move moves
     uint8_t mCount{0};
@@ -32,7 +32,7 @@ struct Move
     uint32_t mDropCounts{0};
 
     Move() = default;
-    Move(std::size_t index, Stone stone) : mDirection(Direction::None), mIndex(index), mStone(stone)
+    Move(std::size_t index, StoneType stoneType) : mDirection(Direction::None), mIndex(index), mStoneType(stoneType)
     {
     }
     Move(std::size_t index, std::size_t count, uint32_t dropCounts, Direction direction)
@@ -53,8 +53,8 @@ using MoveBuffer = std::vector<Move>;
 
 inline bool operator==(const Move& lhs, const Move& rhs)
 {
-    return std::tie(lhs.mIndex, lhs.mStone, lhs.mCount, lhs.mDropCounts, lhs.mDirection) ==
-           std::tie(rhs.mIndex, rhs.mStone, rhs.mCount, rhs.mDropCounts, rhs.mDirection);
+    return std::tie(lhs.mIndex, lhs.mStoneType, lhs.mCount, lhs.mDropCounts, lhs.mDirection) ==
+           std::tie(rhs.mIndex, rhs.mStoneType, rhs.mCount, rhs.mDropCounts, rhs.mDirection);
 }
 
 inline bool operator!=(const Move& lhs, const Move& rhs)
@@ -64,14 +64,14 @@ inline bool operator!=(const Move& lhs, const Move& rhs)
 
 inline bool isSet(const Move& move)
 {
-    return (move.mDirection != Direction::None || move.mStone != Stone::Blank);
+    return (move.mDirection != Direction::None || move.mStoneType != StoneType::Blank);
 }
 
 inline std::ostream& operator<<(std::ostream& stream, const Move& move)
 {
     if (move.mDirection == Direction::None)
     {
-        stream << "Place a " << move.mStone << " at index " << move.mIndex;
+        stream << "Place a " << move.mStoneType << " at index " << move.mIndex;
     }
     else
     {
@@ -119,9 +119,9 @@ inline std::string moveToPtn(const Move& move, std::size_t size)
 
     if (move.mDirection == Direction::None)
     {
-        if (isCap(move.mStone))
+        if (isCap(move.mStoneType))
             ptn.push_back('C');
-        else if (isWall(move.mStone))
+        else if (isWall(move.mStoneType))
             ptn.push_back('S');
 
         ptn.push_back('a' + col);
@@ -149,7 +149,7 @@ template <> struct hash<Move>
     {
         std::size_t directionHash = std::hash<Direction>{}(move.mDirection);
         std::size_t indexHash = std::hash<uint8_t>{}(move.mIndex);
-        std::size_t stoneHash = std::hash<Stone>{}(move.mStone);
+        std::size_t stoneHash = std::hash<StoneType>{}(move.mStoneType);
         std::size_t countHash = std::hash<uint8_t>{}(move.mCount);
         std::size_t dropsHash = std::hash<uint32_t>{}(move.mDropCounts);
 

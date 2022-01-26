@@ -18,8 +18,10 @@ struct PtnTurn
     uint8_t mDistance{0};
     uint32_t mDropCounts{0};
 
-    // Set by Game
-    Stone mTopStone{Stone::Blank};
+    // Only used for placing
+    StoneType mPlacedStoneType{StoneType::Blank};
+
+    // Set by game
     bool mIsWallSmash{false};
 
     std::string mSourceString; // Can be handy to read a file in and write the same file out
@@ -27,6 +29,25 @@ struct PtnTurn
     PtnTurn(const std::string& sourceString);
     std::string canonicalString() const;
 };
+
+inline StoneType getStoneType(std::string_view ptn) {
+    if (ptn.size() == 3)
+    {
+        switch (std::tolower(ptn[0]))
+        {
+        case 'c':
+            return StoneType::Cap;
+        case 'f':
+            return StoneType::Flat;
+        case 's':
+            return StoneType::Wall;
+        default:
+            assert(false);
+        }
+    }
+
+    return StoneType::Flat;
+}
 
 inline PtnTurn::PtnTurn(const std::string& sourceString) : mSourceString(sourceString)
 {
@@ -45,28 +66,7 @@ inline PtnTurn::PtnTurn(const std::string& sourceString) : mSourceString(sourceS
         mDropCounts = 0;
         mIsWallSmash = false;
 
-        auto stoneBits = static_cast<uint8_t>(StoneBits::Stone);
-        if (sourceString.size() == 3)
-        {
-            switch (std::tolower(sourceString[0]))
-            {
-            case 'c':
-                stoneBits = stoneBits | StoneBits::Standing | StoneBits::Road;
-                break;
-            case 'f':
-                stoneBits = stoneBits | StoneBits::Road;
-                break;
-            case 's':
-                stoneBits = stoneBits | StoneBits::Standing;
-                break;
-            default:
-                assert(false);
-            }
-        }
-        else
-            stoneBits = stoneBits | StoneBits::Road; // If not specified the stone is just a flat
-
-        mTopStone = static_cast<Stone>(stoneBits);
+        mPlacedStoneType = getStoneType(sourceString);
         mCol = std::tolower(sourceString[sourceString.size() - 2]) - 'a';
         mRank = sourceString[sourceString.size() - 1] - '1'; // The 1 rank is the first
         assert(mCol < 8 && mRank < 8);
