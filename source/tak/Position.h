@@ -138,7 +138,7 @@ template <> struct hash<Position>
         std::size_t sizeHash = std::hash<std::size_t>{}(pos.size());
         std::size_t playerHash = std::hash<Player>{}(pos.getPlayer());
 
-        // We won't hash flatReserves or capReservers, as for a given mBoard they should never differ
+        // We won't hash flatReserves or capReserves, as for a given mBoard they should never differ
 
         std::size_t squareCount = pos.size() * pos.size();
         std::size_t boardHash = squareCount;
@@ -155,3 +155,4 @@ template <> struct hash<Position>
 } // namespace std
 
 static_assert(std::is_trivially_copyable_v<Position>);
+static_assert(sizeof(Position) == 520);

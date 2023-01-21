@@ -35,7 +35,7 @@ int main()
         auto generateMovesStartingSixes = [&]() { return pos.generateMoves(); };
         runBenchmark(generateMovesStartingSixes);
 
-        auto startingMove = Move(0, Stone::BlackFlat);
+        auto startingMove = Move(0, StoneType::Flat);
         auto copyAndPlayStartingSixes = [&]() { Position nextPosition(pos); nextPosition.play(startingMove); return nextPosition; };
         runBenchmark(copyAndPlayStartingSixes);
 
@@ -64,7 +64,7 @@ int main()
         auto generateMovesTinueSixes = [&]() { return pos.generateMoves(); };
         runBenchmark(generateMovesTinueSixes);
 
-        auto randomPlace = Move(1, Stone::WhiteFlat); // a1 is occupado
+        auto randomPlace = Move(1, StoneType::Flat); // a1 is occupado
         auto copyAndPlayTinueSixes = [&]() { Position nextPosition(pos); nextPosition.play(randomPlace); return nextPosition; };
         runBenchmark(copyAndPlayTinueSixes);
 

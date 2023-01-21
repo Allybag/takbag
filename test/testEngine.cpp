@@ -25,6 +25,7 @@ int lastSquareEvaluate(const Position& pos)
 
 int main()
 {
+    rootLogger.setLogToStdOut(true);
     using namespace boost::ut;
 
     "Test Basic Search"_test = []

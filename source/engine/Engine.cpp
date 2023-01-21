@@ -218,7 +218,7 @@ Move Engine::deepeningSearch(const Position& position)
 
         move = searchResult.mMove;
         mLogger << LogLevel::Info << "Best move " << moveToPtn(move, position.size()) << " with score "
-                << searchResult.mScore << " at depth " << depth << Flush;
+                << searchResult.mScore << " at depth " << depth << " after seeing " << mStats.mSeenNodes << " nodes"  << Flush;
 
         auto searchDuration = searchStop - searchStart;
         auto searchIncreaseFactor = lastSearchDuration ? searchDuration / lastSearchDuration : 1;
