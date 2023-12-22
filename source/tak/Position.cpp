@@ -96,8 +96,7 @@ void Position::place(const Move& place)
 
     bool stoneIsBlack = colour == Player::Black;
     Stone stone = stoneIsBlack ? static_cast<Stone>(place.mStoneType | StoneBits::Black) : static_cast<Stone>(place.mStoneType);
-    Square singleStone = Square(stone, 1, stoneIsBlack ? 1 : 0);
-    mBoard[place.mIndex].add(singleStone, 1);
+    mBoard[place.mIndex] = Square(stone, 1, stoneIsBlack ? 1 : 0);
 
     if (isCap(place.mStoneType))
     {

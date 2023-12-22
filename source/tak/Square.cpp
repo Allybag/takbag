@@ -79,7 +79,6 @@ void Square::add(Square& source, uint8_t count)
     // We drop from the bottom
     source.mCount -= count;
     source.mStack >>= count;
-    // source.clearBeyondStack(); // Should be unnecessary?
 
     // Deal with the topStones
     if (source.mCount)

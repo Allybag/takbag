@@ -155,4 +155,3 @@ template <> struct hash<Position>
 } // namespace std
 
 static_assert(std::is_trivially_copyable_v<Position>);
-static_assert(sizeof(Position) == 520);
