@@ -46,6 +46,16 @@ struct MoveBuffer
     {
         return &mMoves[mSize];
     }
+    Move* begin()
+    {
+        return &mMoves[0];
+    }
+    Move* end()
+    {
+        return &mMoves[mSize];
+    }
+
+
     using iterator = Move*;
     using const_iterator = const Move*;
     void reserve(std::size_t)
@@ -83,10 +93,10 @@ struct MoveBuffer
         ++mSize;
     }
 
-    void emplace_back(uint8_t index, Stone stone) noexcept
+    void emplace_back(uint8_t index, StoneType stone) noexcept
     {
         mMoves[mSize].mIndex = index;
-        mMoves[mSize].mStone = stone;
+        mMoves[mSize].mStoneType = stone;
         mMoves[mSize].mDirection = Direction::None;
         ++mSize;
     }
