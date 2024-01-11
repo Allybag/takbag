@@ -168,11 +168,6 @@ SearchResult Engine::negamax(const Position& position, Move givenMove, int depth
         nextPosition.play(move);
 
         auto score = negamax(nextPosition, Move(), depth - 1, beta * -1, alpha * -1, colour * -1);
-
-        std::string moveStr = moveToPtn(move, position.size());
-        mLogger << LogLevel::Debug << "Score: " << score.mScore << " after calling negamax: move: " << moveStr
-                << ", depth: " << depth << ", alpha: " << alpha << ", beta: " << beta << ", colour: " << colour
-                << Flush;
         score.mScore *= -1;
 
         if (score.mScore > bestScore)
