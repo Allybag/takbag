@@ -89,7 +89,7 @@ class Engine
 
     const bool mUseAlphaBeta = true;
     const bool mUseMoveOrdering = true;
-    const bool mUseTranspositionTable = false;
+    const bool mUseTranspositionTable = true;
     int mMaxDepth;
 
     const OpeningBook mOpeningBook;

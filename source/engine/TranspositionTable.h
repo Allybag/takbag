@@ -54,7 +54,7 @@ public:
 
 public:
     std::optional<TranspositionTableRecord> fetch(const Position& position, std::size_t depth) const;
-    void store(const Position& position, Move move, int score, uint8_t depth);
+    void store(const Position& position, Move move, int score, uint8_t depth, ResultType type);
 
     std::size_t count() const;
 };

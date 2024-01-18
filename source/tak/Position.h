@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HashCombine.h"
 #include "Move.h"
 #include "Player.h"
 #include "Result.h"
@@ -138,18 +139,15 @@ template <> struct hash<Position>
         std::size_t sizeHash = std::hash<std::size_t>{}(pos.size());
         std::size_t playerHash = std::hash<Player>{}(pos.getPlayer());
 
-        // We won't hash flatReserves or capReserves, as for a given mBoard they should never differ
-
         std::size_t squareCount = pos.size() * pos.size();
         std::size_t boardHash = squareCount;
         for (std::size_t index = 0; index < squareCount; ++index)
         {
             auto square = pos[index];
-            boardHash ^= (std::hash<Square>()(square) + 0x9e3779b9) + (boardHash << 6) + (boardHash >> 2);
+            boardHash = hash_combine(boardHash, square);
         }
 
-        std::size_t komiHash = std::hash<double>{}(pos.getKomi());
-        return boardHash ^ (playerHash << 1) ^ (sizeHash << 2) ^ (komiHash << 3);
+        return hash_combine(sizeHash, playerHash, boardHash);
     }
 };
 } // namespace std

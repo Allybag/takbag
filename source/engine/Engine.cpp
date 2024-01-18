@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <optional>
 
-static constexpr int winValue = 1000;
+static constexpr int winValue = 10000;
 static constexpr int infinity = 100001; // Not really infinity, but pretty high
 
 EvaluationWeights gDefaultEvaluationWeights = EvaluationWeights{8, 12, 9, 1, 1, 1, 4};
@@ -100,13 +100,30 @@ SearchResult Engine::negamax(const Position& position, Move givenMove, int depth
 {
     ++mStats.mSeenNodes;
 
+    auto originalAlpha = alpha;
     if (mUseTranspositionTable)
     {
         auto record = mTranspositionTable.fetch(position, depth);
         if (record)
         {
             ++mStats.mTableHits;
-            return {record->mMove, record->mScore};
+            switch (record->mType)
+            {
+            case ResultType::Exact:
+                return {record->mMove, record->mScore};
+            case ResultType::LowerBound:
+                alpha = std::max(alpha, record->mScore);
+                break;
+            case ResultType::UpperBound:
+                beta = std::min(beta, record->mScore);
+                break;
+            case Unknown:
+                break;
+            }
+
+            if (alpha >= beta) {
+                return {record->mMove, record->mScore};
+            }
         }
     }
 
@@ -115,20 +132,16 @@ SearchResult Engine::negamax(const Position& position, Move givenMove, int depth
     {
         ++mStats.mTerminalNodes;
 
-        int score = evaluateResult(result);
-        if (mUseTranspositionTable)
-            mTranspositionTable.store(position, Move(), colour * score, depth);
-        return SearchResult(colour * score * (depth + 1));
+        int score = evaluateResult(result) * colour * (depth + 1);
+        return SearchResult(score);
     }
 
     if (depth == 0)
     {
         ++mStats.mEvaluatedNodes;
 
-        int score = mEvaluator(position);
-        if (mUseTranspositionTable)
-            mTranspositionTable.store(position, Move(), colour * score, depth);
-        return SearchResult(colour * score);
+        int score = mEvaluator(position) * colour;
+        return SearchResult(score);
     }
 
     Move bestMove = Move();
@@ -189,7 +202,10 @@ SearchResult Engine::negamax(const Position& position, Move givenMove, int depth
     }
 
     if (mUseTranspositionTable)
-        mTranspositionTable.store(position, bestMove, bestScore, depth);
+    {
+        auto resultType = bestScore <= originalAlpha ? ResultType::UpperBound : bestScore >= beta ? ResultType::LowerBound : ResultType::Exact;
+        mTranspositionTable.store(position, bestMove, bestScore, depth, resultType);
+    }
 
     return {bestMove, bestScore};
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HashCombine.h"
 #include "Stone.h"
 
 #include <cstddef>
@@ -58,7 +59,7 @@ template <> struct hash<Square>
         std::size_t stoneHash = std::hash<Stone>{}(square.mTopStone);
         std::size_t countHash = std::hash<uint8_t>{}(square.mCount);
         std::size_t stackHash = std::hash<uint32_t>{}(square.mStack);
-        return stoneHash ^ (countHash << 1) ^ (stackHash << 2);
+        return hash_combine(stoneHash, countHash, stackHash);
     }
 };
 } // namespace std

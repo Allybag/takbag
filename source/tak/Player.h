@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <tak/HashCombine.h>
 
 enum class Player : uint8_t
 {
@@ -60,7 +61,7 @@ template <typename ValueType> struct hash<PlayerPair<ValueType>>
     {
         std::size_t whiteHash = std::hash<ValueType>{}(pair.White);
         std::size_t blackHash = std::hash<ValueType>{}(pair.Black);
-        return whiteHash ^ (blackHash << 1);
+        return hash_combine(whiteHash, blackHash);
     }
 };
 } // namespace std

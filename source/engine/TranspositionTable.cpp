@@ -5,8 +5,7 @@ std::optional<TranspositionTableRecord> TranspositionTable::fetch(const Position
     auto hash = std::hash<Position>{}(position);
     auto record = (*mTable)[hash % sTableSize];
 
-    // TODO: Using >= causes the engine to give up if it sees a loss further ahead in the table
-    if (record.mHash == hash && record.mDepth == depth)
+    if (record.mHash == hash && record.mDepth >= depth)
     {
         return record;
     }
@@ -14,7 +13,7 @@ std::optional<TranspositionTableRecord> TranspositionTable::fetch(const Position
     return std::nullopt;
 }
 
-void TranspositionTable::store(const Position& position, Move move, int score, uint8_t depth)
+void TranspositionTable::store(const Position& position, Move move, int score, uint8_t depth, ResultType type)
 {
     auto hash = std::hash<Position>{}(position);
     auto& record = (*mTable)[hash % sTableSize];
@@ -22,7 +21,7 @@ void TranspositionTable::store(const Position& position, Move move, int score, u
     if (record.mHash == hash && record.mDepth >= depth)
         return;
 
-    record = {hash, move, score, depth, ResultType::Unknown};
+    record = {hash, move, score, depth, type};
 }
 
 std::size_t TranspositionTable::count() const
