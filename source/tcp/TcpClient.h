@@ -8,7 +8,7 @@
 
 class TcpClient
 {
-    char mReceiveBuffer[1024];
+    char mReceiveBuffer[8192];
     int mSocket;
 
     Logger mLogger{"TCP"};
